@@ -114,29 +114,86 @@ Plans:
 
 ---
 
-### Phase 6: Polish, QA & Iterate
-**Goal:** Review toàn bộ app trong AI Studio, fix issues, polish UI, ensure tất cả flows hoạt động end-to-end
+### Phase 6A: Critical UX Fixes
+**Goal:** Fix userflow issues identified in real user testing — simplify landing, fix analyzing screen, merge analysis modes, improve UX copy
 
-**Requirements:** All (cross-cutting)
+**Source:** User testing feedback — 2026-03-15 (Issues UX-1 through UX-6)
+
+**Plans:** TBD
+
+Plans:
+- [ ] 6A-01-PLAN.md — Landing simplification: remove/replace "Generate Design" card, simplify action button labels on DNA Card
+- [ ] 6A-02-PLAN.md — Analyzing screen: keep uploaded image visible, skeleton only analysis content, add scan effect
+- [ ] 6A-03-PLAN.md — Parallel analysis: merge Quick/Deep into single "Full Analysis" call, fix Visual DNA data loss, progressive reveal
+- [ ] 6A-04-PLAN.md — UX copy overhaul: replace jargon ("SHIFT+B Dimensions", "Specificity Level") with user-friendly language
 
 **Success Criteria:**
-- [ ] End-to-end flow: Upload → Analyze → DNA Card → Create → Generated Image → Download
-- [ ] End-to-end flow: Upload 2-5 → Compare → Winning Formula → Generate from Formula
-- [ ] UI consistent dark mode across all screens
-- [ ] No broken states or dead-end flows
-- [ ] Error handling for upload failures, generation failures
+- [ ] Landing has 2 clear actions (Analyze + Compare) + optional "My Designs" (if 6C done)
+- [ ] Analyzing screen shows uploaded image with scan animation, only skeletons DNA content
+- [ ] Single "Analyze" action runs both Visual + Buyer DNA in parallel
+- [ ] Visual DNA data persists when Buyer DNA completes
+- [ ] All technical jargon replaced with plain language
 
-**Deliverable:** `.planning/deliverables/QA-CHECKLIST.md` + iteration prompts
+**Deliverable:** Build prompts for each fix task
+
+---
+
+### Phase 6B: Generation Screen Redesign + POD Quality
+**Goal:** Redesign Generation screen from scratch (via `/design:screen-create`), add image reference to generation API, enforce POD print-ready output quality
+
+**Source:** User testing feedback — UX-6, FEAT-1, FEAT-3
+
+**Plans:** TBD
+
+Plans:
+- [ ] 6B-01-PLAN.md — `/design:screen-create` for new Generation screen: simplify 15+ controls into preset-based wizard
+- [ ] 6B-02-PLAN.md — POD quality prompt constraints: flat illustration, white bg, no effects, print-ready
+- [ ] 6B-03-PLAN.md — Image reference in generation: send original image + analysis DNA as generation context
+
+**Success Criteria:**
+- [ ] Generation screen is intuitive for new users (≤5 interactive elements visible)
+- [ ] Generated artwork: flat illustration, clean lines, white/transparent background
+- [ ] Generated artwork matches reference image style (POD-standard)
+- [ ] Original image is used as style reference during generation
+- [ ] No surface effects, lighting, 3D, glass, or photorealistic elements in output
+
+**Reference:** See `.planning/deliverables/reference-pod-artwork/` for desired output style
+
+**Deliverable:** Screen design spec + build prompts
+
+---
+
+### Phase 6C: History & Persistence
+**Goal:** Add client-side persistence so users can view past analyses and generated designs
+
+**Source:** User testing feedback — FEAT-2
+
+**Plans:** TBD
+
+Plans:
+- [ ] 6C-01-PLAN.md — localStorage persistence layer: save/load analysis results + generated images
+- [ ] 6C-02-PLAN.md — "My Designs" UI on Landing: grid of saved designs with quick-view
+
+**Success Criteria:**
+- [ ] Analysis results persist across page refresh (localStorage)
+- [ ] Generated images saved with their DNA context
+- [ ] "My Designs" section on Landing shows saved items (max 10-20)
+- [ ] User can delete saved items
+- [ ] Graceful fallback when localStorage is full
+
+**Deliverable:** Build prompts for persistence layer + UI
 
 ---
 
 ## Phase Summary
 
-| Phase | Name | Requirements | Deliverable |
-|-------|------|-------------|-------------|
-| 1 | UI/UX Style Definition | APP-02, APP-04 | STYLE-GUIDE.md |
-| 2 | AI Studio Configuration | Foundation | AI-STUDIO-CONFIG.md |
-| 3 | Build Prompt: Shell + F1 | APP-01,03,04 + F1-* | BUILD-PROMPT-SHELL-F1.md |
-| 4 | Build Prompt: F2 | F2-* | BUILD-PROMPT-F2.md |
-| 5 | Build Prompt: F3 | F3-* | BUILD-PROMPT-F3.md |
-| 6 | Polish & QA | All | QA-CHECKLIST.md |
+| Phase | Name | Requirements | Deliverable | Status |
+|-------|------|-------------|-------------|--------|
+| 1 | UI/UX Style Definition | APP-02, APP-04 | STYLE-GUIDE.md | ✅ Done |
+| 2 | AI Studio Configuration | Foundation | AI-STUDIO-CONFIG.md | ✅ Done |
+| 3 | Build Prompt: Shell + F1 | APP-01,03,04 + F1-* | BUILD-PROMPT-SHELL-F1.md | ✅ Done |
+| 4 | Build Prompt: F2 | F2-* | BUILD-PROMPT-F2.md | ✅ Done |
+| 5 | Build Prompt: F3 | F3-* | BUILD-PROMPT-F3.md | ✅ Done |
+| 6A | Critical UX Fixes | UX-1..6 | Build prompts | 🔲 Planned |
+| 6B | Generation Redesign + POD Quality | UX-6, FEAT-1, FEAT-3 | Screen spec + build prompts | 🔲 Planned |
+| 6C | History & Persistence | FEAT-2 | Build prompts | 🔲 Planned |
