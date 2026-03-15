@@ -1,0 +1,17 @@
+{
+    "mode": "yolo",
+    "depth": "standard",
+    "parallelization": true,
+    "commit_docs": true,
+    "model_profile": "balanced",
+    "workflow": {
+        "research": false,
+        "plan_check": false,
+        "verifier": true
+    },
+    "notes": {
+        "research": "Skip — already have 2 deep research sessions in .planning/research/",
+        "plan_check": "Skip — phases are prompt-creation, not complex code",
+        "verifier": "Keep — need to verify AI Studio output matches requirements"
+    }
+}
