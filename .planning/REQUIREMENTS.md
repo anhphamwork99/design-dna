@@ -66,4 +66,4 @@
 | APP-01..04 | Phase 3 | ● Complete |
 | F1-01..14 | Phase 3 | ● Complete |
 | F2-01..08 | Phase 4 | ● Complete |
-| F3-01..06 | Phase 5 | ○ Pending |
+| F3-01..06 | Phase 5 | ● Complete |

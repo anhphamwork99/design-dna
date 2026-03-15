@@ -100,15 +100,15 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md — Batch Compare UI scaffold, API wiring, fix templates
+- [x] 05-01-PLAN.md — Batch Compare UI scaffold, API wiring, fix templates
 
 **Success Criteria:**
-- [ ] Upload 2-5 images interface hoạt động
-- [ ] Visual pattern analysis across designs
-- [ ] Buyer Overlap Map hiển thị đúng
-- [ ] "Made For Me" patterns identified
-- [ ] Winning Formula output với actionable brief
-- [ ] "Generate from Formula" routes đúng sang F2
+- [x] Upload 2-5 images interface hoạt động
+- [x] Visual pattern analysis across designs
+- [x] Buyer Overlap Map hiển thị đúng
+- [x] "Made For Me" patterns identified
+- [x] Winning Formula output với actionable brief
+- [x] "Generate from Formula" routes đúng sang F2
 
 **Deliverable:** `.planning/deliverables/BUILD-PROMPT-F3.md`
 
