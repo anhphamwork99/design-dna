@@ -55,15 +55,15 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 03-01-PLAN.md — App scaffold prompt (mock data) + API wiring prompt + fix templates
+- [x] 03-01-PLAN.md — App scaffold prompt (mock data) + API wiring prompt + fix templates
 
 **Success Criteria:**
-- [ ] Build prompt tạo được landing screen với 3 actions
-- [ ] Upload image flow hoạt động
-- [ ] Analysis mode selection (Quick Scan / Deep Analysis) 
-- [ ] DNA Card UI hiển thị đúng 2 tabs (Visual + Buyer)
-- [ ] Loading states during analysis
-- [ ] Dark mode styling theo Phase 1 style guide
+- [x] Build prompt tạo được landing screen với 3 actions
+- [x] Upload image flow hoạt động
+- [x] Analysis mode selection (Quick Scan / Deep Analysis) 
+- [x] DNA Card UI hiển thị đúng 2 tabs (Visual + Buyer)
+- [x] Loading states during analysis
+- [x] Dark mode styling theo Phase 1 style guide
 
 **Deliverable:** `.planning/deliverables/BUILD-PROMPT-SHELL-F1.md`
 
