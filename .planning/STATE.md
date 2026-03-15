@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 | 4 | Build Prompt: F2 | ● Complete | 100% |
 | 5 | Build Prompt: F3 | ● Complete | 100% |
 | 6 | Polish & QA | ○ Pending | 0% |
-| 6A | Critical UX Fixes | ◐ In Progress | 50% |
+| 6A | Critical UX Fixes | ◐ In Progress | 75% |
 
 ## Research & References
 
@@ -49,9 +49,9 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 
 ## Session Continuity
 
-Last session: 2026-03-15T20:36
-Stopped at: Phase 6A plan 02 complete, plans 03-04 pending
+Last session: 2026-03-15T20:38
+Stopped at: Phase 6A plan 03 complete, plan 04 pending
 Resume file: —
 
 ---
-*Last updated: 2026-03-15 after 6A-02 completion*
+*Last updated: 2026-03-15 after 6A-03 completion*
