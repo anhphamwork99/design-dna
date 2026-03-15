@@ -1,0 +1,561 @@
+import React, { useState } from 'react';
+import { motion } from 'motion/react';
+import { ArrowLeft, Download, Sparkles, AlertCircle, X, Settings, Paintbrush, Loader2 } from 'lucide-react';
+import { generateDesignImage, analyzeBuyerFit } from './api';
+
+// ── Types ──────────────────────────────────────────────────────────
+interface CreativeStudioProps {
+    key?: string;
+    analysisResult: any;
+    uploadedImage: { data: string; name: string; type: string } | null;
+    onNavigate: (screen: any) => void;
+    prefilledBrief?: string;
+    initialGenMode?: string;
+}
+
+interface ShiftState {
+    keep: boolean;
+    value: string;
+}
+
+interface Shifts {
+    S: ShiftState;
+    H: ShiftState;
+    I: ShiftState;
+    F: ShiftState;
+    T: ShiftState;
+    B: ShiftState;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+function getInitialShifts(initialGenMode?: string, prefilledBrief?: string): Shifts {
+    if (prefilledBrief) {
+        return {
+            S: { keep: false, value: prefilledBrief },
+            H: { keep: false, value: '' },
+            I: { keep: false, value: '' },
+            F: { keep: false, value: '' },
+            T: { keep: false, value: '' },
+            B: { keep: false, value: '' },
+        };
+    }
+    if (initialGenMode === 'new_buyer') {
+        return {
+            S: { keep: true, value: '' },
+            H: { keep: true, value: '' },
+            I: { keep: true, value: '' },
+            F: { keep: true, value: '' },
+            T: { keep: false, value: '' },
+            B: { keep: false, value: '' },
+        };
+    }
+    // Default: same buyer, new design
+    return {
+        S: { keep: false, value: '' },
+        H: { keep: false, value: '' },
+        I: { keep: true, value: '' },
+        F: { keep: true, value: '' },
+        T: { keep: true, value: '' },
+        B: { keep: true, value: '' },
+    };
+}
+
+function getInitialCreativity(prefilledBrief?: string): number {
+    return prefilledBrief ? 3 : 2;
+}
+
+const creativityLabels: Record<number, string> = {
+    1: "Closely follows the original DNA",
+    2: "Keeps themes, reinterprets freely",
+    3: "Recognizable roots, new direction",
+    4: "Loose inspiration only",
+    5: "Completely new, emotional core only"
+};
+
+const creativityLevelNames: Record<number, string> = {
+    1: 'Faithful',
+    2: 'Inspired',
+    3: 'Remixed',
+    4: 'Original',
+    5: 'Radical',
+};
+
+const dimensionConfig = [
+    { key: 'S' as const, name: 'Visual Style', placeholder: 'e.g., Watercolor landscape' },
+    { key: 'H' as const, name: 'Colors', placeholder: 'e.g., Cool blues and teals' },
+    { key: 'I' as const, name: 'Graphics', placeholder: 'e.g., Cat instead of dog' },
+    { key: 'F' as const, name: 'Typography', placeholder: 'e.g., Bold hand-lettered' },
+    { key: 'T' as const, name: 'Theme & Mood', placeholder: 'e.g., Calm serenity' },
+    { key: 'B' as const, name: 'Audience', placeholder: 'e.g., Yoga moms 30-40' },
+];
+
+// ── Main Component ────────────────────────────────────────────────
+export default function CreativeStudio({
+    analysisResult,
+    uploadedImage,
+    onNavigate,
+    prefilledBrief,
+    initialGenMode,
+}: CreativeStudioProps) {
+    // ── State ──
+    const [creativity, setCreativity] = useState<number>(() => getInitialCreativity(prefilledBrief));
+    const [shifts, setShifts] = useState<Shifts>(() => getInitialShifts(initialGenMode, prefilledBrief));
+    const [appliedPattern, setAppliedPattern] = useState<string | null>(prefilledBrief || null);
+
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [showResult, setShowResult] = useState(false);
+    const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+    const [buyerFitScores, setBuyerFitScores] = useState<any>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    // ── Prompt construction ──
+    const constructPrompt = () => {
+        let prompt = "Generate a new design based on these specifications. Provide exactly ONE image.\n\n";
+
+        prompt += "Visual Direction:\n";
+        if (shifts.S.keep) prompt += `- Visual Style: Use original DNA (${analysisResult?.visual_dna?.graphics?.style || 'N/A'})\n`;
+        else prompt += `- Visual Style: ${shifts.S.value || 'New visual style'}\n`;
+
+        if (shifts.H.keep) prompt += `- Colors: Use original DNA (${analysisResult?.visual_dna?.color?.harmony || 'N/A'})\n`;
+        else prompt += `- Colors: ${shifts.H.value || 'New color palette'}\n`;
+
+        if (shifts.I.keep) prompt += `- Graphics: Use original DNA (${analysisResult?.visual_dna?.graphics?.primary_element || 'N/A'})\n`;
+        else prompt += `- Graphics: ${shifts.I.value || 'New graphics'}\n`;
+
+        if (shifts.F.keep) prompt += `- Typography: Use original DNA (${analysisResult?.visual_dna?.typography?.fonts?.[0]?.classification || 'N/A'})\n`;
+        else prompt += `- Typography: ${shifts.F.value || 'New typography'}\n`;
+
+        prompt += "\nBuyer Targeting:\n";
+        if (shifts.T.keep) prompt += `- Theme & Mood: Use original DNA\n`;
+        else prompt += `- Theme & Mood: ${shifts.T.value || 'New theme'}\n`;
+
+        if (shifts.B.keep) prompt += `- Audience: Use original persona (${analysisResult?.buyer_dna?.persona?.age_range || 'N/A'}, ${analysisResult?.buyer_dna?.identity_signals?.tribe || 'N/A'})\n`;
+        else prompt += `- Audience: ${shifts.B.value || 'New target audience'}\n`;
+
+        if (appliedPattern) {
+            prompt += `\nApplied Pattern/Inspiration: ${appliedPattern}\n`;
+        }
+
+        prompt += `\nCreativity Level: ${creativity}/5 (${creativityLabels[creativity]}).\n`;
+
+        return prompt;
+    };
+
+    // ── Handlers ──
+    const handleGenerate = async () => {
+        const apiKey = localStorage.getItem('designdna_api_key');
+        if (!apiKey) {
+            window.dispatchEvent(new CustomEvent('open-settings'));
+            return;
+        }
+
+        setIsGenerating(true);
+        setShowResult(false);
+        setError(null);
+
+        try {
+            const prompt = constructPrompt();
+            const imageBase64 = await generateDesignImage(apiKey, prompt);
+            setGeneratedImage(imageBase64);
+
+            const fitScores = await analyzeBuyerFit(apiKey, prompt);
+            setBuyerFitScores(fitScores);
+
+            setShowResult(true);
+        } catch (err: any) {
+            console.error(err);
+            let errMsg = err.message || "An unexpected error occurred.";
+            if (errMsg.includes('403') || errMsg.includes('API key not valid')) {
+                errMsg = "Invalid API Key. Please check your settings.";
+            }
+            setError(errMsg);
+            setShowResult(true);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleNewDesign = () => {
+        setShowResult(false);
+        setGeneratedImage(null);
+        setBuyerFitScores(null);
+        setError(null);
+    };
+
+    const handleDownload = () => {
+        if (!generatedImage) return;
+        const a = document.createElement('a');
+        a.href = generatedImage;
+        a.download = 'designdna-generation.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
+    const handleRemovePattern = () => {
+        setAppliedPattern(null);
+        // Do NOT clear user-typed dimension inputs — preserve their work
+    };
+
+    // ── Derived data ──
+    const style = analysisResult?.visual_dna?.graphics?.style;
+    const harmony = analysisResult?.visual_dna?.color?.harmony;
+    const tribe = analysisResult?.buyer_dna?.identity_signals?.tribe;
+    const emotion = analysisResult?.buyer_dna?.emotional_triggers?.primary_emotion;
+
+    const allKeep = dimensionConfig.every(dim => shifts[dim.key].keep);
+
+    // ── Render ──
+    return (
+        <div className="flex flex-col h-screen bg-bg-base">
+            {/* ── Topbar ── */}
+            <div className="h-12 flex items-center justify-between px-4 border-b border-border-default flex-shrink-0 bg-bg-surface1">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => onNavigate(prefilledBrief ? 'compare_results' : 'results')}
+                        className="flex items-center text-text-secondary hover:text-text-primary text-[13px] font-medium transition-colors gap-1.5"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back
+                    </button>
+                    <div className="w-px h-5 bg-border-default" />
+                    <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded ai-gradient" />
+                        <span className="text-[14px] font-semibold">Creative Studio</span>
+                    </div>
+                </div>
+                <button
+                    onClick={() => document.dispatchEvent(new CustomEvent('open-settings'))}
+                    className="text-text-tertiary hover:text-text-primary transition-colors p-1.5 rounded-lg hover:bg-bg-surface2"
+                    aria-label="Settings"
+                >
+                    <Settings className="w-4 h-4" />
+                </button>
+            </div>
+
+            {/* ── 3-Panel Layout ── */}
+            <div className="flex flex-1 overflow-hidden">
+
+                {/* ═══ LEFT PANEL: Configuration ═══ */}
+                <div
+                    className="w-[280px] flex-shrink-0 border-r border-border-default overflow-y-auto p-4 space-y-3 bg-bg-surface1/50"
+                    role="form"
+                    aria-label="Design configuration"
+                >
+                    {/* ── Your Original ── */}
+                    <div className="bg-bg-surface2/50 p-3 rounded-xl border border-border-default">
+                        <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-2">
+                            Your Original
+                        </div>
+                        {uploadedImage && (
+                            <img
+                                src={uploadedImage.data}
+                                alt={uploadedImage.name}
+                                className="w-[80px] h-[80px] rounded-lg object-cover border border-border-default mb-2"
+                            />
+                        )}
+                        <div className="text-[13px] font-medium truncate mb-2">
+                            {uploadedImage?.name || 'Untitled'}
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                            {style && <span className="bg-bg-surface2 px-2 py-0.5 rounded text-[11px] text-text-secondary">{style}</span>}
+                            {harmony && <span className="bg-bg-surface2 px-2 py-0.5 rounded text-[11px] text-text-secondary">{harmony}</span>}
+                            {tribe && <span className="bg-bg-surface2 px-2 py-0.5 rounded text-[11px] text-text-secondary">{tribe}</span>}
+                            {emotion && <span className="bg-bg-surface2 px-2 py-0.5 rounded text-[11px] text-text-secondary">{emotion}</span>}
+                        </div>
+                    </div>
+
+                    {/* ── How Different? (Creativity Level) ── */}
+                    <div className="bg-bg-surface1 p-4 rounded-xl border border-border-default">
+                        <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-3">
+                            How Different?
+                        </div>
+                        <input
+                            type="range"
+                            min="1"
+                            max="5"
+                            step="1"
+                            value={creativity}
+                            onChange={(e) => setCreativity(parseInt(e.target.value))}
+                            className="w-full accent-accent h-1.5 bg-bg-surface2 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <div className="flex justify-between text-[10px] text-text-tertiary mt-2 font-medium">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                                <span key={n} className={n === creativity ? 'text-accent font-semibold' : ''}>
+                                    {creativityLevelNames[n]}
+                                </span>
+                            ))}
+                        </div>
+                        <div className="text-[12px] text-text-secondary mt-3 text-center bg-bg-surface2 py-1.5 rounded-lg">
+                            {creativityLabels[creativity]}
+                        </div>
+                    </div>
+
+                    {/* ── What to Change (6 Dimensions) ── */}
+                    <div className="bg-bg-surface1 p-4 rounded-xl border border-border-default">
+                        <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-3">
+                            What to Change
+                        </div>
+
+                        {allKeep && (
+                            <div className="text-[12px] text-text-tertiary bg-bg-surface2/50 p-2 rounded-lg mb-3 text-center" role="status">
+                                All set to Keep — result will closely follow the original.
+                            </div>
+                        )}
+
+                        <div className="space-y-1">
+                            {dimensionConfig.map((dim) => {
+                                const state = shifts[dim.key];
+                                return (
+                                    <div
+                                        key={dim.key}
+                                        className="py-2 border-b border-border-default/30 last:border-0"
+                                    >
+                                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                                            <span className="text-[13px] font-medium flex-shrink-0">
+                                                {dim.name}
+                                            </span>
+                                            <div className="flex items-center bg-bg-surface2 p-0.5 rounded-full border border-border-default">
+                                                <button
+                                                    onClick={() =>
+                                                        setShifts((s) => ({
+                                                            ...s,
+                                                            [dim.key]: { ...s[dim.key], keep: true },
+                                                        }))
+                                                    }
+                                                    className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-accent ${state.keep
+                                                        ? 'bg-bg-surface1 text-text-primary shadow-sm'
+                                                        : 'text-text-secondary hover:text-text-primary'
+                                                        }`}
+                                                >
+                                                    Keep
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        setShifts((s) => ({
+                                                            ...s,
+                                                            [dim.key]: { ...s[dim.key], keep: false },
+                                                        }))
+                                                    }
+                                                    className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-accent ${!state.keep
+                                                        ? 'bg-accent text-white shadow-sm'
+                                                        : 'text-text-secondary hover:text-text-primary'
+                                                        }`}
+                                                >
+                                                    Change
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {!state.keep && (
+                                            <input
+                                                type="text"
+                                                placeholder={dim.placeholder}
+                                                value={state.value}
+                                                onChange={(e) =>
+                                                    setShifts((s) => ({
+                                                        ...s,
+                                                        [dim.key]: { ...s[dim.key], value: e.target.value },
+                                                    }))
+                                                }
+                                                className="w-full bg-bg-surface2 border border-border-default rounded-lg px-3 py-1.5 text-[12px] text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                                            />
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* ── Applied Patterns ── */}
+                    <div className="bg-bg-surface1 p-4 rounded-xl border border-border-default">
+                        <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-3">
+                            Applied Patterns
+                        </div>
+
+                        {appliedPattern ? (
+                            <div className="flex flex-wrap gap-1.5">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-accent/10 text-accent text-[11px] rounded-lg border border-accent/20 max-w-full">
+                                    <span className="truncate max-w-[180px]">{appliedPattern}</span>
+                                    <button
+                                        onClick={handleRemovePattern}
+                                        className="flex-shrink-0 hover:text-white transition-colors rounded-full"
+                                        aria-label={`Remove pattern`}
+                                    >
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            </div>
+                        ) : (
+                            <button
+                                disabled
+                                className="px-3 py-1.5 text-[12px] text-text-tertiary bg-bg-surface2 rounded-lg border border-border-default opacity-50 cursor-not-allowed"
+                                title="Pattern library coming in Phase 7C"
+                            >
+                                + Add Pattern
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* ═══ CENTER CANVAS: Artwork + Actions ═══ */}
+                <div
+                    className="flex-1 flex flex-col items-center justify-center p-6 overflow-hidden relative"
+                    role="main"
+                    style={{
+                        background: 'linear-gradient(180deg, hsl(222 47% 9%) 0%, hsl(222 47% 7%) 100%)',
+                        boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3), inset 0 0 20px rgba(0,0,0,0.1)',
+                    }}
+                >
+                    {isGenerating ? (
+                        /* ── Loading State ── */
+                        <div className="flex flex-col items-center justify-center text-center">
+                            <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default flex items-center justify-center mb-5">
+                                <Loader2 className="w-6 h-6 text-accent animate-spin" />
+                            </div>
+                            <h2 className="text-[16px] font-semibold mb-1.5">Creating your design...</h2>
+                            <p className="text-text-tertiary text-[13px]">
+                                This usually takes 15–30 seconds
+                            </p>
+                        </div>
+                    ) : showResult && error ? (
+                        /* ── Error State ── */
+                        <div className="flex flex-col items-center justify-center text-center max-w-[400px]">
+                            <div className="bg-error/10 border border-error/20 p-6 rounded-xl w-full">
+                                <AlertCircle className="w-8 h-8 text-error mx-auto mb-3" />
+                                <h3 className="text-error font-medium mb-2">Generation Failed</h3>
+                                <p className="text-text-secondary text-[14px] mb-4">{error}</p>
+                                <button
+                                    onClick={handleGenerate}
+                                    className="px-5 py-2.5 ai-gradient text-white rounded-lg text-[14px] font-medium hover:opacity-90 transition-opacity"
+                                >
+                                    Try Again
+                                </button>
+                            </div>
+                        </div>
+                    ) : showResult && generatedImage ? (
+                        /* ── Generated Artwork ── */
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.98 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="flex flex-col items-center justify-center max-w-full max-h-full"
+                        >
+                            <img
+                                src={generatedImage}
+                                alt="Generated Design"
+                                className="max-w-full max-h-[calc(100vh-200px)] object-contain rounded-xl border border-border-default shadow-lg"
+                            />
+                            <div className="flex gap-3 mt-4">
+                                <button
+                                    onClick={handleNewDesign}
+                                    className="px-4 py-2 bg-bg-surface1 border border-border-default rounded-lg text-[13px] font-medium hover:bg-bg-surface2 transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent"
+                                >
+                                    <Sparkles className="w-3.5 h-3.5" /> Create New Design
+                                </button>
+                                <button
+                                    onClick={handleDownload}
+                                    className="px-4 py-2 bg-bg-surface1 border border-border-default rounded-lg text-[13px] font-medium hover:bg-bg-surface2 transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent"
+                                >
+                                    <Download className="w-3.5 h-3.5" /> Download
+                                </button>
+                            </div>
+                        </motion.div>
+                    ) : (
+                        /* ── Empty State (Create Design CTA) ── */
+                        <div className="flex flex-col items-center justify-center text-center max-w-[320px]">
+                            <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default/50 flex items-center justify-center mb-5">
+                                <Paintbrush className="w-6 h-6 text-text-tertiary" />
+                            </div>
+                            <h2 className="text-[16px] font-medium text-text-secondary mb-1.5">Ready to create</h2>
+                            <p className="text-text-tertiary text-[13px] mb-6 leading-relaxed">
+                                Configure your design on the left, then create
+                            </p>
+                            <button
+                                onClick={handleGenerate}
+                                disabled={isGenerating}
+                                className="px-6 py-2.5 ai-gradient text-white rounded-lg font-medium text-[14px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center gap-2"
+                            >
+                                <Sparkles className="w-4 h-4" />
+                                Create Design
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* ═══ RIGHT PANEL: Buyer Fit ═══ */}
+                <div
+                    className="w-[300px] flex-shrink-0 border-l border-border-default overflow-y-auto p-4 bg-bg-surface1/50"
+                    role="complementary"
+                    aria-label="Buyer fit evaluation"
+                >
+                    {showResult && !error && buyerFitScores ? (
+                        <motion.div
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="space-y-4"
+                        >
+                            <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">
+                                Buyer Fit
+                            </div>
+                            <div className="bg-bg-surface2 p-4 rounded-xl border border-border-default space-y-4">
+                                {/* Buyer Match */}
+                                <div>
+                                    <div className="flex justify-between text-[13px] mb-1.5">
+                                        <span className="text-text-secondary">Buyer Match</span>
+                                        <span className="text-text-primary font-medium">{buyerFitScores.buyer_match || 0}%</span>
+                                    </div>
+                                    <div className="h-2 w-full bg-bg-surface1 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-success rounded-full transition-all duration-1000"
+                                            style={{ width: `${buyerFitScores.buyer_match || 0}%` }}
+                                        />
+                                    </div>
+                                </div>
+                                {/* Emotion Match */}
+                                <div>
+                                    <div className="flex justify-between text-[13px] mb-1.5">
+                                        <span className="text-text-secondary">Emotion Match</span>
+                                        <span className="text-text-primary font-medium">{buyerFitScores.emotion_match || 0}%</span>
+                                    </div>
+                                    <div className="h-2 w-full bg-bg-surface1 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-success rounded-full transition-all duration-1000"
+                                            style={{ width: `${buyerFitScores.emotion_match || 0}%` }}
+                                        />
+                                    </div>
+                                </div>
+                                {/* Originality */}
+                                <div>
+                                    <div className="flex justify-between text-[13px] mb-1.5">
+                                        <span className="text-text-secondary">Originality</span>
+                                        <span className="text-text-primary font-medium">{buyerFitScores.originality || 0}%</span>
+                                    </div>
+                                    <div className="h-2 w-full bg-bg-surface1 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-accent rounded-full transition-all duration-1000"
+                                            style={{ width: `${buyerFitScores.originality || 0}%` }}
+                                        />
+                                    </div>
+                                </div>
+                                {/* Made For Me */}
+                                <div className="pt-2 border-t border-border-default">
+                                    <div className="flex justify-between text-[13px]">
+                                        <span className="text-text-secondary">"Made For Me" Signals</span>
+                                        <span className="text-text-primary font-medium">{buyerFitScores.made_for_me_signal_count || 0}/5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ) : (
+                        /* Empty right panel */
+                        <div className="h-full flex items-center justify-center">
+                            <p className="text-[12px] text-text-tertiary text-center">
+                                Buyer Fit scores will appear here after you create a design
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
