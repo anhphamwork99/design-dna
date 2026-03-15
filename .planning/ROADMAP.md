@@ -77,16 +77,16 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 04-01-PLAN.md — Generation UI scaffold, API wiring, fix templates
+- [x] 04-01-PLAN.md — Generation UI scaffold, API wiring, fix templates
 
 **Success Criteria:**
-- [ ] 3 generation modes hoạt động (Same Buyer / New Buyer / Full Remix)
-- [ ] Creativity Level slider (5 levels) ảnh hưởng prompt generation
-- [ ] SHIFT+B controls với 6 dimensions (keep/change toggles + text input)
-- [ ] AI generates image và hiển thị result
-- [ ] Buyer Fit analysis hiển thị scores
-- [ ] Chat refinement multi-turn hoạt động  
-- [ ] Download button hoạt động
+- [x] 3 generation modes hoạt động (Same Buyer / New Buyer / Full Remix)
+- [x] Creativity Level slider (5 levels) ảnh hưởng prompt generation
+- [x] SHIFT+B controls với 6 dimensions (keep/change toggles + text input)
+- [x] AI generates image và hiển thị result
+- [x] Buyer Fit analysis hiển thị scores
+- [x] Chat refinement multi-turn hoạt động  
+- [x] Download button hoạt động
 
 **Deliverable:** `.planning/deliverables/BUILD-PROMPT-F2.md`
 
