@@ -11,7 +11,8 @@
     },
     "notes": {
         "research": "Skip — already have 2 deep research sessions in .planning/research/",
-        "plan_check": "Skip — phases are prompt-creation, not complex code",
-        "verifier": "Keep — need to verify AI Studio output matches requirements"
+        "plan_check": "Skip — tasks are well-defined UX fixes",
+        "verifier": "Keep — need to verify output matches requirements",
+        "build_method": "Direct code implementation (was: AI Studio build prompts through Phase 5)"
     }
 }
