@@ -52,6 +52,11 @@ Plans:
 
 **Requirements:** APP-01, APP-03, APP-04, F1-01..F1-14
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 03-01-PLAN.md — App scaffold prompt (mock data) + API wiring prompt + fix templates
+
 **Success Criteria:**
 - [ ] Build prompt tạo được landing screen với 3 actions
 - [ ] Upload image flow hoạt động
