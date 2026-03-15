@@ -74,6 +74,11 @@ Plans:
 
 **Requirements:** F2-01..F2-08
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 04-01-PLAN.md — Generation UI scaffold, API wiring, fix templates
+
 **Success Criteria:**
 - [ ] 3 generation modes hoạt động (Same Buyer / New Buyer / Full Remix)
 - [ ] Creativity Level slider (5 levels) ảnh hưởng prompt generation
