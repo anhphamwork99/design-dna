@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { ArrowLeft, Download, Sparkles, AlertCircle, X, Settings, Paintbrush, Loader2 } from 'lucide-react';
-import { generateDesignImage, analyzeBuyerFit } from './api';
+import { motion, AnimatePresence } from 'motion/react';
+import { ArrowLeft, ArrowRight, Download, Sparkles, AlertCircle, X, Settings, Paintbrush, Loader2, RefreshCw, RotateCcw } from 'lucide-react';
+import { synthesizeConcept, generateArtwork, analyzeBuyerFit, SynthesizedConcept } from './api';
 
 // ── Types ──────────────────────────────────────────────────────────
 interface CreativeStudioProps {
@@ -101,72 +101,87 @@ export default function CreativeStudio({
     const [creativity, setCreativity] = useState<number>(() => getInitialCreativity(prefilledBrief));
     const [shifts, setShifts] = useState<Shifts>(() => getInitialShifts(initialGenMode, prefilledBrief));
     const [appliedPattern, setAppliedPattern] = useState<string | null>(prefilledBrief || null);
+    const [aspectRatio, setAspectRatio] = useState('1:1');
 
+    // Synthesis state
+    const [concepts, setConcepts] = useState<SynthesizedConcept[]>([]);
+    const [carouselIndex, setCarouselIndex] = useState(0);
+    const [selectedConceptIndex, setSelectedConceptIndex] = useState(0);
+    const [isSynthesizing, setIsSynthesizing] = useState(false);
+
+    // Generation state
     const [isGenerating, setIsGenerating] = useState(false);
     const [showResult, setShowResult] = useState(false);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [buyerFitScores, setBuyerFitScores] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // ── Prompt construction ──
-    const constructPrompt = () => {
-        let prompt = "Generate a new design based on these specifications. Provide exactly ONE image.\n\n";
-
-        prompt += "Visual Direction:\n";
-        if (shifts.S.keep) prompt += `- Visual Style: Use original DNA (${analysisResult?.visual_dna?.graphics?.style || 'N/A'})\n`;
-        else prompt += `- Visual Style: ${shifts.S.value || 'New visual style'}\n`;
-
-        if (shifts.H.keep) prompt += `- Colors: Use original DNA (${analysisResult?.visual_dna?.color?.harmony || 'N/A'})\n`;
-        else prompt += `- Colors: ${shifts.H.value || 'New color palette'}\n`;
-
-        if (shifts.I.keep) prompt += `- Graphics: Use original DNA (${analysisResult?.visual_dna?.graphics?.primary_element || 'N/A'})\n`;
-        else prompt += `- Graphics: ${shifts.I.value || 'New graphics'}\n`;
-
-        if (shifts.F.keep) prompt += `- Typography: Use original DNA (${analysisResult?.visual_dna?.typography?.fonts?.[0]?.classification || 'N/A'})\n`;
-        else prompt += `- Typography: ${shifts.F.value || 'New typography'}\n`;
-
-        prompt += "\nBuyer Targeting:\n";
-        if (shifts.T.keep) prompt += `- Theme & Mood: Use original DNA\n`;
-        else prompt += `- Theme & Mood: ${shifts.T.value || 'New theme'}\n`;
-
-        if (shifts.B.keep) prompt += `- Audience: Use original persona (${analysisResult?.buyer_dna?.persona?.age_range || 'N/A'}, ${analysisResult?.buyer_dna?.identity_signals?.tribe || 'N/A'})\n`;
-        else prompt += `- Audience: ${shifts.B.value || 'New target audience'}\n`;
-
-        if (appliedPattern) {
-            prompt += `\nApplied Pattern/Inspiration: ${appliedPattern}\n`;
-        }
-
-        prompt += `\nCreativity Level: ${creativity}/5 (${creativityLabels[creativity]}).\n`;
-
-        return prompt;
-    };
-
     // ── Handlers ──
-    const handleGenerate = async () => {
+
+    const handleSynthesize = async () => {
         const apiKey = localStorage.getItem('designdna_api_key');
         if (!apiKey) {
             window.dispatchEvent(new CustomEvent('open-settings'));
             return;
         }
 
-        setIsGenerating(true);
+        setIsSynthesizing(true);
+        setError(null);
+        setConcepts([]);
         setShowResult(false);
+        setGeneratedImage(null);
+        setBuyerFitScores(null);
+
+        try {
+            const result = await synthesizeConcept(apiKey, {
+                originalDna: analysisResult,
+                shifts,
+                creativity,
+                appliedPattern: appliedPattern || undefined,
+            });
+            setConcepts(result);
+            setCarouselIndex(0);
+        } catch (err: any) {
+            console.error(err);
+            let errMsg = err.message || 'Failed to create concepts';
+            if (errMsg.includes('403') || errMsg.includes('API key not valid')) {
+                errMsg = 'Invalid API Key. Please check your settings.';
+            }
+            setError(errMsg);
+        } finally {
+            setIsSynthesizing(false);
+        }
+    };
+
+    const handleGenerateArtwork = async () => {
+        const apiKey = localStorage.getItem('designdna_api_key');
+        if (!apiKey || concepts.length === 0) return;
+
+        const selectedConcept = concepts[carouselIndex];
+        setIsGenerating(true);
         setError(null);
 
         try {
-            const prompt = constructPrompt();
-            const imageBase64 = await generateDesignImage(apiKey, prompt);
+            const imageBase64 = await generateArtwork(apiKey, {
+                concept: selectedConcept,
+                originalImage: uploadedImage?.data || '',
+                originalMimeType: uploadedImage?.type || 'image/png',
+                aspectRatio,
+                creativity,
+            });
             setGeneratedImage(imageBase64);
+            setSelectedConceptIndex(carouselIndex);
 
-            const fitScores = await analyzeBuyerFit(apiKey, prompt);
-            setBuyerFitScores(fitScores);
+            // Run buyer fit scoring (fire-and-forget with state update)
+            const fitPrompt = `${selectedConcept.title}: ${selectedConcept.description}. Visual: ${selectedConcept.visualDirection}. Target: ${selectedConcept.targetBuyer}`;
+            analyzeBuyerFit(apiKey, fitPrompt).then(setBuyerFitScores).catch(console.error);
 
             setShowResult(true);
         } catch (err: any) {
             console.error(err);
-            let errMsg = err.message || "An unexpected error occurred.";
+            let errMsg = err.message || 'Failed to generate artwork';
             if (errMsg.includes('403') || errMsg.includes('API key not valid')) {
-                errMsg = "Invalid API Key. Please check your settings.";
+                errMsg = 'Invalid API Key. Please check your settings.';
             }
             setError(errMsg);
             setShowResult(true);
@@ -175,18 +190,40 @@ export default function CreativeStudio({
         }
     };
 
-    const handleNewDesign = () => {
+    // 3 retry tiers
+    const handleRegenerateArtwork = () => {
         setShowResult(false);
         setGeneratedImage(null);
         setBuyerFitScores(null);
         setError(null);
+        // Trigger artwork generation with same concept
+        setTimeout(() => handleGenerateArtwork(), 0);
+    };
+
+    const handleTryDifferentConcept = () => {
+        setShowResult(false);
+        setGeneratedImage(null);
+        setBuyerFitScores(null);
+        setError(null);
+        // Concepts are still cached — show carousel
+    };
+
+    const handleStartOver = () => {
+        setShowResult(false);
+        setGeneratedImage(null);
+        setBuyerFitScores(null);
+        setConcepts([]);
+        setError(null);
+        // Returns to empty state with "Create Concepts" CTA
     };
 
     const handleDownload = () => {
         if (!generatedImage) return;
+        const conceptTitle = concepts[selectedConceptIndex]?.title || 'design';
+        const slug = conceptTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
         const a = document.createElement('a');
         a.href = generatedImage;
-        a.download = 'designdna-generation.png';
+        a.download = `designdna-${slug}.png`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -194,7 +231,6 @@ export default function CreativeStudio({
 
     const handleRemovePattern = () => {
         setAppliedPattern(null);
-        // Do NOT clear user-typed dimension inputs — preserve their work
     };
 
     // ── Derived data ──
@@ -204,6 +240,253 @@ export default function CreativeStudio({
     const emotion = analysisResult?.buyer_dna?.emotional_triggers?.primary_emotion;
 
     const allKeep = dimensionConfig.every(dim => shifts[dim.key].keep);
+
+    // ── Center Canvas State Machine ──
+    const renderCenterCanvas = () => {
+        // 1. Synthesis loading
+        if (isSynthesizing) {
+            return (
+                <div className="flex flex-col items-center justify-center text-center">
+                    <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default flex items-center justify-center mb-5">
+                        <Loader2 className="w-6 h-6 text-accent animate-spin" />
+                    </div>
+                    <h2 className="text-[16px] font-semibold mb-1.5">Creating concepts...</h2>
+                    <p className="text-text-tertiary text-[13px]">
+                        AI is synthesizing 3 design directions
+                    </p>
+                </div>
+            );
+        }
+
+        // 2. Artwork loading
+        if (isGenerating) {
+            return (
+                <div className="flex flex-col items-center justify-center text-center">
+                    <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default flex items-center justify-center mb-5">
+                        <Loader2 className="w-6 h-6 text-accent animate-spin" />
+                    </div>
+                    <h2 className="text-[16px] font-semibold mb-1.5">Generating artwork...</h2>
+                    <p className="text-text-tertiary text-[13px]">
+                        This usually takes 15–30 seconds
+                    </p>
+                </div>
+            );
+        }
+
+        // 3. Error state
+        if (showResult && error) {
+            return (
+                <div className="flex flex-col items-center justify-center text-center max-w-[400px]">
+                    <div className="bg-error/10 border border-error/20 p-6 rounded-xl w-full">
+                        <AlertCircle className="w-8 h-8 text-error mx-auto mb-3" />
+                        <h3 className="text-error font-medium mb-2">Generation Failed</h3>
+                        <p className="text-text-secondary text-[14px] mb-4">{error}</p>
+                        <div className="flex gap-2 justify-center">
+                            {concepts.length > 0 ? (
+                                <button
+                                    onClick={handleTryDifferentConcept}
+                                    className="px-5 py-2.5 ai-gradient text-white rounded-lg text-[14px] font-medium hover:opacity-90 transition-opacity"
+                                >
+                                    Back to Concepts
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleSynthesize}
+                                    className="px-5 py-2.5 ai-gradient text-white rounded-lg text-[14px] font-medium hover:opacity-90 transition-opacity"
+                                >
+                                    Try Again
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // 4. Artwork display + retry buttons
+        if (showResult && generatedImage) {
+            return (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex flex-col items-center justify-center max-w-full max-h-full"
+                >
+                    <img
+                        src={generatedImage}
+                        alt="Generated Design"
+                        className="max-w-full max-h-[calc(100vh-240px)] object-contain rounded-xl border border-border-default shadow-lg"
+                    />
+                    {/* Primary actions */}
+                    <div className="flex gap-3 mt-4">
+                        <button
+                            onClick={handleDownload}
+                            className="px-4 py-2 bg-bg-surface1 border border-border-default rounded-lg text-[13px] font-medium hover:bg-bg-surface2 transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent"
+                        >
+                            <Download className="w-3.5 h-3.5" /> Download
+                        </button>
+                    </div>
+                    {/* Retry tiers */}
+                    <div className="flex gap-1 mt-3">
+                        <button
+                            onClick={handleRegenerateArtwork}
+                            className="px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5 rounded-lg hover:bg-bg-surface1/60"
+                        >
+                            <RefreshCw className="w-3 h-3" /> Regenerate
+                        </button>
+                        <button
+                            onClick={handleTryDifferentConcept}
+                            className="px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5 rounded-lg hover:bg-bg-surface1/60"
+                        >
+                            <RotateCcw className="w-3 h-3" /> Try Different Concept
+                        </button>
+                        <button
+                            onClick={handleStartOver}
+                            className="px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5 rounded-lg hover:bg-bg-surface1/60"
+                        >
+                            <Sparkles className="w-3 h-3" /> Start Over
+                        </button>
+                    </div>
+                </motion.div>
+            );
+        }
+
+        // 5. Concept carousel
+        if (concepts.length > 0) {
+            const concept = concepts[carouselIndex];
+            return (
+                <div className="flex flex-col items-center justify-center max-w-[520px] w-full">
+                    {/* Carousel header */}
+                    <div className="flex items-center gap-4 mb-4 text-text-tertiary text-[12px]">
+                        <span>Concept {carouselIndex + 1} of {concepts.length}</span>
+                    </div>
+
+                    {/* Concept card */}
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={carouselIndex}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.2 }}
+                            className="bg-bg-surface1 border border-border-default rounded-xl p-6 w-full"
+                        >
+                            <h3 className="text-[18px] font-semibold mb-3">{concept.title}</h3>
+                            <p className="text-[14px] text-text-secondary mb-4 leading-relaxed">
+                                {concept.description}
+                            </p>
+
+                            <div className="space-y-3">
+                                <div>
+                                    <span className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">
+                                        Visual Direction
+                                    </span>
+                                    <p className="text-[13px] text-text-primary mt-1">
+                                        {concept.visualDirection}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">
+                                        Target Buyer
+                                    </span>
+                                    <p className="text-[13px] text-text-primary mt-1">
+                                        {concept.targetBuyer}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">
+                                        Why It Works
+                                    </span>
+                                    <p className="text-[13px] text-text-primary mt-1">
+                                        {concept.coherenceNotes}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Key Elements chips */}
+                            {concept.keyElements && concept.keyElements.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-border-default/30">
+                                    {concept.keyElements.map((el, i) => (
+                                        <span key={i} className="bg-bg-surface2 px-2 py-0.5 rounded text-[11px] text-text-secondary">
+                                            {el}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+
+                    {/* Arrow navigation + dots */}
+                    <div className="flex items-center gap-3 mt-4">
+                        <button
+                            onClick={() => setCarouselIndex(i => Math.max(0, i - 1))}
+                            disabled={carouselIndex === 0}
+                            className="p-2 rounded-lg bg-bg-surface1 border border-border-default text-text-secondary hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            aria-label="Previous concept"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                        </button>
+
+                        <div className="flex gap-1.5">
+                            {concepts.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setCarouselIndex(i)}
+                                    className={`w-2 h-2 rounded-full transition-colors ${i === carouselIndex ? 'bg-accent' : 'bg-bg-surface2 hover:bg-text-tertiary'}`}
+                                    aria-label={`Go to concept ${i + 1}`}
+                                />
+                            ))}
+                        </div>
+
+                        <button
+                            onClick={() => setCarouselIndex(i => Math.min(concepts.length - 1, i + 1))}
+                            disabled={carouselIndex === concepts.length - 1}
+                            className="p-2 rounded-lg bg-bg-surface1 border border-border-default text-text-secondary hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            aria-label="Next concept"
+                        >
+                            <ArrowRight className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex gap-3 mt-5">
+                        <button
+                            onClick={handleGenerateArtwork}
+                            className="px-6 py-2.5 ai-gradient text-white rounded-lg font-medium text-[14px] shadow-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+                        >
+                            <Paintbrush className="w-4 h-4" /> Generate Artwork
+                        </button>
+                        <button
+                            onClick={handleStartOver}
+                            className="px-4 py-2.5 bg-bg-surface1 border border-border-default rounded-lg text-[13px] font-medium hover:bg-bg-surface2 transition-colors flex items-center gap-2"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5" /> Regenerate All
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // 6. Empty state — Create Concepts CTA
+        return (
+            <div className="flex flex-col items-center justify-center text-center max-w-[320px]">
+                <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default/50 flex items-center justify-center mb-5">
+                    <Paintbrush className="w-6 h-6 text-text-tertiary" />
+                </div>
+                <h2 className="text-[16px] font-medium text-text-secondary mb-1.5">Ready to create</h2>
+                <p className="text-text-tertiary text-[13px] mb-6 leading-relaxed">
+                    Configure your design on the left, then create concepts
+                </p>
+                <button
+                    onClick={handleSynthesize}
+                    disabled={isSynthesizing}
+                    className="px-6 py-2.5 ai-gradient text-white rounded-lg font-medium text-[14px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center gap-2"
+                >
+                    <Sparkles className="w-4 h-4" />
+                    Create Concepts
+                </button>
+            </div>
+        );
+    };
 
     // ── Render ──
     return (
@@ -348,18 +631,21 @@ export default function CreativeStudio({
                                         </div>
 
                                         {!state.keep && (
-                                            <input
-                                                type="text"
-                                                placeholder={dim.placeholder}
-                                                value={state.value}
-                                                onChange={(e) =>
-                                                    setShifts((s) => ({
-                                                        ...s,
-                                                        [dim.key]: { ...s[dim.key], value: e.target.value },
-                                                    }))
-                                                }
-                                                className="w-full bg-bg-surface2 border border-border-default rounded-lg px-3 py-1.5 text-[12px] text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
-                                            />
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    placeholder={dim.placeholder}
+                                                    value={state.value}
+                                                    onChange={(e) =>
+                                                        setShifts((s) => ({
+                                                            ...s,
+                                                            [dim.key]: { ...s[dim.key], value: e.target.value },
+                                                        }))
+                                                    }
+                                                    className="w-full bg-bg-surface2 border border-border-default rounded-lg px-3 py-1.5 text-[12px] text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                                                />
+                                                <p className="text-[10px] text-text-tertiary mt-1">Leave empty to let AI decide</p>
+                                            </div>
                                         )}
                                     </div>
                                 );
@@ -396,9 +682,28 @@ export default function CreativeStudio({
                             </button>
                         )}
                     </div>
+
+                    {/* ── Output Size (Aspect Ratio) ── */}
+                    <div className="bg-bg-surface1 p-4 rounded-xl border border-border-default">
+                        <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-3">
+                            Output Size
+                        </div>
+                        <select
+                            value={aspectRatio}
+                            onChange={(e) => setAspectRatio(e.target.value)}
+                            className="w-full bg-bg-surface2 border border-border-default rounded-lg px-3 py-2 text-[13px] text-text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all cursor-pointer"
+                        >
+                            <option value="1:1">1:1 — Square</option>
+                            <option value="4:5">4:5 — Portrait</option>
+                            <option value="3:4">3:4 — Portrait Tall</option>
+                            <option value="4:3">4:3 — Landscape</option>
+                            <option value="16:9">16:9 — Wide</option>
+                            <option value="9:16">9:16 — Tall</option>
+                        </select>
+                    </div>
                 </div>
 
-                {/* ═══ CENTER CANVAS: Artwork + Actions ═══ */}
+                {/* ═══ CENTER CANVAS: Concepts + Artwork ═══ */}
                 <div
                     className="flex-1 flex flex-col items-center justify-center p-6 overflow-hidden relative"
                     role="main"
@@ -407,79 +712,7 @@ export default function CreativeStudio({
                         boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3), inset 0 0 20px rgba(0,0,0,0.1)',
                     }}
                 >
-                    {isGenerating ? (
-                        /* ── Loading State ── */
-                        <div className="flex flex-col items-center justify-center text-center">
-                            <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default flex items-center justify-center mb-5">
-                                <Loader2 className="w-6 h-6 text-accent animate-spin" />
-                            </div>
-                            <h2 className="text-[16px] font-semibold mb-1.5">Creating your design...</h2>
-                            <p className="text-text-tertiary text-[13px]">
-                                This usually takes 15–30 seconds
-                            </p>
-                        </div>
-                    ) : showResult && error ? (
-                        /* ── Error State ── */
-                        <div className="flex flex-col items-center justify-center text-center max-w-[400px]">
-                            <div className="bg-error/10 border border-error/20 p-6 rounded-xl w-full">
-                                <AlertCircle className="w-8 h-8 text-error mx-auto mb-3" />
-                                <h3 className="text-error font-medium mb-2">Generation Failed</h3>
-                                <p className="text-text-secondary text-[14px] mb-4">{error}</p>
-                                <button
-                                    onClick={handleGenerate}
-                                    className="px-5 py-2.5 ai-gradient text-white rounded-lg text-[14px] font-medium hover:opacity-90 transition-opacity"
-                                >
-                                    Try Again
-                                </button>
-                            </div>
-                        </div>
-                    ) : showResult && generatedImage ? (
-                        /* ── Generated Artwork ── */
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.98 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="flex flex-col items-center justify-center max-w-full max-h-full"
-                        >
-                            <img
-                                src={generatedImage}
-                                alt="Generated Design"
-                                className="max-w-full max-h-[calc(100vh-200px)] object-contain rounded-xl border border-border-default shadow-lg"
-                            />
-                            <div className="flex gap-3 mt-4">
-                                <button
-                                    onClick={handleNewDesign}
-                                    className="px-4 py-2 bg-bg-surface1 border border-border-default rounded-lg text-[13px] font-medium hover:bg-bg-surface2 transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent"
-                                >
-                                    <Sparkles className="w-3.5 h-3.5" /> Create New Design
-                                </button>
-                                <button
-                                    onClick={handleDownload}
-                                    className="px-4 py-2 bg-bg-surface1 border border-border-default rounded-lg text-[13px] font-medium hover:bg-bg-surface2 transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent"
-                                >
-                                    <Download className="w-3.5 h-3.5" /> Download
-                                </button>
-                            </div>
-                        </motion.div>
-                    ) : (
-                        /* ── Empty State (Create Design CTA) ── */
-                        <div className="flex flex-col items-center justify-center text-center max-w-[320px]">
-                            <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default/50 flex items-center justify-center mb-5">
-                                <Paintbrush className="w-6 h-6 text-text-tertiary" />
-                            </div>
-                            <h2 className="text-[16px] font-medium text-text-secondary mb-1.5">Ready to create</h2>
-                            <p className="text-text-tertiary text-[13px] mb-6 leading-relaxed">
-                                Configure your design on the left, then create
-                            </p>
-                            <button
-                                onClick={handleGenerate}
-                                disabled={isGenerating}
-                                className="px-6 py-2.5 ai-gradient text-white rounded-lg font-medium text-[14px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center gap-2"
-                            >
-                                <Sparkles className="w-4 h-4" />
-                                Create Design
-                            </button>
-                        </div>
-                    )}
+                    {renderCenterCanvas()}
                 </div>
 
                 {/* ═══ RIGHT PANEL: Buyer Fit ═══ */}
@@ -545,12 +778,25 @@ export default function CreativeStudio({
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Selected concept info */}
+                            {concepts[selectedConceptIndex] && (
+                                <div className="bg-bg-surface2 p-4 rounded-xl border border-border-default">
+                                    <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-2">
+                                        Selected Concept
+                                    </div>
+                                    <h4 className="text-[14px] font-medium mb-1">{concepts[selectedConceptIndex].title}</h4>
+                                    <p className="text-[12px] text-text-secondary leading-relaxed">
+                                        {concepts[selectedConceptIndex].description}
+                                    </p>
+                                </div>
+                            )}
                         </motion.div>
                     ) : (
                         /* Empty right panel */
                         <div className="h-full flex items-center justify-center">
                             <p className="text-[12px] text-text-tertiary text-center">
-                                Buyer Fit scores will appear here after you create a design
+                                Buyer Fit scores will appear here after you generate artwork
                             </p>
                         </div>
                     )}
