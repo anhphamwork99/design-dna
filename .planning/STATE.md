@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** Giúp POD sellers hiểu CHÍNH XÁC tại sao design bán tốt — visual + buyer psychology — rồi tạo original designs
-**Current focus:** Phase 6 — Polish & QA
+**Current focus:** Phase 6A — Critical UX Fixes
 
 ## Current Phase
 
 | Field | Value |
 |-------|-------|
-| Phase | 6 |
-| Name | Polish & QA |
-| Status | ○ Pending |
-| Started | — |
+| Phase | 6A |
+| Name | Critical UX Fixes |
+| Status | ◐ In Progress |
+| Started | 2026-03-15 |
 | Completed | — |
 
 ## Phase Progress
@@ -27,6 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 | 4 | Build Prompt: F2 | ● Complete | 100% |
 | 5 | Build Prompt: F3 | ● Complete | 100% |
 | 6 | Polish & QA | ○ Pending | 0% |
+| 6A | Critical UX Fixes | ◐ In Progress | 25% |
 
 ## Research & References
 
@@ -48,9 +49,9 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 
 ## Session Continuity
 
-Last session: 2026-03-15T18:28
-Stopped at: Phase 5 complete, Phase 6 ready
+Last session: 2026-03-15T20:35
+Stopped at: Phase 6A plan 01 complete, plans 02-04 pending
 Resume file: —
 
 ---
-*Last updated: 2026-03-15 after Phase 1 completion*
+*Last updated: 2026-03-15 after 6A-01 completion*
