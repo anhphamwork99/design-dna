@@ -31,6 +31,11 @@ Plans:
 
 **Requirements:** Foundation cho tất cả F1/F2/F3 features
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 02-01-PLAN.md — Create AI-STUDIO-CONFIG.md with System Instructions (embedded style guide), JSON schemas, model mapping, prompt templates
+
 **Success Criteria:**
 - [ ] System Instructions draft hoàn thiện (role, capabilities, constraints, output formats)
 - [ ] JSON schemas cho DNA analysis output (Visual DNA + Buyer DNA)  
