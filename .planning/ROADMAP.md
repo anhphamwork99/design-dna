@@ -11,6 +11,11 @@
 
 **Requirements:** APP-02, APP-04 (partial)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 01-01-PLAN.md — Create comprehensive STYLE-GUIDE.md with all design tokens, component patterns, layout specs, and quick reference table
+
 **Success Criteria:**
 - [ ] Color palette (dark mode) defined với HEX codes
 - [ ] Typography system chọn (Google Fonts) 
