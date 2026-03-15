@@ -34,14 +34,14 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md — Create AI-STUDIO-CONFIG.md with System Instructions (embedded style guide), JSON schemas, model mapping, prompt templates
+- [x] 02-01-PLAN.md — Create AI-STUDIO-CONFIG.md with System Instructions (condensed style guide), JSON schemas, model mapping, prompt templates
 
 **Success Criteria:**
-- [ ] System Instructions draft hoàn thiện (role, capabilities, constraints, output formats)
-- [ ] JSON schemas cho DNA analysis output (Visual DNA + Buyer DNA)  
-- [ ] JSON schemas cho Batch Compare output
-- [ ] Model selection mapping documented
-- [ ] AI Studio settings guide (model, framework, instructions)
+- [x] System Instructions draft hoàn thiện (role, capabilities, constraints, output formats)
+- [x] JSON schemas cho DNA analysis output (Visual DNA + Buyer DNA)  
+- [x] JSON schemas cho Batch Compare output
+- [x] Model selection mapping documented
+- [x] AI Studio settings guide (model, framework, instructions)
 
 **Deliverable:** `.planning/deliverables/AI-STUDIO-CONFIG.md`
 
