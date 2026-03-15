@@ -97,6 +97,11 @@ Plans:
 
 **Requirements:** F3-01..F3-06
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 05-01-PLAN.md — Batch Compare UI scaffold, API wiring, fix templates
+
 **Success Criteria:**
 - [ ] Upload 2-5 images interface hoạt động
 - [ ] Visual pattern analysis across designs
