@@ -103,7 +103,7 @@ Plans:
 
 ---
 
-### Phase 7B: Concept Synthesis + POD-Ready Generation
+### Phase 7B: Concept Synthesis + POD-Ready Generation ✅
 **Goal:** Implement mandatory AI synthesis step (concept creation) + multimodal generation with POD quality enforcement
 
 **Requirements:** F2-06, F2-07, F2-08, F2-09, F2-10, F2-11, F2-12
@@ -111,23 +111,23 @@ Plans:
 **Architecture context:** TRƯỚC KHI generate artwork, AI phải synthesize original DNA + modifications + applied patterns thành 1 unified concept. Generation gửi concept + original image (multimodal) + POD constraints.
 
 Plans:
-- [ ] 7B-01-PLAN.md — `synthesizeConcept()` API function + concept review UI card
-- [ ] 7B-02-PLAN.md — Multimodal `generateArtwork()` (text + image) + POD prompt constraints
-- [ ] 7B-03-PLAN.md — Chat refinement + download + aspect ratio selection
+- [x] 7B-01-PLAN.md — `synthesizeConcept()` + `generateArtwork()` API functions (multimodal, POD-enforced)
+- [x] 7B-02-PLAN.md — Concept carousel UI, retry tiers, aspect ratio dropdown
 
 **Success Criteria:**
-- [ ] "Create Concept" → AI returns SynthesizedConcept (title, description, visual direction, buyer target, coherence notes)
-- [ ] User can review, edit, or regenerate concept
-- [ ] "Generate Artwork" sends concept + original image to Gemini (multimodal input)
-- [ ] Output: flat illustration, white/transparent bg, no 3D/effects, print-ready
-- [ ] Original uploaded image used as style reference (not just text description)
-- [ ] Chat refinement works (append refinement to prompt, regenerate)
-- [ ] Download button works
-- [ ] Aspect ratio options: 1:1, 4:5, 16:9
+- [x] "Create Concepts" → AI returns 3 SynthesizedConcept (title, description, visual direction, buyer target, coherence notes, key elements)
+- [x] User browses 3 concepts in horizontal carousel, selects one
+- [x] "Generate Artwork" sends concept + original image to Gemini (multimodal input)
+- [x] Output: flat illustration, white/transparent bg, no 3D/effects, print-ready (POD constraints in synthesis)
+- [x] Original uploaded image used as style reference (creativity level drives reference strength)
+- [x] 3 retry tiers: Regenerate Artwork, Try Different Concept, Start Over
+- [x] Download button works (filename from concept title)
+- [x] Aspect ratio options: 1:1, 4:5, 3:4, 4:3, 16:9, 9:16
 
 **Reference:** `.planning/deliverables/reference-pod-artwork/` for desired output quality
 
 **Deliverable:** Direct code implementation
+
 
 ---
 
@@ -186,6 +186,6 @@ Plans:
 | 5 | Build: F3 Batch Compare | F3-01..05 | ✅ Done |
 | 6A | Critical UX Fixes | UX-1..6 | ✅ Done |
 | **7A** | **Creative Studio — UI Redesign** | **F2-01..05** | ✅ Done |
-| **7B** | **Concept Synthesis + POD Generation** | **F2-06..12** | 🔲 Planned |
+| **7B** | **Concept Synthesis + POD Generation** | **F2-06..12** | ✅ Done |
 | **7C** | **Pattern Library + Save Flow** | **F3-06..07, F4-*** | 🔲 Planned |
 | 8 | History & Persistence | F5-* | 🔲 Planned |
