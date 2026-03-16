@@ -111,6 +111,7 @@ export default function CreativeStudio({
 
     // Generation state
     const [isGenerating, setIsGenerating] = useState(false);
+    const [generationStep, setGenerationStep] = useState('');
     const [showResult, setShowResult] = useState(false);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [buyerFitScores, setBuyerFitScores] = useState<any>(null);
@@ -168,6 +169,7 @@ export default function CreativeStudio({
                 originalMimeType: uploadedImage?.type || 'image/png',
                 aspectRatio,
                 creativity,
+                onProgress: (step) => setGenerationStep(step),
             });
             setGeneratedImage(imageBase64);
             setSelectedConceptIndex(carouselIndex);
@@ -265,9 +267,12 @@ export default function CreativeStudio({
                     <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default flex items-center justify-center mb-5">
                         <Loader2 className="w-6 h-6 text-accent animate-spin" />
                     </div>
-                    <h2 className="text-[16px] font-semibold mb-1.5">Generating artwork...</h2>
+                    <h2 className="text-[16px] font-semibold mb-1.5">{generationStep || 'Generating artwork...'}</h2>
                     <p className="text-text-tertiary text-[13px]">
-                        This usually takes 15–30 seconds
+                        {generationStep.includes('illustration') ? 'Step 1 of 3 — creating the illustration' :
+                            generationStep.includes('typography') ? 'Step 2 of 3 — designing decorated text' :
+                                generationStep.includes('Compositing') ? 'Step 3 of 3 — merging layers' :
+                                    'This usually takes 20–40 seconds'}
                     </p>
                 </div>
             );
