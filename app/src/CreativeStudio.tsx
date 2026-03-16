@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight, Download, Sparkles, AlertCircle, X, Settings, Paintbrush, Loader2, RefreshCw, RotateCcw } from 'lucide-react';
-import { synthesizeConcept, generateArtwork, analyzeBuyerFit, SynthesizedConcept } from './api';
+import { synthesizeConcept, generateArtwork, analyzeBuyerFit, cloneDesign, SynthesizedConcept } from './api';
 
 // ── Types ──────────────────────────────────────────────────────────
 interface CreativeStudioProps {
@@ -131,6 +131,12 @@ export default function CreativeStudio({
             return;
         }
 
+        // Subtle mode (creativity=1): skip concepts, clone directly
+        if (creativity === 1) {
+            handleCloneDesign();
+            return;
+        }
+
         setIsSynthesizing(true);
         setError(null);
         setConcepts([]);
@@ -156,6 +162,43 @@ export default function CreativeStudio({
             setError(errMsg);
         } finally {
             setIsSynthesizing(false);
+        }
+    };
+
+    const handleCloneDesign = async () => {
+        const apiKey = localStorage.getItem('designdna_api_key');
+        if (!apiKey) {
+            document.dispatchEvent(new CustomEvent('open-settings'));
+            return;
+        }
+
+        setIsGenerating(true);
+        setError(null);
+        setConcepts([]);
+        setShowResult(false);
+        setGeneratedImage(null);
+        setBuyerFitScores(null);
+
+        try {
+            const imageBase64 = await cloneDesign(apiKey, {
+                originalDna: analysisResult,
+                originalImage: uploadedImage?.data || '',
+                originalMimeType: uploadedImage?.type || 'image/png',
+                aspectRatio,
+                onProgress: (step) => setGenerationStep(step),
+            });
+            setGeneratedImage(imageBase64);
+            setShowResult(true);
+        } catch (err: any) {
+            console.error(err);
+            let errMsg = err.message || 'Failed to clone design';
+            if (errMsg.includes('403') || errMsg.includes('API key not valid')) {
+                errMsg = 'Invalid API Key. Please check your settings.';
+            }
+            setError(errMsg);
+            setShowResult(true);
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -274,9 +317,10 @@ export default function CreativeStudio({
                     </div>
                     <h2 className="text-[16px] font-semibold mb-1.5">{generationStep || 'Generating artwork...'}</h2>
                     <p className="text-text-tertiary text-[13px]">
-                        {generationStep.includes('illustration') ? 'Step 1 of 2 — creating the illustration' :
-                            generationStep.includes('typography') ? 'Step 2 of 2 — adding decorated text' :
-                                'This usually takes 20–40 seconds'}
+                        {creativity === 1 ? 'Reproducing the design — this takes 15–30 seconds' :
+                            generationStep.includes('illustration') ? 'Step 1 of 2 — creating the illustration' :
+                                generationStep.includes('typography') ? 'Step 2 of 2 — adding decorated text' :
+                                    'This usually takes 20–40 seconds'}
                     </p>
                 </div>
             );
@@ -288,10 +332,17 @@ export default function CreativeStudio({
                 <div className="flex flex-col items-center justify-center text-center max-w-[400px]">
                     <div className="bg-error/10 border border-error/20 p-6 rounded-xl w-full">
                         <AlertCircle className="w-8 h-8 text-error mx-auto mb-3" />
-                        <h3 className="text-error font-medium mb-2">Generation Failed</h3>
+                        <h3 className="text-error font-medium mb-2">{creativity === 1 ? 'Clone Failed' : 'Generation Failed'}</h3>
                         <p className="text-text-secondary text-[14px] mb-4">{error}</p>
                         <div className="flex gap-2 justify-center">
-                            {concepts.length > 0 ? (
+                            {creativity === 1 ? (
+                                <button
+                                    onClick={handleCloneDesign}
+                                    className="px-5 py-2.5 ai-gradient text-white rounded-lg text-[14px] font-medium hover:opacity-90 transition-opacity"
+                                >
+                                    Try Again
+                                </button>
+                            ) : concepts.length > 0 ? (
                                 <button
                                     onClick={handleTryDifferentConcept}
                                     className="px-5 py-2.5 ai-gradient text-white rounded-lg text-[14px] font-medium hover:opacity-90 transition-opacity"
@@ -337,17 +388,19 @@ export default function CreativeStudio({
                     {/* Retry tiers */}
                     <div className="flex gap-1 mt-3">
                         <button
-                            onClick={handleRegenerateArtwork}
+                            onClick={creativity === 1 ? handleCloneDesign : handleRegenerateArtwork}
                             className="px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5 rounded-lg hover:bg-bg-surface1/60"
                         >
-                            <RefreshCw className="w-3 h-3" /> Regenerate
+                            <RefreshCw className="w-3 h-3" /> {creativity === 1 ? 'Re-clone' : 'Regenerate'}
                         </button>
-                        <button
-                            onClick={handleTryDifferentConcept}
-                            className="px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5 rounded-lg hover:bg-bg-surface1/60"
-                        >
-                            <RotateCcw className="w-3 h-3" /> Try Different Concept
-                        </button>
+                        {creativity > 1 && (
+                            <button
+                                onClick={handleTryDifferentConcept}
+                                className="px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5 rounded-lg hover:bg-bg-surface1/60"
+                            >
+                                <RotateCcw className="w-3 h-3" /> Try Different Concept
+                            </button>
+                        )}
                         <button
                             onClick={handleStartOver}
                             className="px-3 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5 rounded-lg hover:bg-bg-surface1/60"
@@ -543,11 +596,14 @@ export default function CreativeStudio({
                 </p>
                 <button
                     onClick={handleSynthesize}
-                    disabled={isSynthesizing}
+                    disabled={isSynthesizing || isGenerating}
                     className="px-6 py-2.5 ai-gradient text-white rounded-lg font-medium text-[14px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center gap-2"
                 >
-                    <Sparkles className="w-4 h-4" />
-                    Create Concepts
+                    {creativity === 1 ? (
+                        <><Paintbrush className="w-4 h-4" /> Clone Design</>
+                    ) : (
+                        <><Sparkles className="w-4 h-4" /> Create Concepts</>
+                    )}
                 </button>
             </div>
         );

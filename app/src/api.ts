@@ -385,6 +385,94 @@ async function generateImageFromModel(
 }
 
 
+// ── Clone Design (Subtle Mode) ─────────────────────────────────────
+// Single-pass generation: sends original image + DNA, asks for exact reproduction
+
+export interface CloneDesignInput {
+  originalDna: any;
+  originalImage: string;
+  originalMimeType: string;
+  aspectRatio: string;
+  onProgress?: (step: string) => void;
+}
+
+export async function cloneDesign(
+  apiKey: string,
+  input: CloneDesignInput
+): Promise<string> {
+  const ai = new GoogleGenAI({ apiKey });
+  input.onProgress?.('Cloning design...');
+
+  const dna = input.originalDna;
+  const v = dna?.visual_dna || {};
+  const textContent = v.typography?.text_content;
+
+  const paletteStr = (v.color?.palette || [])
+    .map((c: any) => `${c.name} ${c.hex} (${c.role}, ${c.proportion}%)`)
+    .join(', ');
+
+  const fontsStr = (v.typography?.fonts || [])
+    .map((f: any) => `${f.classification} ${f.weight} ${f.case} (${f.role})`)
+    .join(', ');
+
+  const clonePrompt = `Reproduce the provided design as a PIXEL-ACCURATE recreation. Your output must be visually indistinguishable from the original.
+
+## STRICT REPRODUCTION RULES
+- Copy EVERY visual element exactly: same subject, same pose, same arrangement, same proportions
+- Same composition and layout — identical grid, spacing, and element placement
+- Same illustration style: ${v.graphics?.style || 'match original exactly'}
+- Same detail level: ${v.graphics?.detail_level || 'match original exactly'}
+- Same effects: ${(v.graphics?.effects || []).join(', ') || 'none — match original'}
+
+## COLOR — USE EXACT SAME PALETTE
+${paletteStr || 'Match the original design colors exactly'}
+Harmony: ${v.color?.harmony || 'match original'}
+Temperature: ${v.color?.temperature || 'match original'}
+Contrast: ${v.color?.contrast || 'match original'}
+
+## TYPOGRAPHY — REPRODUCE EXACTLY
+Fonts: ${fontsStr || 'match original exactly'}
+${textContent ? `Primary text: "${textContent.primary}" — render EXACTLY these words, same size, same position, same decoration
+${textContent.secondary ? `Secondary text: "${textContent.secondary}" — render EXACTLY these words` : ''}` : 'Match all text from the original design exactly — same words, same styling, same position'}
+
+## COMPOSITION
+Grid: ${v.composition?.grid_type || 'match original'}
+Symmetry: ${v.composition?.symmetry || 'match original'}
+Focal point: ${v.composition?.focal_point || 'match original'}
+Visual flow: ${v.composition?.visual_flow || 'match original'}
+Density: ${v.composition?.density || 'match original'}
+
+## GRAPHICS
+Primary element: ${v.graphics?.primary_element || 'match original'}
+Secondary elements: ${(v.graphics?.secondary_elements || []).join(', ') || 'match original'}
+
+## OUTPUT RULES
+- Background: solid white (#FFFFFF) where the original has white
+- This is a REPRODUCTION — do NOT add, remove, or alter ANY element
+- The result should look like the same design was re-drawn at high quality
+- Maintain ALL text exactly as written — do NOT rephrase, abbreviate, or add text
+- Illustration-based output — no photorealistic rendering
+
+Generate exactly ONE image.`;
+
+  const parts: any[] = [];
+  if (input.originalImage) {
+    const imageData = input.originalImage.includes(',')
+      ? input.originalImage.split(',')[1]
+      : input.originalImage;
+    parts.push({
+      inlineData: {
+        data: imageData,
+        mimeType: input.originalMimeType || 'image/png',
+      },
+    });
+  }
+  parts.push({ text: clonePrompt });
+
+  return generateImageFromModel(ai, parts, input.aspectRatio);
+}
+
+
 
 
 export async function generateArtwork(
