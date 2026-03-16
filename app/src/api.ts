@@ -447,7 +447,9 @@ Generate exactly ONE image.`;
   // Extract base64 from the illustration data URL
   const illustrationBase64 = illustrationDataUrl.split(',')[1];
 
-  const textPrompt = `You are given an illustration for a Print-on-Demand design. Your job: ADD decorated typography text ON TOP of this illustration to create the final design.
+  const textPrompt = `You are given an illustration base for a Print-on-Demand design. Complete this design by integrating decorated typography as a core part of the composition.
+
+The text is NOT a layer on top — it is an INTEGRAL part of the design, woven into the composition alongside the illustration.
 
 ## Text Content to Render — RENDER EXACTLY THESE AND NOTHING ELSE
 Primary text: "${input.concept.suggestedText?.primary || ''}"
@@ -458,25 +460,25 @@ Text style: ${input.concept.suggestedText?.textStyle || 'bold decorative'}
 Text layout: ${textLayout}
 
 ## CRITICAL TYPOGRAPHY DECORATION INSTRUCTIONS
-This is NOT plain text — create DECORATED, ARTISTIC typography:
+Create DECORATED, ARTISTIC typography that feels like it was designed together with the illustration:
 - Design each word with creative typography decoration matching the concept theme
 - Use decorative elements INTEGRATED into the letters (e.g., thematic icons replacing dots, decorative fills inside letters, ornamental borders around words)
 - Apply creative text effects: embossing, outlines, shadows, gradient fills, textured fills, banner/badge backgrounds behind key words
 - Make the text itself a work of art — like a professional POD typography design
 - Mix font sizes, weights, and decorative treatments across different text lines for visual hierarchy
-- The typography should feel like the centerpiece of a professional POD design
+- The typography should feel like an integral part of the design — not a sticker placed on top
+- Text and illustration should share the same visual language, energy, and quality level
 
 ## Color Palette (USE these for the text decoration)
 ${paletteInstruction || 'Use bold, contrasting colors appropriate for the concept'}
 
 ## MANDATORY OUTPUT RULES
-- KEEP the existing illustration EXACTLY as it is — do NOT modify, redraw, or remove any part of the illustration.
-- ADD the decorated text ON TOP of the illustration in the appropriate positions.
-- The text should be clearly legible against the illustration background.
-- Use contrasting colors, outlines, or banner backgrounds to ensure text readability.
+- PRESERVE the existing illustration — do NOT remove or significantly alter the illustration elements.
+- INTEGRATE the decorated text into the composition naturally — text should feel designed together with the illustration.
+- The text must be clearly legible.
 - Background MUST remain solid white (#FFFFFF) where the original illustration had white.
 - Do NOT add any extra text, labels, or captions beyond what is specified above.
-- Do NOT add any new illustration elements — ONLY add the typography.
+- Do NOT add unrelated illustration elements.
 
 Generate exactly ONE image.`;
 
