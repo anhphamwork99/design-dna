@@ -65,19 +65,19 @@ function getInitialCreativity(prefilledBrief?: string): number {
 }
 
 const creativityLabels: Record<number, string> = {
-    1: "Closely follows the original DNA",
-    2: "Keeps themes, reinterprets freely",
-    3: "Recognizable roots, new direction",
-    4: "Loose inspiration only",
-    5: "Completely new, emotional core only"
+    1: "Almost identical — subtle refinements to changed dimensions",
+    2: "Same vibe — reinterprets your changes while staying close",
+    3: "Noticeably different — bold take on your changes",
+    4: "Very different — your changes as loose starting points",
+    5: "Wildly new — maximum creative freedom on everything"
 };
 
 const creativityLevelNames: Record<number, string> = {
-    1: 'Faithful',
-    2: 'Inspired',
-    3: 'Remixed',
-    4: 'Original',
-    5: 'Radical',
+    1: 'Subtle',
+    2: 'Close',
+    3: 'Bold',
+    4: 'Fresh',
+    5: 'Wild',
 };
 
 const dimensionConfig = [
