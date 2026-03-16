@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, UploadCloud, AlertTriangle, Settings, X, Microscope, Scale, Copy, Check, ImageOff } from 'lucide-react';
+import { ArrowLeft, UploadCloud, AlertTriangle, Settings, X, Microscope, Scale, Copy, Check, ImageOff, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { analyzeDesign, analyzeBatch } from './api';
 import CreativeStudio from './CreativeStudio';
 import { CompareUploadScreen, CompareAnalyzingScreen, CompareResultsScreen } from './CompareScreens';
+import PatternLibrary from './PatternLibrary';
+import PatternDetail from './PatternDetail';
+import { getPatterns } from './patternStorage';
 
-type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results';
+type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results' | 'pattern_library' | 'pattern_detail';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
@@ -16,6 +19,7 @@ export default function App() {
   const [initialGenMode, setInitialGenMode] = useState<string | undefined>(undefined);
   const [compareImages, setCompareImages] = useState<{ data: string; name: string; type: string }[]>([]);
   const [compareResult, setCompareResult] = useState<any>(null);
+  const [selectedPatternId, setSelectedPatternId] = useState<string | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [apiKey, setApiKey] = useState('');
@@ -79,6 +83,9 @@ export default function App() {
       if (errMsg === 'timeout') {
         errorType = 'timeout';
         errorMsg = 'The analysis took too long. Please try again.';
+      } else if (errMsg.includes('location is not supported') || errMsg.includes('FAILED_PRECONDITION')) {
+        errorType = 'api';
+        errorMsg = 'Your location is not supported by Gemini API. Try turning off VPN or switching to a US/EU server.';
       } else if (errMsg.includes('400')) {
         errorType = 'api';
         errorMsg = 'Invalid request. The images may be too large or in an unsupported format.';
@@ -145,6 +152,9 @@ export default function App() {
       if (errMsg === 'timeout') {
         errorType = 'timeout';
         errorMsg = 'The analysis took too long. Please try again.';
+      } else if (errMsg.includes('location is not supported') || errMsg.includes('FAILED_PRECONDITION')) {
+        errorType = 'api';
+        errorMsg = 'Your location is not supported by Gemini API. Try turning off VPN or switching to a US/EU server.';
       } else if (errMsg.includes('400')) {
         errorType = 'api';
         errorMsg = 'Invalid request. The image may be too large or in an unsupported format.';
@@ -262,6 +272,24 @@ export default function App() {
               compareResult={compareResult}
             />
           )}
+          {currentScreen === 'pattern_library' && (
+            <PatternLibrary
+              key="pattern_library"
+              onNavigate={(screen: string, data?: any) => {
+                if (screen === 'pattern_detail' && data?.patternId) {
+                  setSelectedPatternId(data.patternId);
+                }
+                setCurrentScreen(screen as Screen);
+              }}
+            />
+          )}
+          {currentScreen === 'pattern_detail' && selectedPatternId && (
+            <PatternDetail
+              key="pattern_detail"
+              patternId={selectedPatternId}
+              onNavigate={(screen: string) => setCurrentScreen(screen as Screen)}
+            />
+          )}
         </AnimatePresence>
       </main>
 
@@ -355,6 +383,12 @@ function SettingsModal({ onClose, initialKey, onSave }: { onClose: () => void, i
 }
 
 function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) => void }) {
+  const [hasPatterns, setHasPatterns] = useState(false);
+
+  useEffect(() => {
+    setHasPatterns(getPatterns().length > 0);
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -368,7 +402,7 @@ function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) =
         Upload any design to uncover its Visual DNA and discover exactly who it's made for — and why.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-[900px]">
+      <div className={`grid grid-cols-1 ${hasPatterns ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4 w-full max-w-[900px]`}>
         <div
           onClick={() => onNavigate('upload')}
           className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
@@ -386,6 +420,17 @@ function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) =
           <h3 className="text-[16px] font-semibold mb-1">Compare Designs</h3>
           <p className="text-[12px] text-text-secondary">Upload 2-5 designs to find winning patterns</p>
         </div>
+
+        {hasPatterns && (
+          <div
+            onClick={() => onNavigate('pattern_library')}
+            className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
+          >
+            <Layers className="w-7 h-7 text-[#a78bfa] mb-4 group-hover:scale-110 transition-transform origin-left" />
+            <h3 className="text-[16px] font-semibold mb-1">Pattern Library</h3>
+            <p className="text-[12px] text-text-secondary">Browse saved patterns from Compare analysis</p>
+          </div>
+        )}
       </div>
     </motion.div>
   );
