@@ -761,7 +761,7 @@ export default function CreativeStudio({
 
                 {/* ═══ CENTER CANVAS: Concepts + Artwork ═══ */}
                 <div
-                    className="flex-1 flex flex-col items-center justify-center p-6 overflow-hidden relative"
+                    className="flex-1 flex flex-col items-center p-6 overflow-y-auto relative"
                     role="main"
                     style={{
                         background: 'linear-gradient(180deg, hsl(222 47% 9%) 0%, hsl(222 47% 7%) 100%)',
