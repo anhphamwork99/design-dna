@@ -294,9 +294,7 @@ ${input.appliedPattern ? `## Applied Pattern/Inspiration\n${input.appliedPattern
 ## POD Production Constraints
 All concepts MUST be POD-ready:
 - Illustration-based (not photorealistic, no 3D rendering)
-- Solid white background — clean, no gradients or textures behind the artwork
-- Print-ready isolation — artwork floats cleanly on the background
-- No glass morphism, shadows behind artwork, or complex layering
+- Outermost background is solid white — the design's edges and transition into white is a CREATIVE CHOICE (open/fading, badge, freeform, etc.)
 - Must work printed on t-shirts, hoodies, mugs
 - Typography style is FLEXIBLE (can be hand-lettered, sans-serif, serif, display — varies per concept)
 
@@ -307,7 +305,7 @@ Each concept object:
 {
   "title": "Short catchy concept name (3-5 words)",
   "description": "2-3 sentences describing the overall design concept",
-  "visualDirection": "DETAILED visual instructions for the ILLUSTRATION ONLY: exact illustration style, composition layout, key visual elements, how they're arranged. Do NOT mention any text content here — text is handled separately in suggestedText.",
+  "visualDirection": "DETAILED visual instructions for the ILLUSTRATION ONLY: exact illustration style, composition layout, key visual elements, how they're arranged, AND the composition edge style (e.g., 'open composition with soft painterly edges dissolving into white background', 'scene vignette with brush stroke edges fading into white', 'enclosed in a circular badge with ornamental border', 'freeform silhouette with organic edges', etc.). Choose the edge style that best matches the original design's DNA and the concept's visual language. Do NOT mention any text content here — text is handled separately in suggestedText.",
   "suggestedText": {
     "primary": "The main quote, slogan, or text that should appear ON the design (e.g., 'A GIRL & HER CATS')",
     "secondary": "Optional tagline or subtitle. Use actual words — NOT placeholders like '[Name Here]'. If the original has specific names/words, use them. Empty string if none needed.",
@@ -417,11 +415,11 @@ ${paletteInstruction || 'Use colors appropriate for the concept'}
 ${imageRole}
 
 ## MANDATORY OUTPUT RULES
-- Background MUST be solid white (#FFFFFF). No gradients, no textures, no scenes behind the artwork.
-- The design must float cleanly on the white background — isolated, print-ready.
+- The outermost background MUST be solid white (#FFFFFF).
+- Follow the composition edge style described in Visual Direction above (open/fading edges, badge, freeform, etc.).
 - Illustration-based only. No photorealistic rendering, no 3D effects.
 - ABSOLUTELY NO TEXT: Do NOT render any words, letters, numbers, labels, captions, or typography of ANY kind.
-- The illustration should be a complete composition that works on its own but leaves room for text overlay.
+- The illustration should be a complete composition that works on its own but leaves room for text.
 
 Generate exactly ONE image.`;
 
