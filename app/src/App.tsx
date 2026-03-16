@@ -103,7 +103,7 @@ export default function App() {
       }
 
       setError({ type: errorType, message: errorMsg });
-      setCurrentScreen('upload');
+      setCurrentScreen('compare_upload');
     }
   };
 
@@ -379,12 +379,6 @@ function SettingsModal({ onClose, initialKey, onSave }: { onClose: () => void, i
 }
 
 function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) => void }) {
-  const [hasPatterns, setHasPatterns] = useState(false);
-
-  useEffect(() => {
-    setHasPatterns(getPatterns().length > 0);
-  }, []);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -398,7 +392,7 @@ function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) =
         Upload any design to uncover its Visual DNA and discover exactly who it's made for — and why.
       </p>
 
-      <div className={`grid grid-cols-1 ${hasPatterns ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4 w-full max-w-[900px]`}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-[900px]">
         <div
           onClick={() => onNavigate('upload')}
           className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
@@ -417,16 +411,14 @@ function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) =
           <p className="text-[12px] text-text-secondary">Upload 2-5 designs to find winning patterns</p>
         </div>
 
-        {hasPatterns && (
-          <div
-            onClick={() => onNavigate('pattern_library')}
-            className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
-          >
-            <Layers className="w-7 h-7 text-[#a78bfa] mb-4 group-hover:scale-110 transition-transform origin-left" />
-            <h3 className="text-[16px] font-semibold mb-1">Pattern Library</h3>
-            <p className="text-[12px] text-text-secondary">Browse saved patterns from Compare analysis</p>
-          </div>
-        )}
+        <div
+          onClick={() => onNavigate('pattern_library')}
+          className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
+        >
+          <Layers className="w-7 h-7 text-[#a78bfa] mb-4 group-hover:scale-110 transition-transform origin-left" />
+          <h3 className="text-[16px] font-semibold mb-1">Pattern Library</h3>
+          <p className="text-[12px] text-text-secondary">Browse saved patterns from Compare analysis</p>
+        </div>
       </div>
     </motion.div>
   );
