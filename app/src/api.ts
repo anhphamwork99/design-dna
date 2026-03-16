@@ -151,9 +151,10 @@ export async function synthesizeConcept(
 
   const creativityInstruction = CREATIVITY_SYNTHESIS_LABELS[input.creativity] || CREATIVITY_SYNTHESIS_LABELS[3];
 
-  const synthesisPrompt = `You are a Print-on-Demand design strategist. Create exactly 3 distinct concept options for a new design.
-
-## Original Design DNA
+  // At higher creativity, expose LESS original DNA to reduce anchoring
+  const creativity = input.creativity;
+  const dnaSection = creativity <= 2
+    ? `## Original Design DNA (Reference — stay close)
 Visual: ${JSON.stringify(input.originalDna?.visual_dna?.summary || 'N/A')}
 Style: ${input.originalDna?.visual_dna?.graphics?.style || 'N/A'}
 Colors: ${input.originalDna?.visual_dna?.color?.harmony || 'N/A'} (${input.originalDna?.visual_dna?.color?.temperature || 'N/A'})
@@ -161,7 +162,30 @@ Primary Element: ${input.originalDna?.visual_dna?.graphics?.primary_element || '
 Typography: ${input.originalDna?.visual_dna?.typography?.fonts?.[0]?.classification || 'N/A'}
 Buyer Tribe: ${input.originalDna?.buyer_dna?.identity_signals?.tribe || 'N/A'}
 Primary Emotion: ${input.originalDna?.buyer_dna?.emotional_triggers?.primary_emotion || 'N/A'}
-Persona: ${input.originalDna?.buyer_dna?.persona?.age_range || 'N/A'}, ${input.originalDna?.buyer_dna?.persona?.lifestyle || 'N/A'}
+Persona: ${input.originalDna?.buyer_dna?.persona?.age_range || 'N/A'}, ${input.originalDna?.buyer_dna?.persona?.lifestyle || 'N/A'}`
+    : creativity === 3
+      ? `## Original Design DNA (Inspiration — diverge from this)
+Theme: ${input.originalDna?.buyer_dna?.emotional_triggers?.primary_emotion || 'N/A'}
+Buyer: ${input.originalDna?.buyer_dna?.identity_signals?.tribe || 'N/A'}, ${input.originalDna?.buyer_dna?.persona?.age_range || 'N/A'}
+Style hint: ${input.originalDna?.visual_dna?.graphics?.style || 'N/A'}
+Do NOT replicate the original. Use it only as a jumping-off point.`
+      : `## Original Design DNA (Context only — create something NEW)
+The original targets: ${input.originalDna?.buyer_dna?.identity_signals?.tribe || 'N/A'}
+Emotional core: ${input.originalDna?.buyer_dna?.emotional_triggers?.primary_emotion || 'N/A'}
+Do NOT reference the original's visual style, colors, or composition. Create entirely fresh directions.`;
+
+  const synthesisPrompt = `You are a Print-on-Demand design strategist. Your job: create 3 WILDLY DIFFERENT concept options.
+
+## CRITICAL: DIVERSITY REQUIREMENT
+The 3 concepts MUST differ across ALL of these dimensions:
+1. **Different illustration style** — e.g., one minimalist line art, one bold cartoon, one vintage retro. NEVER repeat a style.
+2. **Different color mood** — e.g., one warm earthy, one cool pastel, one high-contrast vibrant. NEVER use similar palettes.
+3. **Different subject/composition** — e.g., one character-focused, one typography-heavy, one pattern/motif-based.
+4. **Different emotional tone** — e.g., one playful humorous, one sentimental warm, one bold empowering.
+
+If your 3 concepts feel like variations of ONE idea, you have failed. They must feel like they came from 3 DIFFERENT designers.
+
+${dnaSection}
 
 ## User's Design Directions
 ${dimensionDirectives}
@@ -170,23 +194,23 @@ ${dimensionDirectives}
 ${creativityInstruction}
 
 ${input.appliedPattern ? `## Applied Pattern/Inspiration\n${input.appliedPattern}\n` : ''}
-## CRITICAL: POD Production Constraints
+## POD Production Constraints
 All concepts MUST be POD-ready:
-- Flat illustration style — clean lines, cartoon/hand-drawn aesthetic
-- White or transparent background — NO gradients, textures, or scenes in background
-- Bold decorative typography — mixed fonts, playful lettering
-- Print-ready isolation — artwork floats cleanly, easy to place on garments
-- No 3D effects, shadows, lighting, glass morphism, or photorealistic rendering
-- Designs must work printed on t-shirts, hoodies, mugs
+- Illustration-based (not photorealistic, no 3D rendering)
+- Solid white background — clean, no gradients or textures behind the artwork
+- Print-ready isolation — artwork floats cleanly on the background
+- No glass morphism, shadows behind artwork, or complex layering
+- Must work printed on t-shirts, hoodies, mugs
+- Typography style is FLEXIBLE (can be hand-lettered, sans-serif, serif, display — varies per concept)
 
 ## Output
-Return a JSON array of exactly 3 concept objects. Each concept must offer a DISTINCT creative direction — do not make 3 similar variations.
+Return a JSON array of exactly 3 concept objects.
 
 Each concept object:
 {
   "title": "Short catchy concept name (3-5 words)",
   "description": "2-3 sentences describing the overall design concept",
-  "visualDirection": "Specific visual instructions: illustration style, composition, key visual elements",
+  "visualDirection": "SPECIFIC visual instructions: exact illustration style, color palette description, composition layout, key visual elements. Be detailed enough that an image generator can follow this.",
   "targetBuyer": "Who would buy this — age, interests, tribe, occasion",
   "coherenceNotes": "Why this concept works as a unified whole — what ties the elements together",
   "keyElements": ["element1", "element2", "element3", "element4"]
@@ -232,7 +256,13 @@ ${input.concept.targetBuyer}
 ## Image Reference Instruction
 ${imageRole}
 
-Generate exactly ONE image. The design must be print-ready for garments.`;
+## MANDATORY OUTPUT RULES
+- Background MUST be solid white (#FFFFFF). No gradients, no textures, no scenes behind the artwork.
+- The design must float cleanly on the white background — isolated, print-ready.
+- Illustration-based only. No photorealistic rendering, no 3D effects.
+- ONE cohesive design composition. Do not split into multiple separate elements.
+
+Generate exactly ONE image.`;
 
   const parts: any[] = [];
 
