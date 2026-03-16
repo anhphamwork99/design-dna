@@ -14,6 +14,7 @@ export interface SynthesizedConcept {
     primary: string;      // Main quote/slogan ON the design
     secondary?: string;   // Tagline or subtitle
     textStyle: string;    // "bold hand-lettered" / "clean sans-serif" etc.
+    textLayout?: string;  // "primary arched above, secondary below" etc.
   };
   colorPalette: Array<{
     hex: string;          // "#1E3A5F"
@@ -305,11 +306,12 @@ Each concept object:
 {
   "title": "Short catchy concept name (3-5 words)",
   "description": "2-3 sentences describing the overall design concept",
-  "visualDirection": "DETAILED visual instructions: exact illustration style, composition layout, key visual elements, how they're arranged. Be specific enough for an image generator to follow.",
+  "visualDirection": "DETAILED visual instructions for the ILLUSTRATION ONLY: exact illustration style, composition layout, key visual elements, how they're arranged. Do NOT mention any text content here — text is handled separately in suggestedText.",
   "suggestedText": {
     "primary": "The main quote, slogan, or text that should appear ON the design (e.g., 'A GIRL & HER CATS')",
-    "secondary": "Optional tagline or subtitle (empty string if none needed)",
-    "textStyle": "How the text should look: e.g., 'bold hand-lettered', 'clean sans-serif', 'vintage serif', 'playful script'"
+    "secondary": "Optional tagline or subtitle. Use actual words — NOT placeholders like '[Name Here]'. If the original has specific names/words, use them. Empty string if none needed.",
+    "textStyle": "How the text should look: e.g., 'bold hand-lettered', 'clean sans-serif', 'vintage serif', 'playful script'",
+    "textLayout": "Where text goes: e.g., 'primary text arched above illustration, secondary below' or 'primary centered top, secondary bottom'"
   },
   "colorPalette": [
     { "hex": "#HEXCODE", "name": "Color Name", "role": "Dominant" },
@@ -324,6 +326,8 @@ Each concept object:
 
 IMPORTANT:
 - suggestedText.primary MUST be actual text content for the design (a quote, slogan, or statement) — NOT a description of what the text should say.
+- suggestedText.secondary MUST be actual text or empty string. NEVER use placeholders like '[Pet Names Here]', '[Name]', '[Custom Text]'. If the original design has specific names/words, USE THOSE EXACT NAMES. If not applicable, use empty string.
+- visualDirection MUST describe ONLY the visual illustration — do NOT mention any text, quotes, labels, or typography in visualDirection. All text-related info goes in suggestedText.
 - colorPalette MUST have 3-5 specific hex colors. Do NOT use generic names without hex.
 - Each concept's colorPalette should be DISTINCTLY different from the others.`;
 
@@ -358,18 +362,27 @@ export async function generateArtwork(
     .map(c => `- ${c.name} (${c.hex}) — ${c.role}`)
     .join('\n');
 
+  // Filter out placeholder secondary text (e.g., "[Pet Names Here]", "[Name]")
+  const secondaryText = input.concept.suggestedText?.secondary || '';
+  const isPlaceholder = /^\[.*\]$/.test(secondaryText.trim()) || secondaryText.includes('[') || secondaryText.trim() === '';
+  const validSecondary = isPlaceholder ? '' : secondaryText;
+
+  // Build text layout instruction
+  const textLayout = input.concept.suggestedText?.textLayout || 'primary text prominently at top, secondary text below the illustration';
+
   const prompt = `Create a Print-on-Demand ready design based on this concept.
 
 ## Concept: ${input.concept.title}
 ${input.concept.description}
 
-## Visual Direction
+## Visual Direction (ILLUSTRATION ONLY)
 ${input.concept.visualDirection}
 
-## Text Content (MUST appear in the design)
+## Text Content — RENDER EXACTLY THESE AND NOTHING ELSE
 Primary text: "${input.concept.suggestedText?.primary || ''}"
-${input.concept.suggestedText?.secondary ? `Secondary text: "${input.concept.suggestedText.secondary}"` : ''}
+${validSecondary ? `Secondary text: "${validSecondary}"` : ''}
 Text style: ${input.concept.suggestedText?.textStyle || 'bold decorative'}
+Text layout: ${textLayout}
 
 ## Color Palette (USE these specific colors)
 ${paletteInstruction || 'Use colors appropriate for the concept'}
@@ -381,8 +394,13 @@ ${imageRole}
 - Background MUST be solid white (#FFFFFF). No gradients, no textures, no scenes behind the artwork.
 - The design must float cleanly on the white background — isolated, print-ready.
 - Illustration-based only. No photorealistic rendering, no 3D effects.
-- ONE cohesive design composition with text and visuals integrated.
-- The PRIMARY TEXT must be clearly legible and prominent in the design.
+- ONE cohesive design composition.
+- TEXT RULES (CRITICAL):
+  • Render ONLY the exact text listed in "Text Content" above. No additional words, labels, or captions.
+  • Do NOT label individual elements in the illustration (no floating names, no arrows, no tags).
+  • The primary text must be clearly legible, prominent, and placed according to the text layout instruction.
+  • Use ONE consistent font style for primary text and ONE for secondary text (if any).
+  • Text should be integrated with the design composition, not floating randomly.
 
 Generate exactly ONE image.`;
 
