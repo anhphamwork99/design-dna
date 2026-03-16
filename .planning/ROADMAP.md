@@ -164,6 +164,27 @@ Plans:
 
 ---
 
+### Phase 7B.2: Typography & Decoration Quality ✅ (INSERTED — Resolved)
+**Goal:** Nâng chất lượng typography decoration trong generated artwork lên ngang bằng artwork gốc.
+
+**Depends on:** Phase 7B.1
+**Source:** User testing feedback (2026-03-16)
+
+**Resolution:** Two-pass pipeline (Pass 1: illustration-only → Pass 2: text decoration overlay) đã được implement trong Phase 7B/7B.1 sessions, giải quyết root cause (single-pass AI generates both illustration AND text). Phase resolved without separate execution.
+
+**Current Architecture:**
+```
+Pass 1: generateArtwork() → illustration ONLY (no text in prompt)
+    ↓
+Pass 2: AI text decoration → integrates decorated typography as integral part of composition
+    ↓
+Original image passed as style reference in both passes
+```
+
+**Deliverable:** Already implemented in `app/src/api.ts` (lines 424-696)
+
+---
+
 ### Phase 7C: Pattern Library + Save Flow
 **Goal:** Enable saving Compare results as reusable Patterns + Pattern Library UI
 
@@ -221,5 +242,6 @@ Plans:
 | **7A** | **Creative Studio — UI Redesign** | **F2-01..05** | ✅ Done |
 | **7B** | **Concept Synthesis + POD Generation** | **F2-06..12** | ✅ Done |
 | **7B.1** | **Pipeline Quality Redesign** | **Quality fix** | ✅ Done |
+| **7B.2** | **Typography & Decoration Quality** | **Quality fix** | ✅ Resolved |
 | **7C** | **Pattern Library + Save Flow** | **F3-06..07, F4-*** | 🔲 Planned |
 | 8 | History & Persistence | F5-* | 🔲 Planned |
