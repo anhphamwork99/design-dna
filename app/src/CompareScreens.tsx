@@ -11,9 +11,11 @@ interface CompareUploadScreenProps {
   compareImages: { data: string; name: string; type: string }[];
   setCompareImages: React.Dispatch<React.SetStateAction<{ data: string; name: string; type: string }[]>>;
   onAnalyze: () => void;
+  error?: { type: string; message: string } | null;
+  onDismissError?: () => void;
 }
 
-export function CompareUploadScreen({ onNavigate, compareImages, setCompareImages, onAnalyze }: CompareUploadScreenProps) {
+export function CompareUploadScreen({ onNavigate, compareImages, setCompareImages, onAnalyze, error, onDismissError }: CompareUploadScreenProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -113,6 +115,32 @@ export function CompareUploadScreen({ onNavigate, compareImages, setCompareImage
             {compareImages.length}/5 images selected
           </p>
         </div>
+
+        {/* Error Banner */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="w-full bg-error/10 border border-error/30 rounded-xl p-4 flex items-start gap-3"
+            >
+              <AlertTriangle className="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-[14px] text-text-primary font-medium mb-0.5">Analysis failed</p>
+                <p className="text-[13px] text-text-secondary">{error.message}</p>
+              </div>
+              {onDismissError && (
+                <button
+                  onClick={onDismissError}
+                  className="p-1 text-text-tertiary hover:text-text-primary rounded-lg transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <button
           onClick={onAnalyze}

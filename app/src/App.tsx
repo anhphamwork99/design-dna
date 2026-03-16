@@ -248,6 +248,8 @@ export default function App() {
               compareImages={compareImages}
               setCompareImages={setCompareImages}
               onAnalyze={handleCompareAnalyze}
+              error={error}
+              onDismissError={() => setError(null)}
             />
           )}
           {currentScreen === 'compare_analyzing' && (
