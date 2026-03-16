@@ -557,7 +557,7 @@ function AnalyzingScreen({
                   Retry
                 </button>
                 {error.type === 'api' && error.message.includes('API key') && (
-                  <button onClick={() => { onCancel(); document.dispatchEvent(new CustomEvent('open-settings')); }} className="text-text-secondary hover:text-text-primary px-4 py-2 rounded-lg text-[14px] font-medium border border-border-default hover:bg-bg-surface2">
+                  <button onClick={() => { document.dispatchEvent(new CustomEvent('open-settings')); onCancel(); }} className="text-text-secondary hover:text-text-primary px-4 py-2 rounded-lg text-[14px] font-medium border border-border-default hover:bg-bg-surface2">
                     Change API Key
                   </button>
                 )}
