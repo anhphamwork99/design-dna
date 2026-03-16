@@ -30,6 +30,7 @@ export default function GenerationScreen({ analysisResult, onNavigate, prefilled
     I: { keep: prefilledBrief ? false : true, value: '' },
     F: { keep: false, value: '' },
     T: { keep: false, value: '' },
+    Q: { keep: true, value: '' },
     B: { keep: prefilledBrief ? false : true, value: '' },
   });
 
@@ -63,6 +64,7 @@ export default function GenerationScreen({ analysisResult, onNavigate, prefilled
         I: { keep: false, value: '' },
         F: { keep: false, value: '' },
         T: { keep: false, value: '' },
+        Q: { keep: true, value: '' },
         B: { keep: false, value: '' },
       });
       return;
@@ -81,6 +83,7 @@ export default function GenerationScreen({ analysisResult, onNavigate, prefilled
         I: { keep: true, value: '' },
         F: { keep: false, value: '' },
         T: { keep: false, value: '' },
+        Q: { keep: true, value: '' },
         B: { keep: true, value: '' },
       });
     } else if (mode === 'new_buyer') {
@@ -90,6 +93,7 @@ export default function GenerationScreen({ analysisResult, onNavigate, prefilled
         I: { keep: false, value: '' },
         F: { keep: true, value: '' },
         T: { keep: false, value: '' },
+        Q: { keep: true, value: '' },
         B: { keep: false, value: '' },
       });
     } else {
@@ -99,6 +103,7 @@ export default function GenerationScreen({ analysisResult, onNavigate, prefilled
         I: { keep: false, value: '' },
         F: { keep: false, value: '' },
         T: { keep: false, value: '' },
+        Q: { keep: true, value: '' },
         B: { keep: false, value: '' },
       });
     }
@@ -127,6 +132,14 @@ export default function GenerationScreen({ analysisResult, onNavigate, prefilled
 
     if (shifts.T.keep) prompt += `- Text: Use original DNA (Typography: ${analysisResult?.visual_dna?.typography?.fonts?.[0]?.classification || 'N/A'})\n`;
     else prompt += `- Text: ${shifts.T.value || 'New text'}\n`;
+
+    if (shifts.Q.keep) {
+      const origPrimary = analysisResult?.visual_dna?.typography?.text_content?.primary || '';
+      const origSecondary = analysisResult?.visual_dna?.typography?.text_content?.secondary || '';
+      prompt += `- Quotes/Text Content: KEEP EXACTLY the same text — primary: "${origPrimary}"${origSecondary ? `, secondary: "${origSecondary}"` : ''}. Do NOT change, rephrase, or add any other text.\n`;
+    } else {
+      prompt += `- Quotes/Text Content: ${shifts.Q.value || 'New quotes/text'}\n`;
+    }
 
     prompt += "\nBuyer Targeting:\n";
     if (shifts.I.keep) prompt += `- Target Buyer: Use original persona (${analysisResult?.buyer_dna?.persona?.age_range || 'N/A'}, ${analysisResult?.buyer_dna?.identity_signals?.tribe || 'N/A'})\n`;
@@ -248,6 +261,7 @@ export default function GenerationScreen({ analysisResult, onNavigate, prefilled
     { key: 'H', name: 'Colors', placeholder: "e.g., Cool blues and teals" },
     { key: 'I', name: 'Graphics & Characters', placeholder: "e.g., Target yoga enthusiasts" },
     { key: 'F', name: 'Typography', placeholder: "e.g., Watercolor style" },
+    { key: 'Q', name: 'Quotes & Text', placeholder: "e.g., 'Live, Laugh, Love' as primary text" },
     { key: 'T', name: 'Theme & Mood', placeholder: "e.g., 'Find Your Peace'" },
     { key: 'B', name: 'Target Audience', placeholder: "e.g., Calm & serenity instead of adventure" },
   ];

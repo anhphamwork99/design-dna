@@ -131,6 +131,16 @@ const DIMENSION_LABELS: Record<string, {
     richContext: (d) => `Tribe: ${d?.buyer_dna?.identity_signals?.tribe || 'N/A'}, Age: ${d?.buyer_dna?.persona?.age_range || 'N/A'}, Interests: ${(d?.buyer_dna?.persona?.interests || []).join(', ') || 'N/A'}, Values: ${(d?.buyer_dna?.persona?.values || []).join(', ') || 'N/A'}, Identity message: "${d?.buyer_dna?.identity_signals?.message_to_world || 'N/A'}", Lifestyle: ${d?.buyer_dna?.persona?.lifestyle || 'N/A'}`,
     shortLabel: (d) => `${d?.buyer_dna?.persona?.age_range || 'N/A'}, ${d?.buyer_dna?.identity_signals?.tribe || 'N/A'}`,
   },
+  Q: {
+    name: 'Quotes & Text Content',
+    richContext: (d) => {
+      const texts = d?.visual_dna?.typography?.text_content;
+      if (texts) return `Primary: "${texts.primary || ''}", Secondary: "${texts.secondary || ''}"`;
+      // Fallback: try to extract from summary
+      return `Text from original design (preserve exactly as-is)`;
+    },
+    shortLabel: (d) => d?.visual_dna?.typography?.text_content?.primary || 'original text',
+  },
 };
 
 // ── Full DNA Packager ──────────────────────────────────────────────
@@ -197,7 +207,8 @@ export async function analyzeDesign(
     },
     "typography": {
       "fonts": [{"classification": "string", "weight": "string", "case": "string", "role": "string"}],
-      "hierarchy_levels": "integer", "suggested_google_fonts": ["string"]
+      "hierarchy_levels": "integer", "suggested_google_fonts": ["string"],
+      "text_content": {"primary": "The main quote/slogan/text on the design (exact wording)", "secondary": "Any secondary text (exact wording, empty string if none)"}
     },
     "graphics": {"style": "string", "primary_element": "string", "secondary_elements": ["string"], "effects": ["string"], "detail_level": "string"},
     "pod_technical": {"best_print_method": "string", "suitable_products": ["string"], "recommended_garment_colors": [{"name": "string", "hex": "#HEX"}], "scalability": "string"}

@@ -24,6 +24,7 @@ interface Shifts {
     I: ShiftState;
     F: ShiftState;
     T: ShiftState;
+    Q: ShiftState;
     B: ShiftState;
 }
 
@@ -36,6 +37,7 @@ function getInitialShifts(initialGenMode?: string, prefilledBrief?: string): Shi
             I: { keep: false, value: '' },
             F: { keep: false, value: '' },
             T: { keep: false, value: '' },
+            Q: { keep: true, value: '' },
             B: { keep: false, value: '' },
         };
     }
@@ -46,6 +48,7 @@ function getInitialShifts(initialGenMode?: string, prefilledBrief?: string): Shi
             I: { keep: true, value: '' },
             F: { keep: true, value: '' },
             T: { keep: false, value: '' },
+            Q: { keep: true, value: '' },
             B: { keep: false, value: '' },
         };
     }
@@ -56,6 +59,7 @@ function getInitialShifts(initialGenMode?: string, prefilledBrief?: string): Shi
         I: { keep: true, value: '' },
         F: { keep: true, value: '' },
         T: { keep: true, value: '' },
+        Q: { keep: true, value: '' },
         B: { keep: true, value: '' },
     };
 }
@@ -85,6 +89,7 @@ const dimensionConfig = [
     { key: 'H' as const, name: 'Colors', placeholder: 'e.g., Cool blues and teals' },
     { key: 'I' as const, name: 'Graphics', placeholder: 'e.g., Cat instead of dog' },
     { key: 'F' as const, name: 'Typography', placeholder: 'e.g., Bold hand-lettered' },
+    { key: 'Q' as const, name: 'Quotes & Text', placeholder: "e.g., 'Live, Laugh, Love'" },
     { key: 'T' as const, name: 'Theme & Mood', placeholder: 'e.g., Calm serenity' },
     { key: 'B' as const, name: 'Audience', placeholder: 'e.g., Yoga moms 30-40' },
 ];
