@@ -122,7 +122,7 @@ export default function CreativeStudio({
     const handleSynthesize = async () => {
         const apiKey = localStorage.getItem('designdna_api_key');
         if (!apiKey) {
-            window.dispatchEvent(new CustomEvent('open-settings'));
+            document.dispatchEvent(new CustomEvent('open-settings'));
             return;
         }
 
