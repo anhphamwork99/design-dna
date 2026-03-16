@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, UploadCloud, X, AlertTriangle } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowLeft, UploadCloud, X, AlertTriangle, Bookmark, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { savePattern, isCompareResultSaved } from './patternStorage';
 
 type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results';
 
@@ -248,6 +249,30 @@ export function CompareResultsScreen({
     show: { opacity: 1, y: 0, transition: { duration: 0.3 } }
   };
 
+  // ── Save as Pattern state ──
+  const [showSavePopup, setShowSavePopup] = useState(false);
+  const [patternName, setPatternName] = useState('');
+  const [isSaved, setIsSaved] = useState(() => isCompareResultSaved(compareResult?.batch_analysis));
+  const [showToast, setShowToast] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSavePattern = async () => {
+    if (!patternName.trim() || isSaving) return;
+    setIsSaving(true);
+    try {
+      await savePattern(patternName.trim(), compareResult?.batch_analysis, compareImages);
+      setIsSaved(true);
+      setShowSavePopup(false);
+      setPatternName('');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2500);
+    } catch (err) {
+      console.error('Failed to save pattern:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleNewComparison = () => {
     if (window.confirm('Start a new comparison? Current results will be lost.')) {
       setCompareImages([]);
@@ -350,6 +375,21 @@ export function CompareResultsScreen({
               >
                 Generate from Formula ✨
               </button>
+              {isSaved ? (
+                <button
+                  disabled
+                  className="flex-1 border border-success/30 text-success font-medium py-3 px-6 rounded-lg opacity-70 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Check className="w-4 h-4" /> Saved
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowSavePopup(true)}
+                  className="flex-1 border border-border-default text-text-primary font-medium py-3 px-6 rounded-lg hover:bg-bg-surface2 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base flex items-center justify-center gap-2"
+                >
+                  <Bookmark className="w-4 h-4" /> Save as Pattern
+                </button>
+              )}
               <button
                 onClick={handleNewComparison}
                 className="flex-1 border border-border-default text-text-primary font-medium py-3 px-6 rounded-lg hover:bg-bg-surface2 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
@@ -437,6 +477,67 @@ export function CompareResultsScreen({
           </motion.div>
         </motion.div>
       </div>
+
+      {/* ── Save as Pattern Popup ── */}
+      <AnimatePresence>
+        {showSavePopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+            onClick={() => setShowSavePopup(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-bg-surface1 border border-border-default rounded-xl shadow-lg p-6 w-[400px] max-w-[90vw]"
+            >
+              <h3 className="text-[16px] font-semibold mb-4">Save as Pattern</h3>
+              <input
+                type="text"
+                placeholder="Name your pattern..."
+                value={patternName}
+                onChange={(e) => setPatternName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSavePattern()}
+                autoFocus
+                className="w-full bg-bg-surface2 border border-border-default rounded-lg px-4 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent mb-4"
+              />
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => { setShowSavePopup(false); setPatternName(''); }}
+                  className="px-4 py-2 text-[13px] text-text-secondary hover:text-text-primary rounded-lg hover:bg-bg-surface2 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSavePattern}
+                  disabled={!patternName.trim() || isSaving}
+                  className="px-5 py-2 ai-gradient text-white text-[13px] font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSaving ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Toast Notification ── */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-success text-white px-5 py-2.5 rounded-lg shadow-lg text-[14px] font-medium flex items-center gap-2 z-50"
+          >
+            <Check className="w-4 h-4" /> Pattern saved!
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
