@@ -9,6 +9,18 @@ export interface SynthesizedConcept {
   targetBuyer: string;
   coherenceNotes: string;
   keyElements: string[];
+  // Enriched fields (Phase 7B.1)
+  suggestedText: {
+    primary: string;      // Main quote/slogan ON the design
+    secondary?: string;   // Tagline or subtitle
+    textStyle: string;    // "bold hand-lettered" / "clean sans-serif" etc.
+  };
+  colorPalette: Array<{
+    hex: string;          // "#1E3A5F"
+    name: string;         // "Deep Ocean"
+    role: string;         // "Dominant" | "Secondary" | "Accent"
+  }>;
+  madeForMeHook: string; // Why buyer feels "this was made for ME"
 }
 
 export interface SynthesizeInput {
@@ -36,12 +48,34 @@ function cleanJsonResponse(text: string): string {
   return clean.trim();
 }
 
-const CREATIVITY_SYNTHESIS_LABELS: Record<number, string> = {
-  1: "Stay very close to original — subtle refinements only",
-  2: "Keep the spirit, reinterpret elements freely",
-  3: "Recognizable roots but new creative direction",
-  4: "Loose inspiration — create something substantially new",
-  5: "Radical departure — keep only the emotional core",
+// ── Creativity: Fidelity Gradient ──────────────────────────────────
+// Creativity controls HOW STRICTLY each dimension is followed (not how much DNA to send)
+
+const CREATIVITY_FIDELITY: Record<number, string> = {
+  1: `Fidelity: VERY HIGH.
+KEEP dimensions → must feel recognizably the same (same palette hex, same typography, same composition structure).
+CHANGE dimensions → follow user direction closely, minimal artistic license.
+REIMAGINE dimensions → vary within the same family (e.g., still earthy tones, still similar style).`,
+
+  2: `Fidelity: HIGH.
+KEEP dimensions → same visual language, can vary details (similar palette, same style family).
+CHANGE dimensions → follow user direction, allow creative interpretation.
+REIMAGINE dimensions → different but in the same creative neighborhood.`,
+
+  3: `Fidelity: MODERATE.
+KEEP dimensions → maintain the feeling/essence, execution can differ significantly.
+CHANGE dimensions → user direction as starting point, push it further.
+REIMAGINE dimensions → genuinely new approach, only loosely inspired by original.`,
+
+  4: `Fidelity: LOW.
+KEEP dimensions → vague echo of the original at most.
+CHANGE dimensions → user direction as loose seed, interpret freely.
+REIMAGINE dimensions → complete freedom, any direction.`,
+
+  5: `Fidelity: MINIMAL.
+KEEP dimensions → thematic whisper only, no visual resemblance needed.
+CHANGE dimensions → user keywords as loose inspiration.
+REIMAGINE dimensions → absolute creative freedom, surprise the user.`,
 };
 
 const CREATIVITY_IMAGE_ROLES: Record<number, string> = {
@@ -52,14 +86,93 @@ const CREATIVITY_IMAGE_ROLES: Record<number, string> = {
   5: "The provided image is for CONTEXT ONLY. Create a completely new design — only the emotional essence should carry over.",
 };
 
-const DIMENSION_LABELS: Record<string, { name: string; dnaPath: (dna: any) => string }> = {
-  S: { name: 'Visual Style', dnaPath: (d) => d?.visual_dna?.graphics?.style || 'N/A' },
-  H: { name: 'Colors', dnaPath: (d) => d?.visual_dna?.color?.harmony || 'N/A' },
-  I: { name: 'Graphics', dnaPath: (d) => d?.visual_dna?.graphics?.primary_element || 'N/A' },
-  F: { name: 'Typography', dnaPath: (d) => d?.visual_dna?.typography?.fonts?.[0]?.classification || 'N/A' },
-  T: { name: 'Theme & Mood', dnaPath: (d) => d?.buyer_dna?.emotional_triggers?.primary_emotion || 'N/A' },
-  B: { name: 'Audience', dnaPath: (d) => `${d?.buyer_dna?.persona?.age_range || 'N/A'}, ${d?.buyer_dna?.identity_signals?.tribe || 'N/A'}` },
+// ── Dimension Labels with Rich DNA Context ─────────────────────────
+
+const DIMENSION_LABELS: Record<string, {
+  name: string;
+  richContext: (dna: any) => string;
+  shortLabel: (dna: any) => string;
+}> = {
+  S: {
+    name: 'Visual Style',
+    richContext: (d) => `Style: ${d?.visual_dna?.graphics?.style || 'N/A'}, Primary element: ${d?.visual_dna?.graphics?.primary_element || 'N/A'}, Secondary: ${(d?.visual_dna?.graphics?.secondary_elements || []).join(', ') || 'none'}, Detail level: ${d?.visual_dna?.graphics?.detail_level || 'N/A'}, Effects: ${(d?.visual_dna?.graphics?.effects || []).join(', ') || 'none'}`,
+    shortLabel: (d) => d?.visual_dna?.graphics?.style || 'N/A',
+  },
+  H: {
+    name: 'Colors',
+    richContext: (d) => {
+      const palette = (d?.visual_dna?.color?.palette || []).map((c: any) => `${c.name} ${c.hex} (${c.role}, ${c.proportion}%)`).join(', ');
+      return `Harmony: ${d?.visual_dna?.color?.harmony || 'N/A'}, Temperature: ${d?.visual_dna?.color?.temperature || 'N/A'}, Contrast: ${d?.visual_dna?.color?.contrast || 'N/A'}, Palette: [${palette}]`;
+    },
+    shortLabel: (d) => d?.visual_dna?.color?.harmony || 'N/A',
+  },
+  I: {
+    name: 'Graphics',
+    richContext: (d) => `Primary: ${d?.visual_dna?.graphics?.primary_element || 'N/A'}, Secondary: ${(d?.visual_dna?.graphics?.secondary_elements || []).join(', ') || 'none'}, Effects: ${(d?.visual_dna?.graphics?.effects || []).join(', ') || 'none'}`,
+    shortLabel: (d) => d?.visual_dna?.graphics?.primary_element || 'N/A',
+  },
+  F: {
+    name: 'Typography',
+    richContext: (d) => {
+      const fonts = (d?.visual_dna?.typography?.fonts || []).map((f: any) => `${f.classification} ${f.weight} ${f.case} (${f.role})`).join(', ');
+      return `Fonts: [${fonts}], Hierarchy levels: ${d?.visual_dna?.typography?.hierarchy_levels || 'N/A'}, Suggested Google Fonts: ${(d?.visual_dna?.typography?.suggested_google_fonts || []).join(', ') || 'N/A'}`;
+    },
+    shortLabel: (d) => d?.visual_dna?.typography?.fonts?.[0]?.classification || 'N/A',
+  },
+  T: {
+    name: 'Theme & Mood',
+    richContext: (d) => `Primary emotion: ${d?.buyer_dna?.emotional_triggers?.primary_emotion || 'N/A'}, Trigger: ${d?.buyer_dna?.emotional_triggers?.trigger_description || 'N/A'}, Secondary: ${(d?.buyer_dna?.emotional_triggers?.secondary_emotions || []).join(', ') || 'none'}, Arc: ${d?.buyer_dna?.emotional_triggers?.emotional_arc || 'N/A'}`,
+    shortLabel: (d) => d?.buyer_dna?.emotional_triggers?.primary_emotion || 'N/A',
+  },
+  B: {
+    name: 'Audience',
+    richContext: (d) => `Tribe: ${d?.buyer_dna?.identity_signals?.tribe || 'N/A'}, Age: ${d?.buyer_dna?.persona?.age_range || 'N/A'}, Interests: ${(d?.buyer_dna?.persona?.interests || []).join(', ') || 'N/A'}, Values: ${(d?.buyer_dna?.persona?.values || []).join(', ') || 'N/A'}, Identity message: "${d?.buyer_dna?.identity_signals?.message_to_world || 'N/A'}", Lifestyle: ${d?.buyer_dna?.persona?.lifestyle || 'N/A'}`,
+    shortLabel: (d) => `${d?.buyer_dna?.persona?.age_range || 'N/A'}, ${d?.buyer_dna?.identity_signals?.tribe || 'N/A'}`,
+  },
 };
+
+// ── Full DNA Packager ──────────────────────────────────────────────
+// Always sends complete DNA to synthesis model — creativity controls fidelity, not exposure
+
+function packageFullDna(dna: any): string {
+  if (!dna) return 'No DNA available.';
+
+  const v = dna.visual_dna || {};
+  const b = dna.buyer_dna || {};
+
+  const paletteStr = (v.color?.palette || []).map((c: any) =>
+    `${c.name} ${c.hex} (${c.role}, ${c.proportion}%)`
+  ).join(', ');
+
+  const fontsStr = (v.typography?.fonts || []).map((f: any) =>
+    `${f.classification} ${f.weight} ${f.case} (${f.role})`
+  ).join(', ');
+
+  const garmentColorsStr = (v.pod_technical?.recommended_garment_colors || []).map((c: any) =>
+    `${c.name} ${c.hex}`
+  ).join(', ');
+
+  const madeForMeStr = (b.made_for_me_decisions || []).map((d: any) =>
+    `• ${d.decision}: ${d.why_it_works}`
+  ).join('\n');
+
+  return `### Visual DNA
+Summary: ${v.summary || 'N/A'}
+Composition: ${v.composition?.grid_type || 'N/A'}, ${v.composition?.symmetry || 'N/A'}, focal: ${v.composition?.focal_point || 'N/A'}, flow: ${v.composition?.visual_flow || 'N/A'}, density: ${v.composition?.density || 'N/A'}
+Color Palette: [${paletteStr}]
+Color Harmony: ${v.color?.harmony || 'N/A'}, Temperature: ${v.color?.temperature || 'N/A'}, Contrast: ${v.color?.contrast || 'N/A'}
+Typography: [${fontsStr}], Hierarchy: ${v.typography?.hierarchy_levels || 'N/A'} levels
+Graphics: Style: ${v.graphics?.style || 'N/A'}, Primary: ${v.graphics?.primary_element || 'N/A'}, Secondary: ${(v.graphics?.secondary_elements || []).join(', ') || 'none'}, Effects: ${(v.graphics?.effects || []).join(', ') || 'none'}, Detail: ${v.graphics?.detail_level || 'N/A'}
+POD Technical: Print: ${v.pod_technical?.best_print_method || 'N/A'}, Products: ${(v.pod_technical?.suitable_products || []).join(', ') || 'N/A'}, Garment colors: [${garmentColorsStr}]
+
+### Buyer DNA
+Persona: ${b.persona?.age_range || 'N/A'}, ${b.persona?.gender_lean || 'N/A'}, Interests: [${(b.persona?.interests || []).join(', ')}], Values: [${(b.persona?.values || []).join(', ')}], Lifestyle: ${b.persona?.lifestyle || 'N/A'}, Spending: ${b.persona?.spending_mindset || 'N/A'}
+Identity: Primary: ${b.identity_signals?.primary || 'N/A'}, Message: "${b.identity_signals?.message_to_world || 'N/A'}", Tribe: ${b.identity_signals?.tribe || 'N/A'}, Aesthetic: ${b.identity_signals?.aesthetic_identity || 'N/A'}
+Emotions: Primary: ${b.emotional_triggers?.primary_emotion || 'N/A'}, Trigger: "${b.emotional_triggers?.trigger_description || 'N/A'}", Secondary: [${(b.emotional_triggers?.secondary_emotions || []).join(', ')}], Arc: ${b.emotional_triggers?.emotional_arc || 'N/A'}
+Occasion: Seasons: [${(b.occasion_timing?.best_seasons || []).join(', ')}], Events: [${(b.occasion_timing?.events || []).join(', ')}], Wear: ${b.occasion_timing?.wear_context || 'N/A'}, Gift: ${b.occasion_timing?.gift_potential?.score || 'N/A'} (${b.occasion_timing?.gift_potential?.who_buys_for_whom || 'N/A'})
+Made-for-me decisions:
+${madeForMeStr || '• N/A'}`;
+}
 
 // ── analyzeDesign ──────────────────────────────────────────────────
 
@@ -136,43 +249,24 @@ export async function synthesizeConcept(
 ): Promise<SynthesizedConcept[]> {
   const ai = new GoogleGenAI({ apiKey });
 
-  // Build dimension directives
+  // Build dimension directives with RICH context
   const dimensionDirectives = Object.entries(DIMENSION_LABELS).map(([key, config]) => {
     const shift = input.shifts[key];
     if (!shift) return '';
     if (shift.keep) {
-      return `- PRESERVE ${config.name}: ${config.dnaPath(input.originalDna)}`;
+      return `- PRESERVE ${config.name}: ${config.richContext(input.originalDna)}`;
     }
     if (shift.value) {
-      return `- CHANGE ${config.name} to: ${shift.value}`;
+      return `- CHANGE ${config.name} to: "${shift.value}" (original was: ${config.shortLabel(input.originalDna)})`;
     }
-    return `- REIMAGINE ${config.name} freely`;
+    // REIMAGINE — include original context so model knows what to diverge FROM
+    return `- REIMAGINE ${config.name} — original: ${config.richContext(input.originalDna)} → create something DIFFERENT`;
   }).filter(Boolean).join('\n');
 
-  const creativityInstruction = CREATIVITY_SYNTHESIS_LABELS[input.creativity] || CREATIVITY_SYNTHESIS_LABELS[3];
+  const fidelityInstruction = CREATIVITY_FIDELITY[input.creativity] || CREATIVITY_FIDELITY[3];
 
-  // At higher creativity, expose LESS original DNA to reduce anchoring
-  const creativity = input.creativity;
-  const dnaSection = creativity <= 2
-    ? `## Original Design DNA (Reference — stay close)
-Visual: ${JSON.stringify(input.originalDna?.visual_dna?.summary || 'N/A')}
-Style: ${input.originalDna?.visual_dna?.graphics?.style || 'N/A'}
-Colors: ${input.originalDna?.visual_dna?.color?.harmony || 'N/A'} (${input.originalDna?.visual_dna?.color?.temperature || 'N/A'})
-Primary Element: ${input.originalDna?.visual_dna?.graphics?.primary_element || 'N/A'}
-Typography: ${input.originalDna?.visual_dna?.typography?.fonts?.[0]?.classification || 'N/A'}
-Buyer Tribe: ${input.originalDna?.buyer_dna?.identity_signals?.tribe || 'N/A'}
-Primary Emotion: ${input.originalDna?.buyer_dna?.emotional_triggers?.primary_emotion || 'N/A'}
-Persona: ${input.originalDna?.buyer_dna?.persona?.age_range || 'N/A'}, ${input.originalDna?.buyer_dna?.persona?.lifestyle || 'N/A'}`
-    : creativity === 3
-      ? `## Original Design DNA (Inspiration — diverge from this)
-Theme: ${input.originalDna?.buyer_dna?.emotional_triggers?.primary_emotion || 'N/A'}
-Buyer: ${input.originalDna?.buyer_dna?.identity_signals?.tribe || 'N/A'}, ${input.originalDna?.buyer_dna?.persona?.age_range || 'N/A'}
-Style hint: ${input.originalDna?.visual_dna?.graphics?.style || 'N/A'}
-Do NOT replicate the original. Use it only as a jumping-off point.`
-      : `## Original Design DNA (Context only — create something NEW)
-The original targets: ${input.originalDna?.buyer_dna?.identity_signals?.tribe || 'N/A'}
-Emotional core: ${input.originalDna?.buyer_dna?.emotional_triggers?.primary_emotion || 'N/A'}
-Do NOT reference the original's visual style, colors, or composition. Create entirely fresh directions.`;
+  // Always package FULL DNA — creativity controls fidelity, not exposure
+  const fullDna = packageFullDna(input.originalDna);
 
   const synthesisPrompt = `You are a Print-on-Demand design strategist. Your job: create 3 WILDLY DIFFERENT concept options.
 
@@ -183,15 +277,16 @@ The 3 concepts MUST differ across ALL of these dimensions:
 3. **Different subject/composition** — e.g., one character-focused, one typography-heavy, one pattern/motif-based.
 4. **Different emotional tone** — e.g., one playful humorous, one sentimental warm, one bold empowering.
 
-If your 3 concepts feel like variations of ONE idea, you have failed. They must feel like they came from 3 DIFFERENT designers.
+If your 3 concepts feel like variations of ONE idea, you have FAILED. They must feel like they came from 3 DIFFERENT designers.
 
-${dnaSection}
+## Original Design DNA (FULL REFERENCE)
+${fullDna}
 
 ## User's Design Directions
 ${dimensionDirectives}
 
 ## Creativity Level: ${input.creativity}/5
-${creativityInstruction}
+${fidelityInstruction}
 
 ${input.appliedPattern ? `## Applied Pattern/Inspiration\n${input.appliedPattern}\n` : ''}
 ## POD Production Constraints
@@ -210,11 +305,27 @@ Each concept object:
 {
   "title": "Short catchy concept name (3-5 words)",
   "description": "2-3 sentences describing the overall design concept",
-  "visualDirection": "SPECIFIC visual instructions: exact illustration style, color palette description, composition layout, key visual elements. Be detailed enough that an image generator can follow this.",
+  "visualDirection": "DETAILED visual instructions: exact illustration style, composition layout, key visual elements, how they're arranged. Be specific enough for an image generator to follow.",
+  "suggestedText": {
+    "primary": "The main quote, slogan, or text that should appear ON the design (e.g., 'A GIRL & HER CATS')",
+    "secondary": "Optional tagline or subtitle (empty string if none needed)",
+    "textStyle": "How the text should look: e.g., 'bold hand-lettered', 'clean sans-serif', 'vintage serif', 'playful script'"
+  },
+  "colorPalette": [
+    { "hex": "#HEXCODE", "name": "Color Name", "role": "Dominant" },
+    { "hex": "#HEXCODE", "name": "Color Name", "role": "Secondary" },
+    { "hex": "#HEXCODE", "name": "Color Name", "role": "Accent" }
+  ],
   "targetBuyer": "Who would buy this — age, interests, tribe, occasion",
-  "coherenceNotes": "Why this concept works as a unified whole — what ties the elements together",
+  "madeForMeHook": "One sentence: why the target buyer would feel THIS design was made specifically for THEM",
+  "coherenceNotes": "Why this concept works as a unified whole — what ties visual + text + emotion together",
   "keyElements": ["element1", "element2", "element3", "element4"]
-}`;
+}
+
+IMPORTANT:
+- suggestedText.primary MUST be actual text content for the design (a quote, slogan, or statement) — NOT a description of what the text should say.
+- colorPalette MUST have 3-5 specific hex colors. Do NOT use generic names without hex.
+- Each concept's colorPalette should be DISTINCTLY different from the others.`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-pro',
@@ -242,6 +353,11 @@ export async function generateArtwork(
 
   const imageRole = CREATIVITY_IMAGE_ROLES[input.creativity] || CREATIVITY_IMAGE_ROLES[3];
 
+  // Build color palette instruction
+  const paletteInstruction = (input.concept.colorPalette || [])
+    .map(c => `- ${c.name} (${c.hex}) — ${c.role}`)
+    .join('\n');
+
   const prompt = `Create a Print-on-Demand ready design based on this concept.
 
 ## Concept: ${input.concept.title}
@@ -250,8 +366,13 @@ ${input.concept.description}
 ## Visual Direction
 ${input.concept.visualDirection}
 
-## Target Buyer
-${input.concept.targetBuyer}
+## Text Content (MUST appear in the design)
+Primary text: "${input.concept.suggestedText?.primary || ''}"
+${input.concept.suggestedText?.secondary ? `Secondary text: "${input.concept.suggestedText.secondary}"` : ''}
+Text style: ${input.concept.suggestedText?.textStyle || 'bold decorative'}
+
+## Color Palette (USE these specific colors)
+${paletteInstruction || 'Use colors appropriate for the concept'}
 
 ## Image Reference Instruction
 ${imageRole}
@@ -260,7 +381,8 @@ ${imageRole}
 - Background MUST be solid white (#FFFFFF). No gradients, no textures, no scenes behind the artwork.
 - The design must float cleanly on the white background — isolated, print-ready.
 - Illustration-based only. No photorealistic rendering, no 3D effects.
-- ONE cohesive design composition. Do not split into multiple separate elements.
+- ONE cohesive design composition with text and visuals integrated.
+- The PRIMARY TEXT must be clearly legible and prominent in the design.
 
 Generate exactly ONE image.`;
 
