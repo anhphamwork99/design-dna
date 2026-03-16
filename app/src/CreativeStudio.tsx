@@ -173,7 +173,7 @@ export default function CreativeStudio({
             setSelectedConceptIndex(carouselIndex);
 
             // Run buyer fit scoring (fire-and-forget with state update)
-            const fitPrompt = `${selectedConcept.title}: ${selectedConcept.description}. Visual: ${selectedConcept.visualDirection}. Target: ${selectedConcept.targetBuyer}`;
+            const fitPrompt = `${selectedConcept.title}: ${selectedConcept.description}. Visual: ${selectedConcept.visualDirection}. Target: ${selectedConcept.targetBuyer}. Text: "${selectedConcept.suggestedText?.primary || ''}". Made-for-me: ${selectedConcept.madeForMeHook || 'N/A'}`;
             analyzeBuyerFit(apiKey, fitPrompt).then(setBuyerFitScores).catch(console.error);
 
             setShowResult(true);
@@ -375,6 +375,49 @@ export default function CreativeStudio({
                                 {concept.description}
                             </p>
 
+                            {/* Suggested Text */}
+                            {concept.suggestedText && concept.suggestedText.primary && (
+                                <div className="mb-4 bg-accent/5 border border-accent/10 rounded-lg px-4 py-3">
+                                    <span className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">
+                                        Design Text
+                                    </span>
+                                    <p className="text-[15px] text-accent font-semibold mt-1.5 leading-snug">
+                                        &ldquo;{concept.suggestedText.primary}&rdquo;
+                                    </p>
+                                    {concept.suggestedText.secondary && (
+                                        <p className="text-[12px] text-text-secondary mt-1 italic">
+                                            &ldquo;{concept.suggestedText.secondary}&rdquo;
+                                        </p>
+                                    )}
+                                    <span className="inline-block mt-2 bg-bg-surface2 px-2 py-0.5 rounded text-[10px] text-text-tertiary">
+                                        {concept.suggestedText.textStyle}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Color Palette */}
+                            {concept.colorPalette && concept.colorPalette.length > 0 && (
+                                <div className="mb-4">
+                                    <span className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">
+                                        Color Palette
+                                    </span>
+                                    <div className="flex items-center gap-3 mt-2">
+                                        {concept.colorPalette.map((color, i) => (
+                                            <div key={i} className="flex items-center gap-1.5" title={`${color.name} (${color.role})`}>
+                                                <div
+                                                    className="w-6 h-6 rounded-full border border-border-default flex-shrink-0 shadow-sm"
+                                                    style={{ backgroundColor: color.hex }}
+                                                />
+                                                <div className="flex flex-col">
+                                                    <span className="text-[11px] text-text-secondary leading-tight">{color.name}</span>
+                                                    <span className="text-[9px] text-text-tertiary leading-tight">{color.role}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="space-y-3">
                                 <div>
                                     <span className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">
@@ -392,6 +435,19 @@ export default function CreativeStudio({
                                         {concept.targetBuyer}
                                     </p>
                                 </div>
+
+                                {/* Made For Me Hook */}
+                                {concept.madeForMeHook && (
+                                    <div>
+                                        <span className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">
+                                            "Made For Me" Hook
+                                        </span>
+                                        <p className="text-[13px] text-text-primary mt-1 bg-bg-surface2/50 rounded-lg px-3 py-2">
+                                            💡 {concept.madeForMeHook}
+                                        </p>
+                                    </div>
+                                )}
+
                                 <div>
                                     <span className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">
                                         Why It Works
