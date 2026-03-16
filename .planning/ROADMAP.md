@@ -190,20 +190,26 @@ Original image passed as style reference in both passes
 
 **Requirements:** F3-06, F3-07, F4-01..F4-05
 
-**Architecture context:** Patterns là tài sản tái sử dụng. User tích lũy patterns từ nhiều lần Compare, apply 0/1/nhiều khi tạo artwork trong Creative Studio.
+**Architecture context:** Patterns là tài sản tái sử dụng. User tích lũy patterns từ nhiều lần Compare, apply vào Creative Studio qua Library panel. Bỏ "Use Winning Formula" shortcut — flow duy nhất qua Library.
+
+**Plans:** 3 plans in 2 waves
 
 Plans:
-- [ ] 7C-01-PLAN.md — Pattern data model + localStorage persistence + save from Compare results
-- [ ] 7C-02-PLAN.md — Pattern Library UI (list, view detail, delete, apply → navigate to Creative Studio)
+- [ ] 7C-01-PLAN.md — Pattern storage utility + Save flow on Compare Results (Wave 1)
+- [ ] 7C-02-PLAN.md — Pattern Library pages + Landing entry point (Wave 2)
+- [ ] 7C-03-PLAN.md — Apply Pattern in Creative Studio + remove prefilledBrief (Wave 2)
 
 **Success Criteria:**
-- [ ] After Compare → "Save as Pattern" button (user names the pattern)
-- [ ] Pattern saved to localStorage with full structured data (visual patterns, buyer overlap, winning formula, specificity ladder)
+- [ ] After Compare → "Save as Pattern" button with naming popup
+- [ ] Pattern saved to localStorage with full batch_analysis + resized thumbnails
 - [ ] Pattern Library accessible from Landing screen (if patterns exist)
-- [ ] Pattern list: name, source count, created date, summary preview
-- [ ] Pattern detail: expandable view with all data
-- [ ] Delete pattern action
-- [ ] "Apply Pattern" → opens Creative Studio with pattern pre-loaded
+- [ ] Pattern list: name, thumbnails, created date, summary
+- [ ] Pattern detail: dedicated page with flat layout (like Compare Results)
+- [ ] Delete pattern with confirm dialog
+- [ ] Creative Studio: + Add Pattern → panel → section selection → apply as chip
+- [ ] Only 1 pattern applied at a time
+- [ ] "Use Winning Formula" completely removed
+- [ ] prefilledBrief prop chain completely removed
 
 **Deliverable:** Direct code implementation
 
