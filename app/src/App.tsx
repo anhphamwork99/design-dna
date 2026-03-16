@@ -15,7 +15,6 @@ export default function App() {
   const [uploadedImage, setUploadedImage] = useState<{ data: string; name: string; type: string } | null>(null);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [error, setError] = useState<{ type: string; message: string } | null>(null);
-  const [prefilledBrief, setPrefilledBrief] = useState<string | undefined>(undefined);
   const [initialGenMode, setInitialGenMode] = useState<string | undefined>(undefined);
   const [compareImages, setCompareImages] = useState<{ data: string; name: string; type: string }[]>([]);
   const [compareResult, setCompareResult] = useState<any>(null);
@@ -240,8 +239,6 @@ export default function App() {
               analysisResult={analysisResult}
               uploadedImage={uploadedImage}
               onNavigate={setCurrentScreen}
-              prefilledBrief={prefilledBrief}
-              initialGenMode={initialGenMode}
             />
           )}
           {currentScreen === 'compare_upload' && (
@@ -268,7 +265,6 @@ export default function App() {
               onNavigate={setCurrentScreen}
               compareImages={compareImages}
               setCompareImages={setCompareImages}
-              setPrefilledBrief={setPrefilledBrief}
               compareResult={compareResult}
             />
           )}

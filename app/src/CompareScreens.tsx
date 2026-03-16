@@ -226,14 +226,12 @@ export function CompareResultsScreen({
   onNavigate,
   compareImages,
   setCompareImages,
-  setPrefilledBrief,
   compareResult
 }: {
   key?: string;
   onNavigate: (s: Screen) => void;
   compareImages: { data: string; name: string; type: string }[];
   setCompareImages: React.Dispatch<React.SetStateAction<{ data: string; name: string; type: string }[]>>;
-  setPrefilledBrief: (brief: string) => void;
   compareResult: any;
 }) {
   const containerVariants = {
@@ -278,13 +276,6 @@ export function CompareResultsScreen({
       setCompareImages([]);
       onNavigate('compare_upload');
     }
-  };
-
-  const handleGenerate = () => {
-    if (compareResult?.batch_analysis?.winning_formula?.suggested_brief) {
-      setPrefilledBrief(compareResult.batch_analysis.winning_formula.suggested_brief);
-    }
-    onNavigate('generation');
   };
 
   const analysis = compareResult?.batch_analysis;
@@ -369,12 +360,6 @@ export function CompareResultsScreen({
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={handleGenerate}
-                className="flex-1 ai-gradient text-white font-medium py-3 px-6 rounded-lg hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-              >
-                Generate from Formula ✨
-              </button>
               {isSaved ? (
                 <button
                   disabled

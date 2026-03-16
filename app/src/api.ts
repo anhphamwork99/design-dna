@@ -28,7 +28,10 @@ export interface SynthesizeInput {
   originalDna: any;
   shifts: Record<string, { keep: boolean; value: string }>;
   creativity: number;
-  appliedPattern?: string;
+  appliedPattern?: {
+    selectedSections: string[];
+    data: Record<string, any>;
+  };
 }
 
 export interface GenerateArtworkInput {
@@ -48,6 +51,66 @@ function cleanJsonResponse(text: string): string {
   else if (clean.startsWith('```')) clean = clean.substring(3);
   if (clean.endsWith('```')) clean = clean.substring(0, clean.length - 3);
   return clean.trim();
+}
+
+// ── Image Resize (prevents 400 errors from oversized payloads) ────
+const MAX_IMAGE_DIMENSION = 1536; // px — Gemini works best at ≤1536px
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4MB
+
+async function resizeImageIfNeeded(dataUrl: string): Promise<string> {
+  // Extract base64 size estimate (base64 is ~33% larger than binary)
+  const base64Part = dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl;
+  const estimatedBytes = (base64Part.length * 3) / 4;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const needsResize =
+        img.width > MAX_IMAGE_DIMENSION ||
+        img.height > MAX_IMAGE_DIMENSION ||
+        estimatedBytes > MAX_IMAGE_BYTES;
+
+      if (!needsResize) {
+        resolve(dataUrl);
+        return;
+      }
+
+      // Calculate new dimensions maintaining aspect ratio
+      let newWidth = img.width;
+      let newHeight = img.height;
+      if (newWidth > MAX_IMAGE_DIMENSION || newHeight > MAX_IMAGE_DIMENSION) {
+        const scale = Math.min(
+          MAX_IMAGE_DIMENSION / newWidth,
+          MAX_IMAGE_DIMENSION / newHeight
+        );
+        newWidth = Math.round(newWidth * scale);
+        newHeight = Math.round(newHeight * scale);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+      // Use JPEG for large images (much smaller than PNG), keep PNG for small
+      let quality = 0.85;
+      let result = canvas.toDataURL('image/jpeg', quality);
+
+      // If still too large, reduce quality
+      while (
+        ((result.split(',')[1].length * 3) / 4) > MAX_IMAGE_BYTES &&
+        quality > 0.4
+      ) {
+        quality -= 0.1;
+        result = canvas.toDataURL('image/jpeg', quality);
+      }
+
+      resolve(result);
+    };
+    img.onerror = () => resolve(dataUrl); // fallback to original
+    img.src = dataUrl;
+  });
 }
 
 // ── Creativity: Fidelity Gradient ──────────────────────────────────
@@ -194,7 +257,7 @@ export async function analyzeDesign(
   apiKey: string
 ) {
   const ai = new GoogleGenAI({ apiKey });
-  const model = 'gemini-3.1-pro-preview';
+  const model = 'gemini-2.5-pro';
 
   const analysisPrompt = `Analyze this design completely. Output ONLY a JSON object with this exact structure:
 {
@@ -229,14 +292,18 @@ Important Rules:
 
   const prompt = analysisPrompt;
 
+  // Resize image before sending to API
+  const resizedImage = await resizeImageIfNeeded(base64Image);
+  const resizedMimeType = resizedImage.startsWith('data:image/jpeg') ? 'image/jpeg' : mimeType;
+
   const response = await ai.models.generateContent({
     model,
     contents: {
       parts: [
         {
           inlineData: {
-            data: base64Image.split(',')[1],
-            mimeType
+            data: resizedImage.split(',')[1],
+            mimeType: resizedMimeType
           }
         },
         {
@@ -252,6 +319,57 @@ Important Rules:
   const text = response.text;
   if (!text) throw new Error("No response from Gemini");
   return JSON.parse(cleanJsonResponse(text));
+}
+
+// ── formatPatternInsights ──────────────────────────────────────────
+
+function formatPatternInsights(pattern: { selectedSections: string[]; data: Record<string, any> }): string {
+  const parts: string[] = ['## PATTERN INSIGHTS (from cross-design analysis)\n'];
+
+  if (pattern.data.winning_formula) {
+    const wf = pattern.data.winning_formula;
+    parts.push('### Winning Formula');
+    if (wf.summary) parts.push(wf.summary);
+    if (wf.keep?.length) parts.push(`**Keep:** ${wf.keep.join(', ')}`);
+    if (wf.experiment_with?.length) parts.push(`**Experiment with:** ${wf.experiment_with.join(', ')}`);
+    if (wf.avoid?.length) parts.push(`**Avoid:** ${wf.avoid.join(', ')}`);
+    if (wf.suggested_brief) parts.push(`**Suggested brief:** ${wf.suggested_brief}`);
+  }
+
+  if (pattern.data.visual_patterns) {
+    const vp = pattern.data.visual_patterns;
+    parts.push('\n### Visual Patterns');
+    if (vp.common_colors) parts.push(`- Colors: ${vp.common_colors}`);
+    if (vp.typography_trends) parts.push(`- Typography: ${vp.typography_trends}`);
+    if (vp.composition_patterns) parts.push(`- Composition: ${vp.composition_patterns}`);
+    if (vp.illustration_styles) parts.push(`- Illustration: ${vp.illustration_styles}`);
+  }
+
+  if (pattern.data.buyer_overlap) {
+    const bo = pattern.data.buyer_overlap;
+    parts.push('\n### Buyer Overlap');
+    if (bo.shared_persona) parts.push(`- Persona: ${bo.shared_persona}`);
+    if (bo.shared_identity) parts.push(`- Identity: ${bo.shared_identity}`);
+    if (bo.shared_emotion) parts.push(`- Emotion: ${bo.shared_emotion}`);
+    if (bo.shared_occasion) parts.push(`- Occasion: ${bo.shared_occasion}`);
+  }
+
+  if (pattern.data.made_for_me_patterns?.length) {
+    parts.push('\n### Made For Me Patterns');
+    pattern.data.made_for_me_patterns.forEach((p: string) => parts.push(`- ${p}`));
+  }
+
+  if (pattern.data.specificity_ladder) {
+    const sl = pattern.data.specificity_ladder;
+    parts.push('\n### Specificity Ladder');
+    if (sl.generic) parts.push(`- Generic: ${sl.generic}`);
+    if (sl.niche) parts.push(`- Niche: ${sl.niche}`);
+    if (sl.hyper_niche) parts.push(`- Hyper-niche: ${sl.hyper_niche}`);
+  }
+
+  parts.push('\nUse these insights to inform your concept generation. They are creative input, not strict rules.\n');
+
+  return parts.join('\n');
 }
 
 // ── synthesizeConcept ──────────────────────────────────────────────
@@ -301,7 +419,7 @@ ${dimensionDirectives}
 ## Creativity Level: ${input.creativity}/5
 ${fidelityInstruction}
 
-${input.appliedPattern ? `## Applied Pattern/Inspiration\n${input.appliedPattern}\n` : ''}
+${input.appliedPattern ? formatPatternInsights(input.appliedPattern) : ''}
 ## POD Production Constraints
 All concepts MUST be POD-ready:
 - Illustration-based (not photorealistic, no 3D rendering)
@@ -386,7 +504,8 @@ async function generateImageFromModel(
 
 
 // ── Clone Design (Subtle Mode) ─────────────────────────────────────
-// Single-pass generation: sends original image + DNA, asks for exact reproduction
+// Single-pass extraction: strips product surface artifacts, recreates design as clean flat artwork
+// Style-agnostic: respects original style (photo collage, illustration, vector, etc.)
 
 export interface CloneDesignInput {
   originalDna: any;
@@ -401,7 +520,7 @@ export async function cloneDesign(
   input: CloneDesignInput
 ): Promise<string> {
   const ai = new GoogleGenAI({ apiKey });
-  input.onProgress?.('Cloning design...');
+  input.onProgress?.('Extracting & recreating design...');
 
   const dna = input.originalDna;
   const v = dna?.visual_dna || {};
@@ -415,55 +534,75 @@ export async function cloneDesign(
     .map((f: any) => `${f.classification} ${f.weight} ${f.case} (${f.role})`)
     .join(', ');
 
-  const clonePrompt = `Reproduce the provided design as a PIXEL-ACCURATE recreation. Your output must be visually indistinguishable from the original.
+  const effectsStr = (v.graphics?.effects || []).join(', ') || 'none';
 
-## STRICT REPRODUCTION RULES
-- Copy EVERY visual element exactly: same subject, same pose, same arrangement, same proportions
-- Same composition and layout — identical grid, spacing, and element placement
-- Same illustration style: ${v.graphics?.style || 'match original exactly'}
-- Same detail level: ${v.graphics?.detail_level || 'match original exactly'}
-- Same effects: ${(v.graphics?.effects || []).join(', ') || 'none — match original'}
+  // Build text instruction
+  let textInstruction = '';
+  if (textContent?.primary) {
+    textInstruction = `\n## TEXT ON THE DESIGN — REPRODUCE EXACTLY
+Primary text: "${textContent.primary}" — same words, same position, same styling
+${textContent.secondary ? `Secondary text: "${textContent.secondary}" — same words, same position, same styling` : ''}
+Typography: ${fontsStr || 'match original'}
+- Reproduce the EXACT same text decoration, effects, and positioning as the original design`;
+  }
 
-## COLOR — USE EXACT SAME PALETTE
+  const clonePrompt = `You are looking at a design that exists ON a physical product surface (t-shirt, hoodie, mug, poster, etc). The image shows the design affected by fabric wrinkles, ambient lighting, camera angle, and surface curvature.
+
+YOUR TASK: Extract the design from the product surface and recreate it as a CLEAN, FLAT, print-ready artwork on a white background. This is a FAITHFUL REPRODUCTION — the result should look like the original design file before it was printed on the product.
+
+## DESIGN TO EXTRACT
+Summary: ${v.summary || 'Analyze from the image'}
+- Style: ${v.graphics?.style || 'match the original design style EXACTLY'}
+- Primary subject: ${v.graphics?.primary_element || 'identify from image'}
+- Secondary elements: ${(v.graphics?.secondary_elements || []).join(', ') || 'identify from image'}
+- Effects: ${effectsStr}
+- Detail level: ${v.graphics?.detail_level || 'high'}
+
+## COMPOSITION — REPRODUCE EXACTLY
+- Layout: ${v.composition?.grid_type || 'match original'}
+- Symmetry: ${v.composition?.symmetry || 'match original'}
+- Focal point: ${v.composition?.focal_point || 'match original'}
+- Flow: ${v.composition?.visual_flow || 'match original'}
+- Density: ${v.composition?.density || 'match original'}
+
+## COLORS — USE EXACT SAME PALETTE
 ${paletteStr || 'Match the original design colors exactly'}
-Harmony: ${v.color?.harmony || 'match original'}
-Temperature: ${v.color?.temperature || 'match original'}
-Contrast: ${v.color?.contrast || 'match original'}
+Harmony: ${v.color?.harmony || 'match original'}, Temperature: ${v.color?.temperature || 'match original'}, Contrast: ${v.color?.contrast || 'match original'}
+${textInstruction}
 
-## TYPOGRAPHY — REPRODUCE EXACTLY
-Fonts: ${fontsStr || 'match original exactly'}
-${textContent ? `Primary text: "${textContent.primary}" — render EXACTLY these words, same size, same position, same decoration
-${textContent.secondary ? `Secondary text: "${textContent.secondary}" — render EXACTLY these words` : ''}` : 'Match all text from the original design exactly — same words, same styling, same position'}
+## WHAT TO STRIP (product surface artifacts)
+- REMOVE: Fabric texture, wrinkles, folds, seams, product edges
+- REMOVE: Environmental lighting (shadows, highlights, color cast from ambient light)
+- REMOVE: Camera distortion (perspective warping, lens distortion, blur, noise)
+- REMOVE: Any part of the physical product visible around/behind the design
 
-## COMPOSITION
-Grid: ${v.composition?.grid_type || 'match original'}
-Symmetry: ${v.composition?.symmetry || 'match original'}
-Focal point: ${v.composition?.focal_point || 'match original'}
-Visual flow: ${v.composition?.visual_flow || 'match original'}
-Density: ${v.composition?.density || 'match original'}
+## WHAT TO KEEP (the design itself)
+- KEEP: The EXACT visual style of the design — if it uses photos/photo collage, keep photographic style. If illustration, keep illustration style. Do NOT convert between styles.
+- KEEP: ALL graphic elements, effects (${effectsStr}), textures, gradients, and decorative details that are PART OF THE DESIGN (not the product surface)
+- KEEP: The exact layout, proportions, and spatial relationships between all elements
+- KEEP: The design's original edge treatment — if the design has soft/fading edges, recreate those. If it has hard edges, keep those.
+- KEEP: All text exactly as written — same words, same fonts, same decoration
 
-## GRAPHICS
-Primary element: ${v.graphics?.primary_element || 'match original'}
-Secondary elements: ${(v.graphics?.secondary_elements || []).join(', ') || 'match original'}
-
-## OUTPUT RULES
-- Background: solid white (#FFFFFF) where the original has white
-- This is a REPRODUCTION — do NOT add, remove, or alter ANY element
-- The result should look like the same design was re-drawn at high quality
-- Maintain ALL text exactly as written — do NOT rephrase, abbreviate, or add text
-- Illustration-based output — no photorealistic rendering
+## CRITICAL RULES
+- Do NOT add any container shape (circle, badge, border, frame) unless the original design clearly has one
+- Do NOT crop or reshape the design — maintain its original proportions and shape
+- Do NOT change the visual style — a photographic design must stay photographic, an illustrated design must stay illustrated
+- Do NOT add, remove, or alter ANY design element
+- The output should fill the canvas naturally, same as the original design would look as a flat file
+- Background MUST be solid white (#FFFFFF) — the design sits on white, ready for print
 
 Generate exactly ONE image.`;
 
   const parts: any[] = [];
   if (input.originalImage) {
-    const imageData = input.originalImage.includes(',')
-      ? input.originalImage.split(',')[1]
-      : input.originalImage;
+    const resizedOriginal = await resizeImageIfNeeded(input.originalImage);
+    const imageData = resizedOriginal.includes(',')
+      ? resizedOriginal.split(',')[1]
+      : resizedOriginal;
     parts.push({
       inlineData: {
         data: imageData,
-        mimeType: input.originalMimeType || 'image/png',
+        mimeType: resizedOriginal.startsWith('data:image/jpeg') ? 'image/jpeg' : (input.originalMimeType || 'image/png'),
       },
     });
   }
@@ -524,13 +663,14 @@ Generate exactly ONE image.`;
 
   const illustrationParts: any[] = [];
   if (input.originalImage) {
-    const imageData = input.originalImage.includes(',')
-      ? input.originalImage.split(',')[1]
-      : input.originalImage;
+    const resizedOriginal = await resizeImageIfNeeded(input.originalImage);
+    const imageData = resizedOriginal.includes(',')
+      ? resizedOriginal.split(',')[1]
+      : resizedOriginal;
     illustrationParts.push({
       inlineData: {
         data: imageData,
-        mimeType: input.originalMimeType || 'image/png',
+        mimeType: resizedOriginal.startsWith('data:image/jpeg') ? 'image/jpeg' : (input.originalMimeType || 'image/png'),
       },
     });
   }
@@ -591,13 +731,14 @@ Generate exactly ONE image.`;
 
   // Also pass original design as style reference
   if (input.originalImage) {
-    const imageData = input.originalImage.includes(',')
-      ? input.originalImage.split(',')[1]
-      : input.originalImage;
+    const resizedOriginal = await resizeImageIfNeeded(input.originalImage);
+    const imageData = resizedOriginal.includes(',')
+      ? resizedOriginal.split(',')[1]
+      : resizedOriginal;
     textParts.push({
       inlineData: {
         data: imageData,
-        mimeType: input.originalMimeType || 'image/png',
+        mimeType: resizedOriginal.startsWith('data:image/jpeg') ? 'image/jpeg' : (input.originalMimeType || 'image/png'),
       },
     });
   }
@@ -680,7 +821,19 @@ export async function analyzeBatch(
     }
   }`;
 
-  const parts: any[] = images.map(img => ({
+  // Resize all images before sending
+  const resizedImages = await Promise.all(
+    images.map(async (img) => {
+      const resized = await resizeImageIfNeeded(img.data);
+      return {
+        ...img,
+        data: resized,
+        type: resized.startsWith('data:image/jpeg') ? 'image/jpeg' : img.type,
+      };
+    })
+  );
+
+  const parts: any[] = resizedImages.map(img => ({
     inlineData: {
       data: img.data.split(',')[1],
       mimeType: img.type
@@ -689,7 +842,7 @@ export async function analyzeBatch(
   parts.push({ text: prompt });
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3.1-pro-preview',
+    model: 'gemini-2.5-pro',
     contents: { parts },
     config: {
       responseMimeType: "application/json",
@@ -708,7 +861,7 @@ export async function analyzeBuyerFit(
   const ai = new GoogleGenAI({ apiKey });
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-2.5-flash',
     contents: {
       parts: [
         {
