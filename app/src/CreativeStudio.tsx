@@ -604,32 +604,6 @@ export default function CreativeStudio({
                         </div>
                     </div>
 
-                    {/* ── How Different? (Creativity Level) ── */}
-                    <div className="bg-bg-surface1 p-4 rounded-xl border border-border-default">
-                        <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-3">
-                            How Different?
-                        </div>
-                        <input
-                            type="range"
-                            min="1"
-                            max="5"
-                            step="1"
-                            value={creativity}
-                            onChange={(e) => setCreativity(parseInt(e.target.value))}
-                            className="w-full accent-accent h-1.5 bg-bg-surface2 rounded-lg appearance-none cursor-pointer"
-                        />
-                        <div className="flex justify-between text-[10px] text-text-tertiary mt-2 font-medium">
-                            {[1, 2, 3, 4, 5].map((n) => (
-                                <span key={n} className={n === creativity ? 'text-accent font-semibold' : ''}>
-                                    {creativityLevelNames[n]}
-                                </span>
-                            ))}
-                        </div>
-                        <div className="text-[12px] text-text-secondary mt-3 text-center bg-bg-surface2 py-1.5 rounded-lg">
-                            {creativityLabels[creativity]}
-                        </div>
-                    </div>
-
                     {/* ── What to Change (6 Dimensions) ── */}
                     <div className="bg-bg-surface1 p-4 rounded-xl border border-border-default">
                         <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-3">
@@ -706,6 +680,32 @@ export default function CreativeStudio({
                                     </div>
                                 );
                             })}
+                        </div>
+                    </div>
+
+                    {/* ── How Different? (Creativity Level) ── */}
+                    <div className="bg-bg-surface1 p-4 rounded-xl border border-border-default">
+                        <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-3">
+                            How Different?
+                        </div>
+                        <input
+                            type="range"
+                            min="1"
+                            max="5"
+                            step="1"
+                            value={creativity}
+                            onChange={(e) => setCreativity(parseInt(e.target.value))}
+                            className="w-full accent-accent h-1.5 bg-bg-surface2 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <div className="flex justify-between text-[10px] text-text-tertiary mt-2 font-medium">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                                <span key={n} className={n === creativity ? 'text-accent font-semibold' : ''}>
+                                    {creativityLevelNames[n]}
+                                </span>
+                            ))}
+                        </div>
+                        <div className="text-[12px] text-text-secondary mt-3 text-center bg-bg-surface2 py-1.5 rounded-lg">
+                            {creativityLabels[creativity]}
                         </div>
                     </div>
 
