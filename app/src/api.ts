@@ -390,23 +390,49 @@ async function compositeImages(illustrationDataUrl: string, textDataUrl: string)
     loadImage(textDataUrl),
   ]);
 
+  const w = illustrationImg.width;
+  const h = illustrationImg.height;
+
+  // Step 1: Remove white background from text image
+  const textCanvas = document.createElement('canvas');
+  textCanvas.width = w;
+  textCanvas.height = h;
+  const textCtx = textCanvas.getContext('2d')!;
+  textCtx.drawImage(textImg, 0, 0, w, h);
+
+  const imageData = textCtx.getImageData(0, 0, w, h);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    // Calculate brightness (0 = black, 255 = white)
+    const brightness = (r + g + b) / 3;
+
+    if (brightness > 245) {
+      // Near-white → fully transparent
+      data[i + 3] = 0;
+    } else if (brightness > 200) {
+      // Transition zone → smooth gradient from transparent to opaque
+      // This preserves anti-aliased edges of text
+      const alpha = Math.round(255 * (1 - (brightness - 200) / 45));
+      data[i + 3] = alpha;
+    }
+    // else: keep original alpha (fully opaque for dark/colored pixels)
+  }
+
+  textCtx.putImageData(imageData, 0, 0);
+
+  // Step 2: Composite — illustration base + transparent text overlay
   const canvas = document.createElement('canvas');
-  canvas.width = illustrationImg.width;
-  canvas.height = illustrationImg.height;
+  canvas.width = w;
+  canvas.height = h;
   const ctx = canvas.getContext('2d')!;
 
-  // Draw illustration as base layer
+  // Draw illustration as base
   ctx.drawImage(illustrationImg, 0, 0);
 
-  // Use 'multiply' blend mode: white pixels become transparent, dark/colored pixels show through
-  ctx.globalCompositeOperation = 'multiply';
-  ctx.drawImage(textImg, 0, 0, canvas.width, canvas.height);
-
-  // Reset to enhance: draw text again with 'darken' for stronger text presence
-  ctx.globalCompositeOperation = 'darken';
-  ctx.drawImage(textImg, 0, 0, canvas.width, canvas.height);
-
-  ctx.globalCompositeOperation = 'source-over';
+  // Draw text with white removed (standard source-over — text sits ON TOP)
+  ctx.drawImage(textCanvas, 0, 0);
 
   return canvas.toDataURL('image/png');
 }
