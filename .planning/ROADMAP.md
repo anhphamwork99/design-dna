@@ -131,6 +131,38 @@ Plans:
 
 ---
 
+### Phase 7B.1: Pipeline Quality Redesign (INSERTED)
+**Goal:** Redesign synthesis → generation pipeline to maximize output quality. Fix DNA utilization gap (25% → 100%), add text content + color palette to concept schema, implement fidelity gradient for creativity×dimensions.
+
+**Depends on:** Phase 7B
+**Source:** Real user testing feedback (2026-03-16) + first-principles audit
+
+**Changes:**
+1. **Full DNA packaging** — synthesis receives ALL 30+ DNA fields (not cherry-picked 8)
+2. **Expanded concept schema** — add `suggestedText` (primary quote, tagline, text style), `colorPalette` (hex colors), `madeForMeHook`
+3. **Fidelity gradient** — creativity level modulates HOW STRICTLY each dimension is followed (not how much DNA to send)
+4. **Informed REIMAGINE** — "Change + empty" includes original value as context (not blind "freely")
+5. **Rich generation prompt** — inject text content, specific hex colors, background rules into image gen
+6. **UI updates** — concept card shows suggested text, color palette swatches, made-for-me hook
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 7B.1 to break down)
+
+**Success Criteria:**
+- [ ] Synthesis receives full DNA (visual_dna + buyer_dna complete)
+- [ ] Concepts include `suggestedText.primary`, `colorPalette[]`, `madeForMeHook`
+- [ ] Creativity level uses fidelity gradient (no DNA/creativity conflicts)
+- [ ] Generation prompt includes text content + hex palette from concept
+- [ ] REIMAGINE directives include original value context
+- [ ] Concept card UI shows text preview + color swatches
+- [ ] Output quality improvement verified with same test image
+
+**Reference:** `.planning/phases/7B.1-pipeline-quality-redesign/DESIGN.md` (pipeline redesign spec)
+
+**Deliverable:** Direct code implementation
+
+---
+
 ### Phase 7C: Pattern Library + Save Flow
 **Goal:** Enable saving Compare results as reusable Patterns + Pattern Library UI
 
@@ -187,5 +219,6 @@ Plans:
 | 6A | Critical UX Fixes | UX-1..6 | ✅ Done |
 | **7A** | **Creative Studio — UI Redesign** | **F2-01..05** | ✅ Done |
 | **7B** | **Concept Synthesis + POD Generation** | **F2-06..12** | ✅ Done |
+| **7B.1** | **Pipeline Quality Redesign** | **Quality fix** | 🔲 Inserted |
 | **7C** | **Pattern Library + Save Flow** | **F3-06..07, F4-*** | 🔲 Planned |
 | 8 | History & Persistence | F5-* | 🔲 Planned |
