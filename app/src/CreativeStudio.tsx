@@ -269,10 +269,9 @@ export default function CreativeStudio({
                     </div>
                     <h2 className="text-[16px] font-semibold mb-1.5">{generationStep || 'Generating artwork...'}</h2>
                     <p className="text-text-tertiary text-[13px]">
-                        {generationStep.includes('illustration') ? 'Step 1 of 3 — creating the illustration' :
-                            generationStep.includes('typography') ? 'Step 2 of 3 — designing decorated text' :
-                                generationStep.includes('Compositing') ? 'Step 3 of 3 — merging layers' :
-                                    'This usually takes 20–40 seconds'}
+                        {generationStep.includes('illustration') ? 'Step 1 of 2 — creating the illustration' :
+                            generationStep.includes('typography') ? 'Step 2 of 2 — adding decorated text' :
+                                'This usually takes 20–40 seconds'}
                     </p>
                 </div>
             );
