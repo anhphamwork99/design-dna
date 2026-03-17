@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, UploadCloud, AlertTriangle, Settings, Microscope, Scale, Copy, Check, ImageOff, Layers, LogOut } from 'lucide-react';
+import { ArrowLeft, UploadCloud, AlertTriangle, Settings, Microscope, Scale, Copy, Check, ImageOff, Layers, LogOut, BookOpen } from 'lucide-react';
+import MyAnalysesList from './components/MyAnalysesList';
 import { motion, AnimatePresence } from 'motion/react';
-import { analyzeDesign, analyzeBatch, saveAnalysis } from './apiClient';
+import { analyzeDesign, analyzeBatch, saveAnalysis, getAnalysis } from './apiClient';
 import { generateThumbnail } from './api';
 import CreativeStudio from './CreativeStudio';
 import { CompareUploadScreen, CompareAnalyzingScreen, CompareResultsScreen } from './CompareScreens';
@@ -13,7 +14,7 @@ import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
 import SettingsModal from './components/SettingsModal';
 
-type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results' | 'pattern_library' | 'pattern_detail';
+export type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results' | 'pattern_library' | 'pattern_detail' | 'my_analyses' | 'view_analysis';
 
 export default function App() {
   const { user, session, loading, signOut } = useAuth();
@@ -27,6 +28,7 @@ export default function App() {
   const [compareResult, setCompareResult] = useState<any>(null);
   const [selectedPatternId, setSelectedPatternId] = useState<string | null>(null);
   const [savedAnalysisId, setSavedAnalysisId] = useState<string | null>(null);
+  const [viewingAnalysisId, setViewingAnalysisId] = useState<string | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -345,6 +347,24 @@ export default function App() {
               onNavigate={(screen: string) => setCurrentScreen(screen as Screen)}
             />
           )}
+          {currentScreen === 'my_analyses' && (
+            <MyAnalysesList
+              key="my_analyses"
+              onNavigate={setCurrentScreen}
+              onViewAnalysis={(id) => {
+                setViewingAnalysisId(id);
+                setCurrentScreen('view_analysis');
+              }}
+            />
+          )}
+          {currentScreen === 'view_analysis' && viewingAnalysisId && (
+            <ViewAnalysisScreen
+              key="view_analysis"
+              analysisId={viewingAnalysisId}
+              onNavigate={setCurrentScreen}
+              setInitialGenMode={setInitialGenMode}
+            />
+          )}
         </AnimatePresence>
       </main>
 
@@ -375,7 +395,7 @@ function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) =
         Upload any design to uncover its Visual DNA and discover exactly who it's made for — and why.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-[900px]">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-[1200px]">
         <div
           onClick={() => onNavigate('upload')}
           className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
@@ -401,6 +421,15 @@ function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) =
           <Layers className="w-7 h-7 text-[#a78bfa] mb-4 group-hover:scale-110 transition-transform origin-left" />
           <h3 className="text-[16px] font-semibold mb-1">Pattern Library</h3>
           <p className="text-[12px] text-text-secondary">Browse saved patterns from Compare analysis</p>
+        </div>
+
+        <div
+          onClick={() => onNavigate('my_analyses')}
+          className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
+        >
+          <BookOpen className="w-7 h-7 text-[#34d399] mb-4 group-hover:scale-110 transition-transform origin-left" />
+          <h3 className="text-[16px] font-semibold mb-1">My Analyses</h3>
+          <p className="text-[12px] text-text-secondary">Browse your saved design analyses</p>
         </div>
       </div>
     </motion.div>
@@ -630,13 +659,15 @@ function ResultsScreen({
   uploadedImage,
   analysisResult,
   onNavigate,
-  setInitialGenMode
+  setInitialGenMode,
+  readMode = false
 }: {
   key?: string;
   uploadedImage: { data: string; name: string } | null;
   analysisResult: any;
   onNavigate: (s: Screen) => void;
   setInitialGenMode: (mode: string | undefined) => void;
+  readMode?: boolean;
 }) {
   const [activeTab, setActiveTab] = useState<'visual' | 'buyer'>('visual');
   const [copied, setCopied] = useState(false);
@@ -693,10 +724,10 @@ function ResultsScreen({
       className="pt-8 mb-24"
     >
       <button
-        onClick={() => onNavigate('upload')}
+        onClick={() => onNavigate(readMode ? 'my_analyses' : 'upload')}
         className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-6 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
       >
-        <ArrowLeft className="w-4 h-4 mr-2" /> Back to Upload
+        <ArrowLeft className="w-4 h-4 mr-2" /> {readMode ? 'Back to My Analyses' : 'Back to Upload'}
       </button>
 
       <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
@@ -1074,26 +1105,30 @@ function ResultsScreen({
             )}
 
             <motion.div variants={itemVariants} className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-border-default">
-              <button
-                onClick={() => { setInitialGenMode('same_buyer'); onNavigate('generation'); }}
-                className="px-5 py-3 rounded-lg ai-gradient text-white text-[14px] font-medium hover:opacity-90 transition-opacity text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-              >
-                Create Similar Design
-                <p className="text-[12px] text-white/70 font-normal mt-0.5">Same audience, fresh design</p>
-              </button>
-              <button
-                onClick={() => { setInitialGenMode('new_buyer'); onNavigate('generation'); }}
-                className="px-5 py-3 rounded-lg border border-border-default text-[14px] font-medium hover:bg-bg-surface2 transition-colors text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-              >
-                Remix for Different Audience
-                <p className="text-[12px] text-text-tertiary font-normal mt-0.5">Keep the style, target new buyers</p>
-              </button>
-              <button
-                onClick={() => onNavigate('upload')}
-                className="px-5 py-2 rounded-lg text-text-secondary hover:text-text-primary text-[14px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-              >
-                Analyze Another Design
-              </button>
+              {!readMode && (
+                <>
+                  <button
+                    onClick={() => { setInitialGenMode('same_buyer'); onNavigate('generation'); }}
+                    className="px-5 py-3 rounded-lg ai-gradient text-white text-[14px] font-medium hover:opacity-90 transition-opacity text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+                  >
+                    Create Similar Design
+                    <p className="text-[12px] text-white/70 font-normal mt-0.5">Same audience, fresh design</p>
+                  </button>
+                  <button
+                    onClick={() => { setInitialGenMode('new_buyer'); onNavigate('generation'); }}
+                    className="px-5 py-3 rounded-lg border border-border-default text-[14px] font-medium hover:bg-bg-surface2 transition-colors text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+                  >
+                    Remix for Different Audience
+                    <p className="text-[12px] text-text-tertiary font-normal mt-0.5">Keep the style, target new buyers</p>
+                  </button>
+                  <button
+                    onClick={() => onNavigate('upload')}
+                    className="px-5 py-2 rounded-lg text-text-secondary hover:text-text-primary text-[14px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+                  >
+                    Analyze Another Design
+                  </button>
+                </>
+              )}
               <button
                 onClick={handleCopyDNA}
                 className="px-5 py-2 rounded-lg text-text-secondary hover:text-text-primary text-[14px] font-medium transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
@@ -1109,5 +1144,78 @@ function ResultsScreen({
         </div>
       </div>
     </motion.div>
+  );
+}
+
+function ViewAnalysisScreen({
+  analysisId,
+  onNavigate,
+  setInitialGenMode
+}: {
+  key?: string;
+  analysisId: string | null;
+  onNavigate: (s: Screen) => void;
+  setInitialGenMode: (mode: string | undefined) => void;
+}) {
+  const { session } = useAuth();
+  const [analysis, setAnalysis] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchAnalysis() {
+      if (!session || !analysisId) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getAnalysis(session.access_token, analysisId);
+        setAnalysis(data);
+      } catch (err: any) {
+        console.error('Failed to fetch analysis:', err);
+        setError(err.message || 'Failed to load analysis');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnalysis();
+  }, [session, analysisId]);
+
+  if (loading) {
+    return (
+      <div className="pt-24 flex flex-col items-center justify-center">
+        <div className="w-8 h-8 rounded ai-gradient animate-pulse mb-4" />
+        <p className="text-[14px] text-text-secondary">Loading analysis...</p>
+      </div>
+    );
+  }
+
+  if (error || !analysis) {
+    return (
+      <div className="pt-24 flex flex-col items-center text-center gap-4">
+        <AlertTriangle className="w-12 h-12 text-error" />
+        <h2 className="text-[20px] font-semibold">Failed to Load Analysis</h2>
+        <p className="text-[14px] text-text-secondary max-w-[400px]">{error}</p>
+        <button
+          onClick={() => onNavigate('my_analyses')}
+          className="mt-2 px-5 py-3 rounded-lg border border-border-default hover:bg-bg-surface1 text-text-primary text-[14px] font-medium transition-colors"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  const mockUploadedImage = { name: analysis.name, data: analysis.thumbnail || '', type: 'image/jpeg' };
+
+  return (
+    <>
+      <ResultsScreen
+        uploadedImage={mockUploadedImage}
+        analysisResult={analysis.result_json}
+        onNavigate={onNavigate}
+        setInitialGenMode={setInitialGenMode}
+        readMode={true}
+      />
+    </>
   );
 }
