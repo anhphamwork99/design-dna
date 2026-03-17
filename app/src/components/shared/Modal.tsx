@@ -56,7 +56,7 @@ export function Modal({
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 8 }}
                         transition={{ duration: 0.15, ease: 'easeOut' }}
-                        className={`bg-bg-surface1 border border-border-default rounded-[16px] shadow-modal ${width} w-full mx-4`}
+                        className={`bg-bg-surface1 border border-border-default rounded-[16px] shadow-2xl ${width} w-full mx-4`}
                     >
                         {title && (
                             <div className="flex items-center justify-between px-6 pt-6 pb-0">
