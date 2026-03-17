@@ -51,19 +51,19 @@
 | ROUTER-04 | Auth boundary ABOVE AppShell — unauthenticated → Login, authenticated → AppShell+Routes | Keep auth gate |
 | ROUTER-05 | `document.title` update on every route change | Accessibility |
 
-### SHARED — Reusable UI Components
+### SHARED — Reusable UI Components ✅
 
 | ID | Requirement | Notes |
 |----|-------------|-------|
-| SHARED-01 | `Button` — primary (black bg), secondary (gray bg), ghost (transparent), icon-only (circular) | 4 variants |
-| SHARED-02 | `Card` — surface card with subtle border, rounded corners (16px), hover state | Base card |
-| SHARED-03 | `Input` — text input with label, placeholder, error state | Form input |
-| SHARED-04 | `Modal` — centered overlay with backdrop blur(24px), 16px radius, close button | Generic modal |
-| SHARED-05 | `UploadZone` — drag & drop with dashed border, preview, format hints, validation | Image upload |
-| SHARED-06 | `EmptyState` — icon + title + description + CTA button | Per-screen empty experience |
-| SHARED-07 | `ErrorBanner` — error message with optional retry button | API/network errors |
-| SHARED-08 | `LoadingSpinner` — consistent spinner + skeleton card pattern | Loading states |
-| SHARED-09 | `Badge` — small pill with label | Tags, status |
+| ~~SHARED-01~~ | ~~`Button` — primary, secondary, ghost, icon-only~~ | ✅ 4 variants, 3 sizes, loading |
+| ~~SHARED-02~~ | ~~`Card` — surface card with border, hover~~ | ✅ 16px radius, keyboard support |
+| ~~SHARED-03~~ | ~~`Input` — text input with label, error~~ | ✅ Helper text, accessible |
+| ~~SHARED-04~~ | ~~`Modal` — centered overlay with backdrop blur~~ | ✅ Escape, scroll lock, animated |
+| ~~SHARED-05~~ | ~~`UploadZone` — drag & drop with preview~~ | ✅ Compact mode, validation |
+| ~~SHARED-06~~ | ~~`EmptyState` — icon + title + CTA~~ | ✅ Uses Button |
+| ~~SHARED-07~~ | ~~`ErrorBanner` — error with retry~~ | ✅ Dismissible |
+| ~~SHARED-08~~ | ~~`LoadingSpinner` — spinner + skeleton~~ | ✅ Spinner, Skeleton, SkeletonCard |
+| ~~SHARED-09~~ | ~~`Badge` — small pill~~ | ✅ 5 semantic variants |
 
 ### SCREEN — Screen Extraction & Redesign
 

@@ -3,8 +3,8 @@
 ## Current
 
 - **Milestone:** v3.0 — UI Redesign
-- **Phase:** 15 — Shared UI Components (IN PROGRESS)
-- **Status:** Plan 15-01 (Core UI Components) complete. Plan 15-02 (Feature Components) pending.
+- **Phase:** 16 — App Shell & Sidebar (NEXT)
+- **Status:** Phase 15 complete. Ready to plan Phase 16.
 
 ## Milestone History
 
@@ -22,7 +22,10 @@
 - Modal (backdrop blur, escape, scroll lock, animated), Badge (pill, 5 variants)
 - 254 lines, zero build errors
 
-### Plan 15-02: Feature Components — PENDING
+### Plan 15-02: Feature Components ✅
+- 4 components: UploadZone (drag/drop, preview, compact), EmptyState, ErrorBanner, LoadingSpinner
+- Barrel export updated with all 9+ exports
+- Zero build errors
 
 ## Phase 14 Results
 
@@ -56,4 +59,4 @@
 
 ## Stopping Point
 
-2026-03-17: Plan 15-01 complete (core UI components). Next: Execute Plan 15-02 (feature components).
+2026-03-17: Phase 15 complete (9 shared UI components). Next: `/gsd:plan-phase 16` for App Shell & Sidebar.
