@@ -14,9 +14,9 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 |-------|-------|
 | Milestone | v2.0 — Backend System |
 | Phase | 11 — Server Persistence — Analyses |
-| Status | ● In Progress (1/3 plans complete) |
+| Status | ● In Progress (2/3 plans complete) |
 | Plan 11-01 | ✅ Backend Analyses CRUD Routes |
-| Plan 11-02 | ⬜ Auto-Save Analysis + Frontend API Integration |
+| Plan 11-02 | ✅ Auto-Save Analysis + Frontend API Integration |
 | Plan 11-03 | ⬜ My Analyses UI — Landing Card + List + View |
 
 ## Phase Progress
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 | 8 | Supabase + Backend Scaffold | ● Complete | 100% |
 | 9 | Authentication | ● Complete | 100% |
 | 10 | API Proxy + Prompt Protection | ● Complete | 100% |
-| 11 | Server Persistence — Analyses | ◐ In Progress | 33% |
+| 11 | Server Persistence — Analyses | ◐ In Progress | 66% |
 | 12 | Server Persistence — Patterns | ○ Not Started | 0% |
 | 13 | localStorage Migration | ○ Not Started | 0% |
 
@@ -60,9 +60,9 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 - **Image gen model:** gemini-2.5-flash-image (multimodal input)
 - **Buyer fit model:** gemini-3-flash-preview (scoring)
 
-Last session: 2026-03-17T13:20
-Stopped at: Phase 11-01 complete — analyses CRUD routes created
-Next action: Phase 11-02 — Auto-Save Analysis + Frontend API Integration
+Last session: 2026-03-17T13:28
+Stopped at: Phase 11-02 complete — Auto-Save Analysis implemented
+Next action: Phase 11-03 — My Analyses UI — Landing Card + List + View
 
 ## Roadmap Evolution
 
