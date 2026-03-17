@@ -22,9 +22,9 @@
 ### Server Persistence (Supabase PostgreSQL)
 
 - [x] **DATA-01**: Analysis results (DNA Card JSON) saved per user with thumbnail *(Phase 11 ✓)*
-- [ ] **DATA-02**: Patterns (Compare results JSON + thumbnails) saved per user
+- [x] **DATA-02**: Patterns (Compare results JSON + thumbnails) saved per user *(Phase 12 ✓)*
 - [x] **DATA-03**: User can list and delete their analyses *(Phase 11 ✓)*
-- [ ] **DATA-04**: User can list and delete their patterns
+- [x] **DATA-04**: User can list and delete their patterns *(Phase 12 ✓)*
 - [x] **DATA-05**: Row Level Security ensures users only access their own data *(Phase 8 ✓)*
 
 ### Frontend Auth & Data UI
@@ -66,7 +66,7 @@
 | PROXY-01, PROXY-02, PROXY-04, PROXY-05 | 10 ✅ |
 | PROXY-03 | 8 ✅ |
 | DATA-01, DATA-03 | 11 ✅ |
-| DATA-02, DATA-04 | 12 |
+| DATA-02, DATA-04 | 12 ✅ |
 | DATA-05 | 8 ✅ |
 | UI-01..03 | 9 ✅ |
 | UI-04, UI-05 | 11 ✅ |
