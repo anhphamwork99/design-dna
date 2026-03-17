@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Download, RefreshCw, Sparkles, Loader2, Paintbrush } from 'lucide-react';
+import { X, Download, RefreshCw, Sparkles, Loader2, Paintbrush, Lightbulb } from 'lucide-react';
 import type { SynthesizedConcept } from './types';
 
 interface ConceptDetailDialogProps {
@@ -228,7 +228,7 @@ export default function ConceptDetailDialog({
                                                 "Made For Me" Hook
                                             </span>
                                             <p className="text-[13px] text-text-primary mt-1 bg-bg-surface2/50 rounded-lg px-3 py-2">
-                                                💡 {concept.madeForMeHook}
+                                                <Lightbulb className="w-3.5 h-3.5 inline mr-1 text-accent" /> {concept.madeForMeHook}
                                             </p>
                                         </div>
                                     )}

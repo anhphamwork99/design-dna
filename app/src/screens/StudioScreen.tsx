@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'motion/react';
-import { X } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import type { Stage, StudioGoal, Shifts, AppliedPatternData, SynthesizedConcept } from '../studio/types';
 import { getDefaultShifts } from '../studio/types';
 import GoalPicker from '../studio/GoalPicker';
@@ -259,150 +258,116 @@ export default function StudioScreen() {
     // ── Render by stage ──
     return (
         <div className="flex flex-col h-full min-h-screen bg-bg-base relative">
-            {/* Exit button — always visible to leave studio */}
-            <button
-                onClick={() => navigate('/')}
-                className="absolute top-4 left-4 z-50 p-2 rounded-xl bg-bg-surface1 border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors shadow-sm"
-                aria-label="Exit Studio"
-                title="Exit Studio"
-            >
-                <X className="w-5 h-5" />
-            </button>
+            {/* Top bar — exit + Studio title */}
+            <div className="absolute top-4 left-4 z-50 flex items-center gap-3">
+                <button
+                    onClick={() => navigate('/')}
+                    className="p-2 rounded-xl bg-bg-surface1 border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors shadow-sm"
+                    aria-label="Exit Studio"
+                    title="Exit Studio"
+                >
+                    <LogOut className="w-5 h-5" />
+                </button>
+                <span className="text-[15px] font-semibold text-text-primary">Studio</span>
+            </div>
 
-            <AnimatePresence mode="wait">
-                {stage === 'goals' && (
-                    <motion.div
-                        key="goals"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="flex-1"
-                    >
-                        <GoalPicker
-                            onSelectGoal={handleSelectGoal}
-                            preloadedImage={uploadedImage ? { data: uploadedImage.data, name: uploadedImage.name } : null}
-                        />
-                    </motion.div>
-                )}
+            {stage === 'goals' && (
+                <div className="flex-1">
+                    <GoalPicker
+                        onSelectGoal={handleSelectGoal}
+                        preloadedImage={uploadedImage ? { data: uploadedImage.data, name: uploadedImage.name } : null}
+                    />
+                </div>
+            )}
 
-                {stage === 'upload' && goal && (
-                    <motion.div
-                        key="upload"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="flex-1"
-                    >
-                        <UploadStage
-                            goal={goal}
-                            onImageReady={handleImageReady}
-                            onBack={handleBackToGoals}
-                        />
-                        {/* Inline error from failed analysis */}
-                        {error && (
-                            <div className="fixed inset-0 flex items-center justify-center bg-bg-base/80 z-50">
-                                <div className="bg-bg-surface1 border border-border-default rounded-2xl p-8 max-w-[400px] text-center shadow-lg">
-                                    <p className="text-[15px] text-text-primary font-medium mb-2">
-                                        Analysis Failed
-                                    </p>
-                                    <p className="text-[13px] text-text-secondary mb-6">{error}</p>
-                                    <div className="flex gap-3 justify-center">
-                                        <button
-                                            onClick={() => {
-                                                setError(null);
-                                                if (uploadedImage) handleImageReady(uploadedImage);
-                                            }}
-                                            className="px-4 py-2 rounded-xl bg-text-primary text-white text-[13px] font-medium hover:opacity-90 transition-opacity"
-                                        >
-                                            Try Again
-                                        </button>
-                                        <button
-                                            onClick={handleRetryUpload}
-                                            className="px-4 py-2 rounded-xl bg-bg-surface1 border border-border-default text-text-secondary text-[13px] font-medium hover:border-border-hover transition-colors"
-                                        >
-                                            Upload Different Image
-                                        </button>
-                                    </div>
+            {stage === 'upload' && goal && (
+                <div className="flex-1">
+                    <UploadStage
+                        goal={goal}
+                        onImageReady={handleImageReady}
+                        onBack={handleBackToGoals}
+                    />
+                    {/* Inline error from failed analysis */}
+                    {error && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-bg-base/80 z-50">
+                            <div className="bg-bg-surface1 border border-border-default rounded-2xl p-8 max-w-[400px] text-center shadow-lg">
+                                <p className="text-[15px] text-text-primary font-medium mb-2">
+                                    Analysis Failed
+                                </p>
+                                <p className="text-[13px] text-text-secondary mb-6">{error}</p>
+                                <div className="flex gap-3 justify-center">
+                                    <button
+                                        onClick={() => {
+                                            setError(null);
+                                            if (uploadedImage) handleImageReady(uploadedImage);
+                                        }}
+                                        className="px-4 py-2 rounded-xl bg-text-primary text-white text-[13px] font-medium hover:opacity-90 transition-opacity"
+                                    >
+                                        Try Again
+                                    </button>
+                                    <button
+                                        onClick={handleRetryUpload}
+                                        className="px-4 py-2 rounded-xl bg-bg-surface1 border border-border-default text-text-secondary text-[13px] font-medium hover:border-border-hover transition-colors"
+                                    >
+                                        Upload Different Image
+                                    </button>
                                 </div>
                             </div>
-                        )}
-                    </motion.div>
-                )}
+                        </div>
+                    )}
+                </div>
+            )}
 
-                {stage === 'analyzing' && uploadedImage && (
-                    <motion.div
-                        key="analyzing"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="flex-1"
-                    >
-                        <AnalyzingStage image={{ data: uploadedImage.data, name: uploadedImage.name }} />
-                    </motion.div>
-                )}
+            {stage === 'analyzing' && uploadedImage && (
+                <div className="flex-1">
+                    <AnalyzingStage image={{ data: uploadedImage.data, name: uploadedImage.name }} />
+                </div>
+            )}
 
-                {/* Clone flow stages */}
-                {(stage === 'studio' || stage === 'cloning' || stage === 'clone-result') && goal === 'clone' && uploadedImage && (
-                    <motion.div
-                        key="clone-flow"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="flex-1"
-                    >
-                        <CloneStudio
-                            stage={stage as 'studio' | 'cloning' | 'clone-result'}
-                            uploadedImage={uploadedImage}
-                            analysisResult={analysisResult}
-                            clonedImage={clonedImage}
-                            error={error}
-                            aspectRatio={aspectRatio}
-                            onAspectRatioChange={setAspectRatio}
-                            onClone={handleClone}
-                            onReClone={handleReClone}
-                            onDownload={handleCloneDownload}
-                            onStartOver={handleStartOver}
-                        />
-                    </motion.div>
-                )}
+            {/* Clone flow stages */}
+            {(stage === 'studio' || stage === 'cloning' || stage === 'clone-result') && goal === 'clone' && uploadedImage && (
+                <div className="flex-1">
+                    <CloneStudio
+                        stage={stage as 'studio' | 'cloning' | 'clone-result'}
+                        uploadedImage={uploadedImage}
+                        analysisResult={analysisResult}
+                        clonedImage={clonedImage}
+                        error={error}
+                        aspectRatio={aspectRatio}
+                        onAspectRatioChange={setAspectRatio}
+                        onClone={handleClone}
+                        onReClone={handleReClone}
+                        onDownload={handleCloneDownload}
+                        onStartOver={handleStartOver}
+                    />
+                </div>
+            )}
 
-                {/* Variation/Explore flow */}
-                {showVariationStudio && uploadedImage && (
-                    <motion.div
-                        key="variation-flow"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="flex-1"
-                    >
-                        <VariationStudio
-                            goal={goal as 'variations' | 'explore'}
-                            stage={stage}
-                            uploadedImage={uploadedImage}
-                            analysisResult={analysisResult}
-                            shifts={shifts}
-                            onShiftsChange={setShifts}
-                            appliedPattern={appliedPattern}
-                            onApplyPattern={setAppliedPattern}
-                            onRemovePattern={() => setAppliedPattern(null)}
-                            aspectRatio={aspectRatio}
-                            onAspectRatioChange={setAspectRatio}
-                            concepts={concepts}
-                            conceptArtworks={conceptArtworks}
-                            onCreateConcepts={handleCreateConcepts}
-                            onSelectConcept={(index) => setSelectedConceptIndex(index)}
-                            onQuickAction={handleQuickAction}
-                            onStartOver={handleStartOver}
-                            error={error}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Variation/Explore flow */}
+            {showVariationStudio && uploadedImage && (
+                <div className="flex-1">
+                    <VariationStudio
+                        goal={goal as 'variations' | 'explore'}
+                        stage={stage}
+                        uploadedImage={uploadedImage}
+                        analysisResult={analysisResult}
+                        shifts={shifts}
+                        onShiftsChange={setShifts}
+                        appliedPattern={appliedPattern}
+                        onApplyPattern={setAppliedPattern}
+                        onRemovePattern={() => setAppliedPattern(null)}
+                        aspectRatio={aspectRatio}
+                        onAspectRatioChange={setAspectRatio}
+                        concepts={concepts}
+                        conceptArtworks={conceptArtworks}
+                        onCreateConcepts={handleCreateConcepts}
+                        onSelectConcept={(index) => setSelectedConceptIndex(index)}
+                        onQuickAction={handleQuickAction}
+                        onStartOver={handleStartOver}
+                        error={error}
+                    />
+                </div>
+            )}
 
             {/* Concept Detail Dialog — overlays on top */}
             {selectedConceptIndex !== null && concepts[selectedConceptIndex] && (

@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
-import { motion } from 'motion/react';
-import { ArrowLeft } from 'lucide-react';
+import { Copy, Layers, Sparkles, ChevronRight } from 'lucide-react';
 import type { StudioGoal } from './types';
 import { UploadZone } from '../components/shared/UploadZone';
 import { resizeImageIfNeeded } from '../api';
@@ -26,14 +25,15 @@ const goalDescriptions: Record<StudioGoal, { title: string; description: string 
     },
 };
 
-const goalIcons: Record<StudioGoal, string> = {
-    clone: '🎯',
-    variations: '🔄',
-    explore: '✨',
+const goalIconMap: Record<StudioGoal, React.ComponentType<{ className?: string }>> = {
+    clone: Copy,
+    variations: Layers,
+    explore: Sparkles,
 };
 
 export default function UploadStage({ goal, onImageReady, onBack }: UploadStageProps) {
     const info = goalDescriptions[goal];
+    const GoalIcon = goalIconMap[goal];
 
     const handleFileSelect = useCallback(
         async (file: { data: string; name: string; type: string }) => {
@@ -46,36 +46,23 @@ export default function UploadStage({ goal, onImageReady, onBack }: UploadStageP
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-6 relative">
-            {/* Back link */}
-            <motion.button
-                className="absolute top-6 left-6 flex items-center gap-1.5 text-[13px] text-text-secondary hover:text-text-primary transition-colors"
-                onClick={onBack}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-            >
-                <ArrowLeft className="w-4 h-4" />
-                Back to goals
-            </motion.button>
-
-            {/* Goal breadcrumb */}
-            <motion.div
-                className="flex items-center gap-2 mb-6 bg-bg-surface1 border border-border-default rounded-full px-4 py-2"
-                initial={{ opacity: 0, y: -12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.05 }}
-            >
-                <span className="text-[18px]">{goalIcons[goal]}</span>
-                <span className="text-[13px] font-medium text-text-primary">{info.title}</span>
-            </motion.div>
+            {/* Breadcrumb: Studio > Goal */}
+            <div className="absolute top-6 left-16 flex items-center gap-1.5 text-[13px]">
+                <button
+                    onClick={onBack}
+                    className="text-text-secondary hover:text-text-primary transition-colors"
+                >
+                    Studio
+                </button>
+                <ChevronRight className="w-3.5 h-3.5 text-text-tertiary" />
+                <span className="text-text-primary font-medium flex items-center gap-1.5">
+                    <GoalIcon className="w-3.5 h-3.5" />
+                    {info.title}
+                </span>
+            </div>
 
             {/* Upload zone container */}
-            <motion.div
-                className="w-full max-w-[500px]"
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-            >
+            <div className="w-full max-w-[500px]">
                 {/* Description */}
                 <p className="text-center text-text-secondary text-[15px] mb-6">
                     {info.description}
@@ -92,7 +79,7 @@ export default function UploadStage({ goal, onImageReady, onBack }: UploadStageP
                 <p className="text-center text-[12px] text-text-tertiary mt-4">
                     Supports PNG, JPG, WEBP · Max 10 MB
                 </p>
-            </motion.div>
+            </div>
         </div>
     );
 }

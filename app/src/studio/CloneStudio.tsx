@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { Download, RefreshCw, RotateCcw } from 'lucide-react';
+import { Copy, Download, RefreshCw, RotateCcw } from 'lucide-react';
 
 interface CloneStudioProps {
     stage: 'studio' | 'cloning' | 'clone-result';
@@ -93,7 +93,7 @@ function ClonePreview({
                     whileTap={{ scale: 0.98 }}
                     onClick={onClone}
                 >
-                    🎯 Clone This Design
+                    <Copy className="w-4 h-4 mr-1.5 inline" /> Clone This Design
                 </motion.button>
 
                 <p className="text-[11px] text-text-tertiary text-center leading-relaxed">
