@@ -1,23 +1,36 @@
-# Orchestration State — Phase 11 Execution
+# Orchestration State — v3.0 UI Redesign
 
 ## Pending Spawns
 
-| ID | Type | Prompt File | Status | Return Trigger | Wave |
-|----|------|-------------|--------|----------------|------|
-| 01 | Executor | SPAWN-01-plan-11-01-backend-analyses.md | pending | "plan 11-01 execution complete" | 1 |
-| 02 | Executor | SPAWN-02-plan-11-02-auto-save.md | pending | "plan 11-02 execution complete" | 2 |
-| 03 | Executor | SPAWN-03-plan-11-03-my-analyses-ui.md | pending | "plan 11-03 execution complete" | 2 |
-
-## Execution Order
-
-1. **SPAWN-01** (Plan 11-01) — Backend CRUD routes
-   ↓ must complete first
-2. **SPAWN-02** (Plan 11-02) — Auto-save + frontend API
-   ↓ must complete first  
-3. **SPAWN-03** (Plan 11-03) — My Analyses UI
+| ID | Type | Prompt File | Status | Return Trigger |
+|----|------|-------------|--------|----------------|
+| 01 | Researcher | SPAWN-01-design-system-extraction.md | pending | "design system research complete" |
+| 02 | Researcher | SPAWN-02-uiux-patterns-research.md | pending | "features research complete" |
+| 03 | Researcher | SPAWN-03-architecture-research.md | pending | "architecture research complete" |
+| 04 | Researcher | SPAWN-04-pitfalls-research.md | pending | "pitfalls research complete" |
 
 ## Completed Spawns
 
 | ID | Type | Prompt File | Completed | Output |
 |----|------|-------------|-----------|--------|
 | — | — | — | — | — |
+
+## Next Steps
+
+After all 4 researchers complete:
+1. Spawn synthesizer → SUMMARY.md
+2. Define requirements
+3. Create roadmap
+
+## Workflow Position
+
+- [x] Phase 1-2: Load context
+- [x] Phase 3: Version → v3.0
+- [x] Phase 4: Update PROJECT.md
+- [x] Phase 5: Update STATE.md
+- [x] Phase 6: Commit
+- [x] Phase 7: Research → 4 researchers spawned
+- [ ] Phase 7.5: Synthesize → SUMMARY.md
+- [ ] Phase 8: Define requirements
+- [ ] Phase 9: Create roadmap
+- [ ] Phase 10: Done
