@@ -63,7 +63,85 @@ export async function deleteAnalysis(token: string, id: string) {
     return coreFetch(`/api/analyses/${id}`, { method: 'DELETE', token });
 }
 
-// ── API Functions ──────────────────────────────────────────────────
+// ── Patterns CRUD ──────────────────────────────────────────────
+
+/** Pattern as returned by the server (snake_case from DB). */
+export interface SavedPattern {
+    id: string;
+    name: string;
+    summary: string;
+    source_image_count: number;
+    thumbnails: string[];
+    batch_analysis?: any;
+    created_at: string;
+}
+
+/** List all user patterns (excludes batch_analysis for perf). */
+export async function listPatterns(token: string): Promise<SavedPattern[]> {
+    return coreFetch<SavedPattern[]>('/api/patterns', { method: 'GET', token });
+}
+
+/** Get a single pattern with full batch_analysis. */
+export async function getPatternById(token: string, id: string): Promise<SavedPattern> {
+    return coreFetch<SavedPattern>(`/api/patterns/${id}`, { method: 'GET', token });
+}
+
+/** Save a new pattern. Returns { id, name, created_at }. */
+export async function savePattern(
+    token: string,
+    data: {
+        name: string;
+        summary: string;
+        sourceImageCount: number;
+        thumbnails: string[];
+        batchAnalysis: any;
+    },
+): Promise<{ id: string; name: string; created_at: string }> {
+    return coreFetch('/api/patterns', { method: 'POST', body: data, token });
+}
+
+/** Delete a pattern by ID. */
+export async function deletePatternById(token: string, id: string): Promise<{ success: boolean }> {
+    return coreFetch<{ success: boolean }>(`/api/patterns/${id}`, { method: 'DELETE', token });
+}
+
+/** Check if a pattern with the given summary already exists. */
+export async function checkPatternSaved(token: string, summary: string): Promise<boolean> {
+    if (!summary || summary === 'No summary') return false;
+    const patterns = await listPatterns(token);
+    return patterns.some(p => p.summary === summary);
+}
+
+// ── Thumbnail Helpers ──────────────────────────────────────────
+
+/** Resize a data URI to a small thumbnail (default 100x100 max). */
+export function resizeToThumbnail(dataUri: string, maxSize = 100): Promise<string> {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width;
+            let h = img.height;
+
+            if (w > h) {
+                if (w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; }
+            } else {
+                if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; }
+            }
+
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d')!;
+            ctx.drawImage(img, 0, 0, w, h);
+
+            resolve(canvas.toDataURL('image/jpeg', 0.6));
+        };
+        img.onerror = () => resolve(dataUri);
+        img.src = dataUri;
+    });
+}
+
+// ── AI Functions ──────────────────────────────────────────────────
 
 
 /**
