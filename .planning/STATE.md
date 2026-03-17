@@ -4,7 +4,7 @@
 
 - **Milestone:** v3.0 — UI Redesign
 - **Phase:** 20 — Creative Studio Redesign
-- **Status:** Planned — 3 plans in 2 waves. Ready to execute.
+- **Status:** Executing — Plan 01 ✅, Plan 02 & 03 in progress.
 
 ## Milestone History
 
@@ -13,6 +13,15 @@
 | v1.0 Full Feature App | 1–7 | ✅ Complete |
 | v2.0 Backend System | 8–13 | ✅ Complete |
 | v3.0 UI Redesign | 14–24 | 🔄 Active |
+
+## Phase 20 Results
+
+### Plan 20-01: State Machine + Types + Goal Picker ✅
+- `studio/types.ts`: Stage enum (10 stages), StudioGoal, goalCards, getDefaultShifts, dimensionConfig
+- `studio/GoalPicker.tsx`: 3 large cards with motion/react animations, preloaded image indicator
+- `StudioScreen.tsx` rewritten as stage-machine shell (79 LOC), fallback to CreativeStudio
+- Entry from Analyze via `useLocation().state` preloads image+DNA
+- Build: 0 errors
 
 ## Phase 17 Results
 
@@ -73,4 +82,4 @@
 
 ## Stopping Point
 
-2026-03-18: Phase 20 planned (Creative Studio Redesign). 3 plans: 01=State Machine+GoalPicker, 02=Upload+Clone Flow, 03=Variation/Explore+Cleanup. 2 waves. Next: `/gsd:execute-phase 20`.
+2026-03-18: Plan 20-01 complete (State Machine + GoalPicker). Plans 02+03 executing. Studio now has stage-based state machine with GoalPicker entry point and CreativeStudio fallback.
