@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, UploadCloud, AlertTriangle, Settings, X, Microscope, Scale, Copy, Check, ImageOff, Layers, LogOut } from 'lucide-react';
+import { ArrowLeft, UploadCloud, AlertTriangle, Settings, Microscope, Scale, Copy, Check, ImageOff, Layers, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { analyzeDesign, analyzeBatch } from './apiClient';
 import CreativeStudio from './CreativeStudio';
@@ -10,6 +10,7 @@ import { getPatterns } from './patternStorage';
 import { useAuth } from './contexts/AuthContext';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
+import SettingsModal from './components/SettingsModal';
 
 type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results' | 'pattern_library' | 'pattern_detail';
 
@@ -67,35 +68,42 @@ export default function App() {
       if (abortController.signal.aborted) return;
 
       console.error(err);
-      let errorType = 'network';
-      let errorMsg = 'Could not reach the Gemini API. Check your internet connection and try again.';
-
       const errMsg = err?.message || String(err);
+
+      // NO_API_KEY → auto-open Settings
+      if (errMsg.includes('NO_API_KEY') || errMsg.includes('No API key')) {
+        setIsSettingsOpen(true);
+        setCurrentScreen('compare_upload');
+        return;
+      }
+
+      let errorType = 'network';
+      let errorMessage = 'Could not reach the Gemini API. Check your internet connection and try again.';
 
       if (errMsg === 'timeout') {
         errorType = 'timeout';
-        errorMsg = 'The analysis took too long. Please try again.';
+        errorMessage = 'The analysis took too long. Please try again.';
       } else if (errMsg.includes('location is not supported') || errMsg.includes('FAILED_PRECONDITION')) {
         errorType = 'api';
-        errorMsg = 'Your location is not supported by Gemini API. Try turning off VPN or switching to a US/EU server.';
+        errorMessage = 'Your location is not supported by Gemini API. Try turning off VPN or switching to a US/EU server.';
       } else if (errMsg.includes('400')) {
         errorType = 'api';
-        errorMsg = 'Invalid request. The images may be too large or in an unsupported format.';
+        errorMessage = 'Invalid request. The images may be too large or in an unsupported format.';
       } else if (errMsg.includes('403') || errMsg.includes('API key not valid')) {
         errorType = 'api';
-        errorMsg = 'Invalid API key. Please check your key in Settings.';
+        errorMessage = 'Invalid API key. Please check your key in Settings.';
       } else if (errMsg.includes('429') || errMsg.includes('quota')) {
         errorType = 'api';
-        errorMsg = 'Rate limit exceeded. Please wait a moment and try again.';
+        errorMessage = 'Rate limit exceeded. Please wait a moment and try again.';
       } else if (errMsg.includes('50') || errMsg.includes('unavailable')) {
         errorType = 'api';
-        errorMsg = 'Gemini API is temporarily unavailable. Please try again later.';
+        errorMessage = 'Gemini API is temporarily unavailable. Please try again later.';
       } else if (errMsg.includes('JSON') || errMsg.includes('parse') || errMsg.includes('SyntaxError')) {
         errorType = 'parse';
-        errorMsg = 'Received an unexpected response format. Please try again.';
+        errorMessage = 'Received an unexpected response format. Please try again.';
       }
 
-      setError({ type: errorType, message: errorMsg });
+      setError({ type: errorType, message: errorMessage });
       setCurrentScreen('compare_upload');
     }
   };
@@ -132,35 +140,42 @@ export default function App() {
       if (abortController.signal.aborted) return;
 
       console.error(err);
-      let errorType = 'network';
-      let errorMsg = 'Could not reach the Gemini API. Check your internet connection and try again.';
-
       const errMsg = err?.message || String(err);
+
+      // NO_API_KEY → auto-open Settings
+      if (errMsg.includes('NO_API_KEY') || errMsg.includes('No API key')) {
+        setIsSettingsOpen(true);
+        setCurrentScreen('upload');
+        return;
+      }
+
+      let errorType = 'network';
+      let errorMessage = 'Could not reach the Gemini API. Check your internet connection and try again.';
 
       if (errMsg === 'timeout') {
         errorType = 'timeout';
-        errorMsg = 'The analysis took too long. Please try again.';
+        errorMessage = 'The analysis took too long. Please try again.';
       } else if (errMsg.includes('location is not supported') || errMsg.includes('FAILED_PRECONDITION')) {
         errorType = 'api';
-        errorMsg = 'Your location is not supported by Gemini API. Try turning off VPN or switching to a US/EU server.';
+        errorMessage = 'Your location is not supported by Gemini API. Try turning off VPN or switching to a US/EU server.';
       } else if (errMsg.includes('400')) {
         errorType = 'api';
-        errorMsg = 'Invalid request. The image may be too large or in an unsupported format.';
+        errorMessage = 'Invalid request. The image may be too large or in an unsupported format.';
       } else if (errMsg.includes('403') || errMsg.includes('API key not valid')) {
         errorType = 'api';
-        errorMsg = 'Invalid API key. Please check your key in Settings.';
+        errorMessage = 'Invalid API key. Please check your key in Settings.';
       } else if (errMsg.includes('429') || errMsg.includes('quota')) {
         errorType = 'api';
-        errorMsg = 'Rate limit exceeded. Please wait a moment and try again.';
+        errorMessage = 'Rate limit exceeded. Please wait a moment and try again.';
       } else if (errMsg.includes('50') || errMsg.includes('unavailable')) {
         errorType = 'api';
-        errorMsg = 'Gemini API is temporarily unavailable. Please try again later.';
+        errorMessage = 'Gemini API is temporarily unavailable. Please try again later.';
       } else if (errMsg.includes('JSON') || errMsg.includes('parse')) {
         errorType = 'parse';
-        errorMsg = 'Received an unexpected response format. Please try again.';
+        errorMessage = 'Received an unexpected response format. Please try again.';
       }
 
-      setError({ type: errorType, message: errorMsg });
+      setError({ type: errorType, message: errorMessage });
     }
   };
 
@@ -325,58 +340,7 @@ export default function App() {
   );
 }
 
-function SettingsModal({ onClose }: { onClose: () => void }) {
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="relative w-full max-w-[400px] bg-bg-surface1 border border-border-default rounded-xl p-6"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="settings-title"
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-text-secondary hover:text-text-primary transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        <h2 id="settings-title" className="text-[20px] font-semibold mb-6">Settings</h2>
-
-        <p className="text-[14px] text-text-secondary">
-          API key management will be available in the next update.
-        </p>
-
-        <div className="flex gap-3 justify-end mt-6">
-          <button
-            onClick={onClose}
-            className="px-5 py-3 text-[14px] font-medium bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
 
 function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) => void }) {
   return (
