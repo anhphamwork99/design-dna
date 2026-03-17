@@ -82,4 +82,4 @@
 
 ## Stopping Point
 
-2026-03-18: Plan 20-01 complete (State Machine + GoalPicker). Plans 02+03 executing. Studio now has stage-based state machine with GoalPicker entry point and CreativeStudio fallback.
+2026-03-18: Plans 20-01 + 20-02 complete (Wave 1). Studio has stage-based state machine, GoalPicker, Upload+Analyze+Clone flow end-to-end. Plan 03 (Wave 2) remaining: Variations/Explore + cleanup.
