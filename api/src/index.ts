@@ -11,14 +11,18 @@ import { patternsRoute } from './routes/patterns.js';
 
 const app = new Hono();
 
-// CORS — only allow frontend origin (MUST be before other middleware)
+// CORS — allow any localhost origin in dev, restrict in production
 const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000';
 app.use(
     '*',
     cors({
         origin: (origin) => {
-            // Return the origin if it matches, otherwise return null
-            if (origin === ALLOWED_ORIGIN || origin === 'http://localhost:3000') {
+            // Allow any localhost origin in development
+            if (origin && /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
+                return origin;
+            }
+            // Allow configured origin
+            if (origin === ALLOWED_ORIGIN) {
                 return origin;
             }
             return ALLOWED_ORIGIN;
