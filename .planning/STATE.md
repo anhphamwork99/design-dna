@@ -1,54 +1,50 @@
-# DesignDNA — Project State
+# State — DesignDNA v3.0
 
-## Project Reference
+## Current
 
-See: .planning/PROJECT.md (updated 2026-03-17)
-
-**Core value:** Giúp POD sellers hiểu CHÍNH XÁC tại sao một design bán tốt — rồi tạo designs original có cùng sức hấp dẫn
-**Current focus:** v3.0 UI Redesign — Krea AI-inspired
-
-## Current Phase
-
-| Field | Value |
-|-------|-------|
-| Milestone | v3.0 — UI Redesign |
-| Phase | Not started (defining requirements) |
-| Status | Defining requirements |
-| Last activity | 2026-03-17 — Milestone v3.0 started |
+- **Milestone:** v3.0 — UI Redesign
+- **Phase:** 14 — Design System Foundation (NEXT)
+- **Status:** Requirements defined, roadmap created. Ready to plan Phase 14.
 
 ## Milestone History
 
 | Milestone | Phases | Status |
 |-----------|--------|--------|
-| v1.0 — Full Feature App | 1 → 7C (11 phases) | ✅ Shipped 2026-03-17 |
-| v2.0 — Backend System | 8 → 13 (6 phases) | ✅ Shipped 2026-03-17 |
-
-See `.planning/MILESTONES.md` for full history.
+| v1.0 Full Feature App | 1–7 | ✅ Complete |
+| v2.0 Backend System | 8–13 | ✅ Complete |
+| v3.0 UI Redesign | 14–24 | 🔄 Active |
 
 ## Architecture Summary
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | React + Vite SPA |
-| Backend API | Hono (TypeScript) |
-| Database | Supabase PostgreSQL + RLS |
-| Auth | Supabase Auth (email + Google OAuth) |
-| AI | Gemini (4 models via server-side proxy) |
-| Encryption | AES-256-GCM (API keys) |
+**Current:** React + Vite + Supabase + Hono | 35 files, ~6,500 LOC
+**Target:** Same stack + React Router v7, Inter font, light mode, sidebar nav
 
 ## Key Models
 
 - **Analysis:** gemini-3.1-pro-preview
 - **Synthesis:** gemini-2.5-pro
-- **Image gen:** gemini-2.5-flash-image (multimodal input)
-- **Buyer fit:** gemini-3-flash-preview (scoring)
+- **Generation:** gemini-2.5-flash-image
+- **Scoring:** gemini-3-flash-preview
+
+## v3.0 Decisions
+
+| Decision | Choice |
+|----------|--------|
+| Dark mode | ❌ Light only |
+| Font | Inter (variable) |
+| Router | React Router v7 |
+| Mobile sidebar | Collapse to bottom nav |
 
 ## Accumulated Context
 
-- v3.0 scope: 100% UI redesign, no new features
-- Design reference: Krea AI (light, clean, minimal, left sidebar)
-- All existing features preserved: Analysis, Creative Studio, Compare, Pattern Library, My Analyses, Settings
+- **Research completed:** DESIGN-SYSTEM.md (28KB), FEATURES.md (35KB), ARCHITECTURE.md (20KB), PITFALLS.md (21KB)
+- **Synthesis:** SUMMARY.md with key findings
+- **Requirements:** 45 requirements in 8 categories (REQUIREMENTS.md)
+- **Roadmap:** 11 phases (14–24) with dependency chain (ROADMAP.md)
+- **Token names stay same** — Tailwind @theme already semantic, only values swap
+- **God Component App.tsx** (1,307 LOC) → decompose in Phase 17
+- **Top pitfalls:** P1 (big-bang CSS), P2 (logic loss), P3 (depth mismatch), P4 (nav shock), P5 (auth break)
 
-Last session: 2026-03-17T16:58
-Stopped at: Defining v3.0 requirements
-Next action: Research → Requirements → Roadmap
+## Stopping Point
+
+2026-03-17: Requirements & roadmap complete. Next: `/gsd:plan-phase` for Phase 14.

@@ -32,7 +32,7 @@ DesignDNA là AI-powered design intelligence tool cho Print On Demand (POD) sell
 - Left sidebar navigation thay thế landing screen selection
 - Redesign tất cả screens: Analysis, Creative Studio, Compare, Pattern Library, My Analyses, Settings
 - Clear feature list & navigation flow
-- Light mode as default (giữ dark mode toggle nếu phù hợp)
+- Light mode only (no dark mode toggle)
 
 ## Architecture Principles (chốt 2026-03-16)
 
@@ -61,7 +61,18 @@ DesignDNA là AI-powered design intelligence tool cho Print On Demand (POD) sell
 
 ### Active
 
-(Defining requirements for v3.0 UI Redesign)
+**v3.0 — UI Redesign (45 requirements):**
+- STYLE-01..06: Design System Foundation (tokens, reset, globals, Inter font, achromatic palette)
+- LAYOUT-01..06: App Shell & Sidebar (AppShell, Sidebar, 3-zone nav, collapse on mobile)
+- ROUTER-01..05: React Router v7 (named routes, App.tsx decompose, auth boundary)
+- SHARED-01..09: Shared UI Components (Button, Card, Input, Modal, UploadZone, EmptyState, etc.)
+- SCREEN-01..08: Screen Extraction & Redesign (Home, Analyze, Studio, Compare, Library, Analyses, Settings)
+- AUTH-01..02: Auth Screens Redesign (Login, Register with light theme)
+- UX-01..06: Interaction Patterns (context menus, lightbox, quick actions, empty/loading/error states)
+- POLISH-01..03: CSS cleanup, accessibility, responsive testing
+
+**Full details:** `.planning/REQUIREMENTS.md`
+**Roadmap:** `.planning/ROADMAP.md` (Phase 14–24)
 
 ### Out of Scope
 
@@ -92,7 +103,9 @@ DesignDNA là AI-powered design intelligence tool cho Print On Demand (POD) sell
 - **Model for synthesis:** gemini-2.5-pro (strong reasoning for concept creation)
 - **Model for image gen:** gemini-2.5-flash-image (artwork generation with multimodal input)
 - **Model for buyer fit:** gemini-3-flash-preview (scoring)
-- **UI Style:** Dark mode elegant — premium, clean, design-tool aesthetic
+- **UI Style:** Light mode, Krea AI-inspired — achromatic, minimal, premium creative tool aesthetic
+- **Font:** Inter (variable, Google Fonts)
+- **Router:** React Router v7
 - **Structured Output:** JSON schema enforce cho analysis outputs
 - **Persistence:** Supabase PostgreSQL (server-side, per-user with RLS)
 - **API Keys:** User-provided Gemini API keys, stored encrypted (AES-256-GCM)
@@ -103,7 +116,11 @@ DesignDNA là AI-powered design intelligence tool cho Print On Demand (POD) sell
 |----------|-----------|---------|
 | React framework | Đơn giản cho SPA, không cần SSR | ✓ Good |
 | Remove Trend Advisor | Google Search quá generic cho POD niches | ✓ Good |
-| Dark mode elegant UI | User preference + phù hợp design tool aesthetic | ✓ Good |
+| Dark mode elegant UI | User preference + phù hợp design tool aesthetic | ✓ Good (v1-v2) |
+| Light-only (no dark mode) | Simplicity — no ThemeContext, no dual token layer | v3.0 |
+| Inter font | Free Suisse Intl alternative, variable weight support incl. 450 | v3.0 |
+| React Router v7 | URL-based nav, back/forward, deep links, decompose god component | v3.0 |
+| Sidebar collapse on mobile | Standard mobile UX, bottom nav or hamburger | v3.0 |
 | Direct code in IDE | Transitioned from AI Studio Build Mode — more control | ✓ Good |
 | Merge Quick/Deep analysis | Single unified flow, better UX (Phase 6A) | ✓ Good |
 | Original = required ground truth | Generation luôn cần 1 design gốc đã analyze | ✓ Good |
