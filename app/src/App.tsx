@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, UploadCloud, AlertTriangle, Settings, Microscope, Scale, Copy, Check, ImageOff, Layers, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { analyzeDesign, analyzeBatch } from './apiClient';
+import { analyzeDesign, analyzeBatch, saveAnalysis } from './apiClient';
+import { generateThumbnail } from './api';
 import CreativeStudio from './CreativeStudio';
 import { CompareUploadScreen, CompareAnalyzingScreen, CompareResultsScreen } from './CompareScreens';
 import PatternLibrary from './PatternLibrary';
@@ -25,6 +26,7 @@ export default function App() {
   const [compareImages, setCompareImages] = useState<{ data: string; name: string; type: string }[]>([]);
   const [compareResult, setCompareResult] = useState<any>(null);
   const [selectedPatternId, setSelectedPatternId] = useState<string | null>(null);
+  const [savedAnalysisId, setSavedAnalysisId] = useState<string | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -133,6 +135,23 @@ export default function App() {
       ]);
 
       if (abortController.signal.aborted) return;
+
+      // Auto-save fire-and-forget
+      generateThumbnail(uploadedImage.data, 200)
+        .then(thumbnail => {
+          saveAnalysis(token, {
+            name: uploadedImage.name,
+            thumbnail,
+            resultJson: result
+          })
+            .then(saved => {
+              if (saved && saved.id) {
+                setSavedAnalysisId(saved.id);
+              }
+            })
+            .catch(err => console.warn('Failed to auto-save analysis:', err));
+        })
+        .catch(err => console.warn('Failed to generate thumbnail for auto-save:', err));
 
       setAnalysisResult(result);
       setCurrentScreen('results');
