@@ -19,16 +19,16 @@
 
 ## Requirements
 
-### STYLE — Design System Foundation
+### STYLE — Design System Foundation ✅
 
 | ID | Requirement | Notes |
 |----|-------------|-------|
-| STYLE-01 | Create design tokens as CSS custom properties — colors, typography, spacing, radius, shadows, transitions | From DESIGN-SYSTEM.md extraction |
-| STYLE-02 | Swap Tailwind `@theme` values from dark to light palette — semantic names unchanged | Zero JSX changes needed |
-| STYLE-03 | Add CSS reset (Josh Comeau style) + globals (body, typography, scrollbar) | Separate files in `styles/` |
-| STYLE-04 | Organize CSS into `styles/tokens.css`, `reset.css`, `globals.css`, `utilities.css` | Import order matters |
-| STYLE-05 | Use Inter font (Google Fonts variable) — replace current font stack | Single family for all text |
-| STYLE-06 | Achromatic color palette — grayscale only, no brand hue | Krea AI pattern |
+| ~~STYLE-01~~ | ~~Create design tokens as CSS custom properties~~ | ✅ `styles/tokens.css` |
+| ~~STYLE-02~~ | ~~Swap Tailwind `@theme` values from dark to light palette~~ | ✅ Token names preserved |
+| ~~STYLE-03~~ | ~~Add CSS reset + globals~~ | ✅ `styles/reset.css`, `styles/globals.css` |
+| ~~STYLE-04~~ | ~~Organize CSS into `styles/` folder~~ | ✅ 4 files + import-only entry |
+| ~~STYLE-05~~ | ~~Use Inter font (Google Fonts variable)~~ | ✅ Variable 100-900 weight |
+| ~~STYLE-06~~ | ~~Achromatic color palette~~ | ✅ Grayscale only |
 
 ### LAYOUT — App Shell & Navigation
 

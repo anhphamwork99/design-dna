@@ -3,8 +3,8 @@
 ## Current
 
 - **Milestone:** v3.0 — UI Redesign
-- **Phase:** 14 — Design System Foundation (NEXT)
-- **Status:** Requirements defined, roadmap created. Ready to plan Phase 14.
+- **Phase:** 15 — Shared UI Components (NEXT)
+- **Status:** Phase 14 complete. Ready to plan Phase 15.
 
 ## Milestone History
 
@@ -13,6 +13,15 @@
 | v1.0 Full Feature App | 1–7 | ✅ Complete |
 | v2.0 Backend System | 8–13 | ✅ Complete |
 | v3.0 UI Redesign | 14–24 | 🔄 Active |
+
+## Phase 14 Results
+
+- **2 plans, 2 waves** — both complete
+- Created CSS architecture: `styles/tokens.css`, `reset.css`, `globals.css`, `utilities.css`
+- Restructured `index.css` to import-only (109 LOC → 7 lines)
+- All token names preserved, values swapped dark→light
+- Fixed 4 `border-white/` hardcoded colors → token-based
+- Updated `index.html` with preconnect, theme-color, SEO meta
 
 ## Architecture Summary
 
@@ -35,16 +44,6 @@
 | Router | React Router v7 |
 | Mobile sidebar | Collapse to bottom nav |
 
-## Accumulated Context
-
-- **Research completed:** DESIGN-SYSTEM.md (28KB), FEATURES.md (35KB), ARCHITECTURE.md (20KB), PITFALLS.md (21KB)
-- **Synthesis:** SUMMARY.md with key findings
-- **Requirements:** 45 requirements in 8 categories (REQUIREMENTS.md)
-- **Roadmap:** 11 phases (14–24) with dependency chain (ROADMAP.md)
-- **Token names stay same** — Tailwind @theme already semantic, only values swap
-- **God Component App.tsx** (1,307 LOC) → decompose in Phase 17
-- **Top pitfalls:** P1 (big-bang CSS), P2 (logic loss), P3 (depth mismatch), P4 (nav shock), P5 (auth break)
-
 ## Stopping Point
 
-2026-03-17: Requirements & roadmap complete. Next: `/gsd:plan-phase` for Phase 14.
+2026-03-17: Phase 14 complete. Next: `/gsd:plan-phase 15` for Shared UI Components.
