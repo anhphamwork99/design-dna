@@ -259,40 +259,47 @@ export default function StudioScreen() {
     return (
         <div className="flex flex-col h-full min-h-screen bg-bg-base relative">
             {/* Top bar — exit + dynamic breadcrumb */}
-            <div className="absolute top-4 left-4 z-50 flex items-center gap-2">
-                <button
-                    onClick={() => navigate('/')}
-                    className="p-2 rounded-xl bg-bg-surface1 border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors shadow-sm"
-                    aria-label="Exit Studio"
-                    title="Exit Studio"
-                >
-                    <LogOut className="w-5 h-5" />
-                </button>
+            {(() => {
+                const isLoadingStage = stage === 'analyzing' || stage === 'cloning' || stage === 'synthesizing' || stage === 'generating';
+                return (
+                    <div className="absolute top-4 left-4 z-50 flex items-center gap-2">
+                        <button
+                            onClick={() => navigate('/')}
+                            className="p-2 rounded-xl bg-bg-surface1 border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors shadow-sm"
+                            aria-label="Exit Studio"
+                            title="Exit Studio"
+                        >
+                            <LogOut className="w-5 h-5" />
+                        </button>
 
-                {/* Breadcrumb */}
-                <nav className="flex items-center gap-1 text-[14px]">
-                    {stage === 'goals' ? (
-                        <span className="font-semibold text-text-primary">Studio</span>
-                    ) : (
-                        <>
-                            <button
-                                onClick={handleStartOver}
-                                className="text-text-secondary hover:text-text-primary transition-colors"
-                            >
-                                Studio
-                            </button>
-                            {goal && (
-                                <>
-                                    <ChevronRight className="w-3.5 h-3.5 text-text-tertiary" />
-                                    <span className="font-medium text-text-primary">
-                                        {goal === 'clone' ? 'Clone Design' : goal === 'variations' ? 'Make Variations' : 'Explore New Ideas'}
-                                    </span>
-                                </>
-                            )}
-                        </>
-                    )}
-                </nav>
-            </div>
+                        {/* Breadcrumb — hidden during loading stages */}
+                        {!isLoadingStage && (
+                            <nav className="flex items-center gap-1 text-[14px]">
+                                {stage === 'goals' ? (
+                                    <span className="font-semibold text-text-primary">Studio</span>
+                                ) : (
+                                    <>
+                                        <button
+                                            onClick={handleStartOver}
+                                            className="text-text-secondary hover:text-text-primary transition-colors"
+                                        >
+                                            Studio
+                                        </button>
+                                        {goal && (
+                                            <>
+                                                <ChevronRight className="w-3.5 h-3.5 text-text-tertiary" />
+                                                <span className="font-medium text-text-primary">
+                                                    {goal === 'clone' ? 'Clone Design' : goal === 'variations' ? 'Make Variations' : 'Explore New Ideas'}
+                                                </span>
+                                            </>
+                                        )}
+                                    </>
+                                )}
+                            </nav>
+                        )}
+                    </div>
+                );
+            })()}
 
             {stage === 'goals' && (
                 <div className="flex-1">

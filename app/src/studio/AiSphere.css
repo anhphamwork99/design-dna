@@ -1,0 +1,104 @@
+/* ── AI Sphere ────────────────────────────────────────────────────── */
+/* Premium glowing orb loading animation                              */
+
+.ai-sphere {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Core orb — gradient sphere with subtle color shift */
+.ai-sphere__core {
+    position: absolute;
+    inset: 15%;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 35%,
+            rgba(255, 255, 255, 0.6) 0%,
+            transparent 50%),
+        radial-gradient(circle at 50% 50%,
+            #6366f1 0%,
+            #8b5cf6 30%,
+            #a855f7 50%,
+            #7c3aed 80%,
+            #4f46e5 100%);
+    box-shadow:
+        inset 0 -8px 20px rgba(0, 0, 0, 0.25),
+        inset 0 4px 12px rgba(255, 255, 255, 0.15);
+    animation: sphere-breathe 3s ease-in-out infinite;
+}
+
+/* Rotating ring — orbital arc around the sphere */
+.ai-sphere__ring {
+    position: absolute;
+    inset: 5%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: rgba(139, 92, 246, 0.8);
+    border-right-color: rgba(139, 92, 246, 0.3);
+    animation: sphere-orbit 1.8s linear infinite;
+}
+
+.ai-sphere__ring::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 1.5px solid transparent;
+    border-bottom-color: rgba(167, 139, 250, 0.6);
+    border-left-color: rgba(167, 139, 250, 0.2);
+    animation: sphere-orbit 2.8s linear infinite reverse;
+}
+
+/* Outer glow — pulsing ambient light */
+.ai-sphere__glow {
+    position: absolute;
+    inset: -20%;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+            rgba(139, 92, 246, 0.2) 0%,
+            rgba(139, 92, 246, 0.08) 40%,
+            transparent 70%);
+    animation: sphere-glow 2.5s ease-in-out infinite;
+}
+
+/* ── Keyframes ────────────────────────────────────────────────────── */
+
+@keyframes sphere-breathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    50% {
+        transform: scale(1.04);
+        filter: brightness(1.15);
+    }
+}
+
+@keyframes sphere-orbit {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes sphere-glow {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+}

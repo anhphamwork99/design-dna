@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { Copy, Download, RefreshCw, RotateCcw } from 'lucide-react';
+import AiSphere from './AiSphere';
 
 interface CloneStudioProps {
     stage: 'studio' | 'cloning' | 'clone-result';
@@ -106,49 +107,27 @@ function ClonePreview({
 
 function CloningLoader({ image }: { image: { data: string; name: string } }) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-6 relative">
-            {/* Thumbnail corner */}
-            <motion.div
-                className="absolute top-6 left-6"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-            >
+        <div className="flex flex-col items-center justify-center min-h-screen px-6">
+            {/* Title */}
+            <h2 className="text-[22px] font-semibold text-text-primary mb-10 tracking-tight">
+                Extracting &amp; recreating design
+            </h2>
+
+            {/* AI Sphere */}
+            <div className="mb-10">
+                <AiSphere size={100} />
+            </div>
+
+            {/* Image indicator */}
+            <div className="flex items-center gap-3 bg-bg-surface1 border border-border-default rounded-xl px-4 py-3">
                 <img
                     src={image.data}
                     alt={image.name}
-                    className="w-[80px] h-[80px] rounded-xl object-cover border border-border-default shadow-sm"
+                    className="w-10 h-10 rounded-lg object-cover border border-border-default"
                 />
-            </motion.div>
-
-            <div className="flex flex-col items-center gap-8">
-                {/* Spinner */}
-                <div className="relative flex items-center justify-center">
-                    <motion.div
-                        className="absolute w-32 h-32 rounded-full"
-                        style={{
-                            background:
-                                'radial-gradient(circle, var(--color-accent-subtle) 0%, transparent 70%)',
-                        }}
-                        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                    <motion.div
-                        className="relative w-16 h-16 rounded-full border-[3px] border-border-default"
-                        style={{ borderTopColor: 'var(--color-accent)' }}
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-                    />
-                    <motion.div
-                        className="absolute w-3 h-3 rounded-full bg-accent"
-                        animate={{ scale: [1, 1.3, 1] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                </div>
-
-                <p className="text-[15px] font-medium text-text-secondary">
-                    Extracting & recreating design…
-                </p>
+                <span className="text-[13px] text-text-secondary max-w-[180px] truncate">
+                    {image.name}
+                </span>
             </div>
         </div>
     );
