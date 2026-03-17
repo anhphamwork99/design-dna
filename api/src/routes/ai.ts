@@ -84,6 +84,7 @@ aiRoute.post('/ai/analyze', async (c) => {
         const result = await analyzeDesign(ai, imageData, mimeType);
         return c.json(result);
     } catch (err) {
+        console.error('[ai/analyze] Error:', err);
         const mapped = mapGeminiError(err);
         return c.json({ code: mapped.code, message: mapped.message }, mapped.status as any);
     }

@@ -10,13 +10,13 @@ import type { GoogleGenAI } from '@google/genai';
 import { cleanJsonResponse } from './helpers.js';
 
 export async function analyzeDesign(
-    ai: GoogleGenAI,
-    imageData: string,
-    mimeType: string,
+  ai: GoogleGenAI,
+  imageData: string,
+  mimeType: string,
 ): Promise<any> {
-    const model = 'gemini-2.5-pro';
+  const model = 'gemini-2.5-pro';
 
-    const analysisPrompt = `Analyze this design completely. Output ONLY a JSON object with this exact structure:
+  const analysisPrompt = `Analyze this design completely. Output ONLY a JSON object with this exact structure:
 {
   "visual_dna": {
     "summary": "2-3 sentences max",
@@ -47,27 +47,30 @@ Important Rules:
 - buyer_dna.made_for_me_decisions must have exactly 3-5 items.
 - Commit to one primary buyer profile. If design is ambiguous, add a brief note in lifestyle.`;
 
-    const response = await ai.models.generateContent({
-        model,
-        contents: {
-            parts: [
-                {
-                    inlineData: {
-                        data: imageData,
-                        mimeType,
-                    },
-                },
-                {
-                    text: analysisPrompt,
-                },
-            ],
-        },
-        config: {
-            responseMimeType: 'application/json',
-        },
-    });
+  // Strip data URI prefix if present (e.g. "data:image/png;base64,...")
+  const base64Data = imageData.includes(',') ? imageData.split(',')[1] : imageData;
 
-    const text = response.text;
-    if (!text) throw new Error('No response from Gemini');
-    return JSON.parse(cleanJsonResponse(text));
+  const response = await ai.models.generateContent({
+    model,
+    contents: {
+      parts: [
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType,
+          },
+        },
+        {
+          text: analysisPrompt,
+        },
+      ],
+    },
+    config: {
+      responseMimeType: 'application/json',
+    },
+  });
+
+  const text = response.text;
+  if (!text) throw new Error('No response from Gemini');
+  return JSON.parse(cleanJsonResponse(text));
 }

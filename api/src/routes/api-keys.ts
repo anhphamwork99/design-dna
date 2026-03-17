@@ -107,7 +107,8 @@ apiKeysRoute.post('/api-keys', async (c) => {
         }
 
         return c.json({ success: true, message: 'API key saved' }, 201);
-    } catch {
+    } catch (err) {
+        console.error('[api-keys POST] Error:', err);
         return c.json(
             { code: 'INTERNAL_ERROR', message: 'Unexpected error' },
             500,

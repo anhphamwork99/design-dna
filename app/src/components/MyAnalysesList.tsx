@@ -3,10 +3,9 @@ import { motion } from 'motion/react';
 import { ArrowLeft, Trash2, BookOpen } from 'lucide-react';
 import { listAnalyses, deleteAnalysis } from '../apiClient';
 import { useAuth } from '../contexts/AuthContext';
-import { Screen } from '../App';
 
 interface Props {
-    onNavigate: (s: Screen) => void;
+    onNavigate: (s: string) => void;
     onViewAnalysis: (id: string) => void;
 }
 
