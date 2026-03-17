@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, UploadCloud, AlertTriangle, Settings, X, Microscope, Scale, Copy, Check, ImageOff, Layers, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { analyzeDesign, analyzeBatch } from './api';
+import { analyzeDesign, analyzeBatch } from './apiClient';
 import CreativeStudio from './CreativeStudio';
 import { CompareUploadScreen, CompareAnalyzingScreen, CompareResultsScreen } from './CompareScreens';
 import PatternLibrary from './PatternLibrary';
@@ -14,7 +14,7 @@ import RegisterScreen from './RegisterScreen';
 type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results' | 'pattern_library' | 'pattern_detail';
 
 export default function App() {
-  const { user, loading, signOut } = useAuth();
+  const { user, session, loading, signOut } = useAuth();
   const [authScreen, setAuthScreen] = useState<'login' | 'register'>('login');
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [uploadedImage, setUploadedImage] = useState<{ data: string; name: string; type: string } | null>(null);
@@ -26,16 +26,8 @@ export default function App() {
   const [selectedPatternId, setSelectedPatternId] = useState<string | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [apiKey, setApiKey] = useState('');
 
   useEffect(() => {
-    const savedKey = localStorage.getItem('designdna_api_key');
-    if (savedKey) {
-      setApiKey(savedKey);
-    } else {
-      setIsSettingsOpen(true);
-    }
-
     const handleOpenSettings = () => setIsSettingsOpen(true);
     document.addEventListener('open-settings', handleOpenSettings);
     return () => document.removeEventListener('open-settings', handleOpenSettings);
@@ -44,13 +36,9 @@ export default function App() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleCompareAnalyze = async () => {
-    if (compareImages.length < 2) return;
+    if (compareImages.length < 2 || !session) return;
 
-    const currentApiKey = localStorage.getItem('designdna_api_key');
-    if (!currentApiKey) {
-      setIsSettingsOpen(true);
-      return;
-    }
+    const token = session.access_token;
 
     setCurrentScreen('compare_analyzing');
     setError(null);
@@ -67,7 +55,7 @@ export default function App() {
       });
 
       const result = await Promise.race([
-        analyzeBatch(compareImages, currentApiKey),
+        analyzeBatch(token, compareImages),
         timeoutPromise
       ]);
 
@@ -113,13 +101,9 @@ export default function App() {
   };
 
   const handleAnalyze = async () => {
-    if (!uploadedImage) return;
+    if (!uploadedImage || !session) return;
 
-    const currentApiKey = localStorage.getItem('designdna_api_key');
-    if (!currentApiKey) {
-      setIsSettingsOpen(true);
-      return;
-    }
+    const token = session.access_token;
 
     setCurrentScreen('analyzing');
     setError(null);
@@ -136,7 +120,7 @@ export default function App() {
       });
 
       const result = await Promise.race([
-        analyzeDesign(uploadedImage.data, uploadedImage.type, currentApiKey),
+        analyzeDesign(token, uploadedImage.data, uploadedImage.type),
         timeoutPromise
       ]);
 
@@ -334,12 +318,6 @@ export default function App() {
         {isSettingsOpen && (
           <SettingsModal
             onClose={() => setIsSettingsOpen(false)}
-            initialKey={apiKey}
-            onSave={(key) => {
-              setApiKey(key);
-              localStorage.setItem('designdna_api_key', key);
-              setIsSettingsOpen(false);
-            }}
           />
         )}
       </AnimatePresence>
@@ -347,9 +325,7 @@ export default function App() {
   );
 }
 
-function SettingsModal({ onClose, initialKey, onSave }: { onClose: () => void, initialKey: string, onSave: (key: string) => void }) {
-  const [keyInput, setKeyInput] = useState(initialKey);
-
+function SettingsModal({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -385,33 +361,16 @@ function SettingsModal({ onClose, initialKey, onSave }: { onClose: () => void, i
 
         <h2 id="settings-title" className="text-[20px] font-semibold mb-6">Settings</h2>
 
-        <div className="flex flex-col gap-2 mb-8">
-          <label className="text-[14px] text-text-secondary font-medium">Gemini API Key</label>
-          <input
-            type="password"
-            value={keyInput}
-            onChange={(e) => setKeyInput(e.target.value)}
-            placeholder="Paste your API key here"
-            className="w-full bg-bg-surface1 border border-border-default hover:border-border-hover focus:border-accent focus:ring-1 focus:ring-accent rounded-lg px-[14px] py-[10px] text-[14px] text-text-primary outline-none transition-all"
-          />
-          <p className="text-[12px] text-text-tertiary mt-1">
-            Your key is stored locally in your browser and never sent to our servers.
-          </p>
-        </div>
+        <p className="text-[14px] text-text-secondary">
+          API key management will be available in the next update.
+        </p>
 
-        <div className="flex gap-3 justify-end">
+        <div className="flex gap-3 justify-end mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-[14px] font-medium text-text-secondary hover:text-text-primary transition-colors"
+            className="px-5 py-3 text-[14px] font-medium bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors"
           >
-            Cancel
-          </button>
-          <button
-            onClick={() => onSave(keyInput)}
-            disabled={!keyInput.trim()}
-            className="px-5 py-3 text-[14px] font-medium bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Save
+            Close
           </button>
         </div>
       </motion.div>
