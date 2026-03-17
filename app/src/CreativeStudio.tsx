@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight, Download, Sparkles, AlertCircle, X, Settings, Paintbrush, Loader2, RefreshCw, RotateCcw, Bookmark, Check } from 'lucide-react';
 import { synthesizeConcept, generateArtwork, analyzeBuyerFit, cloneDesign } from './apiClient';
 import type { SynthesizedConcept } from './api';
-import { getPatterns, SavedPattern } from './patternStorage';
+import { listPatterns, SavedPattern } from './apiClient';
 import { useAuth } from './contexts/AuthContext';
 
 // ── Types ──────────────────────────────────────────────────────────
@@ -784,7 +784,11 @@ export default function CreativeStudio({
                         ) : (
                             <button
                                 onClick={() => {
-                                    setSavedPatterns(getPatterns());
+                                    if (!showPatternPanel && session) {
+                                        listPatterns(session.access_token)
+                                            .then(setSavedPatterns)
+                                            .catch((err) => console.error('Failed to load patterns:', err));
+                                    }
                                     setShowPatternPanel(!showPatternPanel);
                                 }}
                                 className="px-3 py-1.5 text-[12px] text-accent bg-accent/10 rounded-lg border border-accent/20 hover:bg-accent/15 transition-colors"
@@ -989,7 +993,7 @@ export default function CreativeStudio({
                                     { key: 'made_for_me_patterns', label: 'Made For Me Patterns', desc: 'hooks, differentiation' },
                                     { key: 'specificity_ladder', label: 'Specificity Ladder', desc: 'specificity insights' },
                                 ].map(({ key, label, desc }) => {
-                                    const hasData = pendingPattern.batchAnalysis?.[key];
+                                    const hasData = pendingPattern.batch_analysis?.[key];
                                     return (
                                         <label
                                             key={key}
@@ -1029,8 +1033,8 @@ export default function CreativeStudio({
                                             .map(([k]) => k);
                                         const data: Record<string, any> = {};
                                         sections.forEach(s => {
-                                            if (pendingPattern.batchAnalysis?.[s]) {
-                                                data[s] = pendingPattern.batchAnalysis[s];
+                                            if (pendingPattern.batch_analysis?.[s]) {
+                                                data[s] = pendingPattern.batch_analysis[s];
                                             }
                                         });
                                         setAppliedPattern({
