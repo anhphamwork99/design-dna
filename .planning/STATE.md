@@ -3,8 +3,8 @@
 ## Current
 
 - **Milestone:** v3.0 — UI Redesign
-- **Phase:** 17 — Router & Screen Extraction ✅ COMPLETE
-- **Status:** Phase 17 complete. Ready to plan Phase 18+.
+- **Phase:** 20 — Creative Studio Redesign
+- **Status:** Planned — 3 plans in 2 waves. Ready to execute.
 
 ## Milestone History
 
@@ -73,4 +73,4 @@
 
 ## Stopping Point
 
-2026-03-17: Phase 17 complete (Router & Screen Extraction). App.tsx reduced from 1,224 → 74 LOC. All screens self-contained in `screens/`. Next: Phase 18+ (Home, Analyze, Studio redesigns — can be done in any order).
+2026-03-18: Phase 20 planned (Creative Studio Redesign). 3 plans: 01=State Machine+GoalPicker, 02=Upload+Clone Flow, 03=Variation/Explore+Cleanup. 2 waves. Next: `/gsd:execute-phase 20`.
