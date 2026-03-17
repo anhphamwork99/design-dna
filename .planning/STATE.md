@@ -3,8 +3,8 @@
 ## Current
 
 - **Milestone:** v3.0 — UI Redesign
-- **Phase:** 16 — App Shell & Sidebar (NEXT)
-- **Status:** Phase 15 complete. Ready to plan Phase 16.
+- **Phase:** 17 — Router & Screen Extraction (NEXT)
+- **Status:** Phase 16 complete. Ready to plan Phase 17.
 
 ## Milestone History
 
@@ -14,32 +14,37 @@
 | v2.0 Backend System | 8–13 | ✅ Complete |
 | v3.0 UI Redesign | 14–24 | 🔄 Active |
 
-## Phase 15 Progress
+## Phase 16 Progress
 
-### Plan 15-01: Core UI Components ✅
-- 5 components + barrel export in `app/src/components/shared/`
-- Button (4 variants, 3 sizes, loading), Card (hover, clickable), Input (label, error, helper)
-- Modal (backdrop blur, escape, scroll lock, animated), Badge (pill, 5 variants)
-- 254 lines, zero build errors
+### Plan 16-01: Layout Components ✅
+- Installed react-router-dom@7.13.1
+- Dancing Script font + `--font-logo` CSS token
+- 3 layout components: Sidebar (142 LOC), SidebarNavItem (34 LOC), AppShell (23 LOC)
+- Sidebar: 3 zones (WORKSPACE, TOOLS, FOOTER), collapse toggle, active state
 
-### Plan 15-02: Feature Components ✅
-- 4 components: UploadZone (drag/drop, preview, compact), EmptyState, ErrorBanner, LoadingSpinner
-- Barrel export updated with all 9+ exports
-- Zero build errors
+### Plan 16-02: Wire Routes & Refactor App.tsx ✅
+- BrowserRouter wraps app in main.tsx
+- HomeScreen placeholder at `/`
+- Routes: /, /analyze, /studio, /compare, /library, /library/pattern/:id, /library/analysis/:id
+- Header removed, LandingScreen removed
+- Analyze/Compare sub-flows stay as internal state
+- UI polish: bolder logo, more spacing, subtle hover/active (user-approved)
+
+## Phase 15 Results
+
+- 9 shared UI components in `components/shared/`
+- Button, Card, Input, Modal, Badge, UploadZone, EmptyState, ErrorBanner, LoadingSpinner
 
 ## Phase 14 Results
 
-- **2 plans, 2 waves** — both complete
-- Created CSS architecture: `styles/tokens.css`, `reset.css`, `globals.css`, `utilities.css`
-- Restructured `index.css` to import-only (109 LOC → 7 lines)
-- All token names preserved, values swapped dark→light
-- Fixed 4 `border-white/` hardcoded colors → token-based
-- Updated `index.html` with preconnect, theme-color, SEO meta
+- CSS architecture: tokens, reset, globals, utilities
+- Light mode Krea-inspired achromatic palette
+- Inter font, import-only index.css
 
 ## Architecture Summary
 
-**Current:** React + Vite + Supabase + Hono | 35 files, ~6,500 LOC
-**Target:** Same stack + React Router v7, Inter font, light mode, sidebar nav
+**Current:** React + Vite + Supabase + Hono | React Router v7, sidebar nav
+**Target:** Same stack, extract screens from App.tsx god component
 
 ## Key Models
 
@@ -53,10 +58,11 @@
 | Decision | Choice |
 |----------|--------|
 | Dark mode | ❌ Light only |
-| Font | Inter (variable) |
+| Font | Inter (variable) + Dancing Script (logo) |
 | Router | React Router v7 |
-| Mobile sidebar | Collapse to bottom nav |
+| Mobile sidebar | Deferred (desktop only for now) |
+| Active state | bg highlight + bold (no left border) |
 
 ## Stopping Point
 
-2026-03-17: Phase 15 complete (9 shared UI components). Next: `/gsd:plan-phase 16` for App Shell & Sidebar.
+2026-03-17: Phase 16 complete (App Shell + Sidebar + React Router). Next: `/gsd:plan-phase 17` for Router & Screen Extraction.

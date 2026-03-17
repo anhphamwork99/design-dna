@@ -30,23 +30,23 @@
 | ~~STYLE-05~~ | ~~Use Inter font (Google Fonts variable)~~ | ✅ Variable 100-900 weight |
 | ~~STYLE-06~~ | ~~Achromatic color palette~~ | ✅ Grayscale only |
 
-### LAYOUT — App Shell & Navigation
+### LAYOUT — App Shell & Navigation ✅ (5/6)
 
 | ID | Requirement | Notes |
 |----|-------------|-------|
-| LAYOUT-01 | Create `AppShell` component — sidebar + content area wrapper | Replaces landing screen |
-| LAYOUT-02 | Create `Sidebar` — expanded (240px icon+label) and collapsed (64px icon-only) | Toggle button at top |
-| LAYOUT-03 | Sidebar sections: WORKSPACE (Home, My Analyses, Pattern Library) + TOOLS (Analyze, Studio, Compare) + FOOTER (Settings, Profile) | 3-zone grouping |
-| LAYOUT-04 | Active sidebar item — left accent bar (4px) + bg highlight + bold text | Krea active state pattern |
-| LAYOUT-05 | Sidebar collapse on mobile (≤768px) → hamburger or bottom nav | Responsive |
-| LAYOUT-06 | Remove `LandingScreen` — all features accessible from sidebar | No more feature-selection landing |
+| ~~LAYOUT-01~~ | ~~Create `AppShell` component — sidebar + content area wrapper~~ | ✅ Replaces landing screen |
+| ~~LAYOUT-02~~ | ~~Create `Sidebar` — expanded (240px icon+label) and collapsed (64px icon-only)~~ | ✅ Toggle button at top |
+| ~~LAYOUT-03~~ | ~~Sidebar sections: WORKSPACE (Home, Library) + TOOLS (Studio, Analyze, Compare) + FOOTER (Settings, Sign Out)~~ | ✅ 3-zone grouping |
+| ~~LAYOUT-04~~ | ~~Active sidebar item — bg highlight + bold text~~ | ✅ Modified: no left border (user decision) |
+| LAYOUT-05 | Sidebar collapse on mobile (≤768px) → hamburger or bottom nav | ⏭️ Deferred (desktop only) |
+| ~~LAYOUT-06~~ | ~~Remove `LandingScreen` — all features accessible from sidebar~~ | ✅ Removed |
 
-### ROUTER — Navigation Infrastructure
+### ROUTER — Navigation Infrastructure (2/5)
 
 | ID | Requirement | Notes |
 |----|-------------|-------|
-| ROUTER-01 | Install `react-router-dom` v7 | Named routes |
-| ROUTER-02 | Routes: `/` (redirect to `/analyze`), `/analyze`, `/analyze/:id`, `/studio`, `/compare`, `/patterns`, `/patterns/:id`, `/analyses`, `/settings` | URL-based nav |
+| ~~ROUTER-01~~ | ~~Install `react-router-dom` v7~~ | ✅ v7.13.1 |
+| ~~ROUTER-02~~ | ~~Routes: `/`, `/analyze`, `/studio`, `/compare`, `/library`, `/library/pattern/:id`, `/library/analysis/:id`~~ | ✅ URL-based nav |
 | ROUTER-03 | Refactor `App.tsx` from 1,307 LOC god component to ~50 LOC (Router + Auth gate) | Decompose |
 | ROUTER-04 | Auth boundary ABOVE AppShell — unauthenticated → Login, authenticated → AppShell+Routes | Keep auth gate |
 | ROUTER-05 | `document.title` update on every route change | Accessibility |

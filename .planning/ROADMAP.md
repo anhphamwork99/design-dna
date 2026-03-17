@@ -13,7 +13,7 @@
 |-------|------|-------------|------|------|
 | 14 | Design System Foundation ✅ | STYLE-01..06 | 🔴 HIGH | Medium |
 | 15 | Shared UI Components ✅ | SHARED-01..09 | 🟡 MED | Medium |
-| 16 | App Shell & Sidebar | LAYOUT-01..06, ROUTER-01..02 | 🔴 HIGH | Large |
+| 16 | App Shell & Sidebar ✅ | LAYOUT-01..06, ROUTER-01..02 | 🔴 HIGH | Large |
 | 17 | Router & Screen Extraction | ROUTER-03..05, SCREEN-01 | 🔴 HIGH | Large |
 | 18 | Home Screen | SCREEN-02, UX-04 (home) | 🟡 MED | Small |
 | 19 | Analyze Screen Redesign | SCREEN-03, UX-01..06 (analyze) | 🟡 MED | Large |
