@@ -13,11 +13,11 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 | Field | Value |
 |-------|-------|
 | Milestone | v2.0 — Backend System |
-| Phase | 11 — Server Persistence — Analyses |
-| Status | ● Complete (3/3 plans complete) |
-| Plan 11-01 | ✅ Backend Analyses CRUD Routes |
-| Plan 11-02 | ✅ Auto-Save Analysis + Frontend API Integration |
-| Plan 11-03 | ✅ My Analyses UI — Landing Card + List + View |
+| Phase | 12 — Server Persistence — Patterns |
+| Status | ● Planned (3 plans in 2 waves) |
+| Plan 12-01 | ✅ Backend Patterns CRUD Routes |
+| Plan 12-02 | ⬜ Frontend API Client & Storage Deprecation |
+| Plan 12-03 | ⬜ Replace Local Storage with Patterns API |
 
 ## Phase Progress
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 | 9 | Authentication | ● Complete | 100% |
 | 10 | API Proxy + Prompt Protection | ● Complete | 100% |
 | 11 | Server Persistence — Analyses | ● Complete | 100% |
-| 12 | Server Persistence — Patterns | ○ Not Started | 0% |
+| 12 | Server Persistence — Patterns | ● Planned | 0% |
 | 13 | localStorage Migration | ○ Not Started | 0% |
 
 ## Architecture Decisions (2026-03-16)
