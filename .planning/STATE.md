@@ -3,8 +3,8 @@
 ## Current
 
 - **Milestone:** v3.0 — UI Redesign
-- **Phase:** 15 — Shared UI Components (NEXT)
-- **Status:** Phase 14 complete. Ready to plan Phase 15.
+- **Phase:** 15 — Shared UI Components (IN PROGRESS)
+- **Status:** Plan 15-01 (Core UI Components) complete. Plan 15-02 (Feature Components) pending.
 
 ## Milestone History
 
@@ -13,6 +13,16 @@
 | v1.0 Full Feature App | 1–7 | ✅ Complete |
 | v2.0 Backend System | 8–13 | ✅ Complete |
 | v3.0 UI Redesign | 14–24 | 🔄 Active |
+
+## Phase 15 Progress
+
+### Plan 15-01: Core UI Components ✅
+- 5 components + barrel export in `app/src/components/shared/`
+- Button (4 variants, 3 sizes, loading), Card (hover, clickable), Input (label, error, helper)
+- Modal (backdrop blur, escape, scroll lock, animated), Badge (pill, 5 variants)
+- 254 lines, zero build errors
+
+### Plan 15-02: Feature Components — PENDING
 
 ## Phase 14 Results
 
@@ -46,4 +56,4 @@
 
 ## Stopping Point
 
-2026-03-17: Phase 14 complete. Next: `/gsd:plan-phase 15` for Shared UI Components.
+2026-03-17: Plan 15-01 complete (core UI components). Next: Execute Plan 15-02 (feature components).
