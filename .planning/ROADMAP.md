@@ -123,15 +123,15 @@ Plans: TBD
 
 **Architecture context:** Users hiện tại có patterns trong localStorage. Khi họ login lần đầu, app detect và upload patterns lên Supabase. Idempotent — safe to run multiple times.
 
-Plans: TBD
+Plans: ✅ 13-01 (localStorage Pattern Migration)
 
 **Success Criteria:**
-- [ ] On first login, app detects existing localStorage patterns
-- [ ] Migration prompt shown to user (with pattern count)
-- [ ] Patterns uploaded to Supabase with original names, dates, data
-- [ ] Migration is idempotent (duplicate detection by name + created date)
-- [ ] localStorage cleared after successful migration
-- [ ] If no localStorage patterns, migration silently skipped
+- [x] On first login, app detects existing localStorage patterns
+- [x] Migration prompt shown to user (with pattern count)
+- [x] Patterns uploaded to Supabase with original names, dates, data
+- [x] Migration is idempotent (duplicate detection by name + created date)
+- [x] localStorage cleared after successful migration
+- [x] If no localStorage patterns, migration silently skipped
 
 **Deliverable:** Direct code implementation
 
