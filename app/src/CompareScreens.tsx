@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, UploadCloud, X, AlertTriangle, Bookmark, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { savePattern, isCompareResultSaved } from './patternStorage';
+import { savePattern, checkPatternSaved, resizeToThumbnail } from './apiClient';
+import { useAuth } from './contexts/AuthContext';
 
 type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results';
 
@@ -276,17 +277,37 @@ export function CompareResultsScreen({
   };
 
   // ── Save as Pattern state ──
+  const { session } = useAuth();
   const [showSavePopup, setShowSavePopup] = useState(false);
   const [patternName, setPatternName] = useState('');
-  const [isSaved, setIsSaved] = useState(() => isCompareResultSaved(compareResult?.batch_analysis));
+  const [isSaved, setIsSaved] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Check if already saved (async)
+  useEffect(() => {
+    if (!session || !compareResult?.batch_analysis) return;
+    const summary = compareResult.batch_analysis?.winning_formula?.summary || '';
+    checkPatternSaved(session.access_token, summary)
+      .then(saved => setIsSaved(saved))
+      .catch(() => { });
+  }, [session, compareResult]);
+
   const handleSavePattern = async () => {
-    if (!patternName.trim() || isSaving) return;
+    if (!patternName.trim() || isSaving || !session) return;
     setIsSaving(true);
     try {
-      await savePattern(patternName.trim(), compareResult?.batch_analysis, compareImages);
+      const thumbnails = await Promise.all(
+        compareImages.map(img => resizeToThumbnail(img.data))
+      );
+      const summary = compareResult?.batch_analysis?.winning_formula?.summary || 'No summary';
+      await savePattern(session.access_token, {
+        name: patternName.trim(),
+        summary,
+        sourceImageCount: compareImages.length,
+        thumbnails,
+        batchAnalysis: compareResult?.batch_analysis,
+      });
       setIsSaved(true);
       setShowSavePopup(false);
       setPatternName('');
