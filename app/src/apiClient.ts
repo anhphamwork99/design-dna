@@ -9,16 +9,24 @@ import type { SynthesizedConcept, SynthesizeInput, GenerateArtworkInput, CloneDe
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
-// ── Auth Fetch Helper ──────────────────────────────────────────────
+// ── Core Fetch Helper ──────────────────────────────────────────────
 
-async function authFetch<T = any>(path: string, body: any, token: string): Promise<T> {
-    const res = await fetch(`${API_BASE}/api/ai${path}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
+async function coreFetch<T = any>(
+    path: string,
+    options: { method?: string; body?: any; token?: string } = {}
+): Promise<T> {
+    const headers: Record<string, string> = {};
+    if (options.body) {
+        headers['Content-Type'] = 'application/json';
+    }
+    if (options.token) {
+        headers['Authorization'] = `Bearer ${options.token}`;
+    }
+
+    const res = await fetch(`${API_BASE}${path}`, {
+        method: options.method || 'POST',
+        headers,
+        body: options.body ? JSON.stringify(options.body) : undefined,
     });
 
     if (!res.ok) {
@@ -29,7 +37,34 @@ async function authFetch<T = any>(path: string, body: any, token: string): Promi
     return res.json();
 }
 
+async function authFetch<T = any>(path: string, body: any, token: string): Promise<T> {
+    return coreFetch<T>(`/api/ai${path}`, { body, token, method: 'POST' });
+}
+
+// ── Analyses CRUD ──────────────────────────────────────────────────
+
+export async function saveAnalysis(token: string, data: { name: string; thumbnail: string; resultJson: any }) {
+    return coreFetch('/api/analyses', { method: 'POST', body: data, token });
+}
+
+export async function listAnalyses(token: string, limit?: number, offset?: number) {
+    const params = new URLSearchParams();
+    if (limit) params.append('limit', limit.toString());
+    if (offset) params.append('offset', offset.toString());
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return coreFetch(`/api/analyses${query}`, { method: 'GET', token });
+}
+
+export async function getAnalysis(token: string, id: string) {
+    return coreFetch(`/api/analyses/${id}`, { method: 'GET', token });
+}
+
+export async function deleteAnalysis(token: string, id: string) {
+    return coreFetch(`/api/analyses/${id}`, { method: 'DELETE', token });
+}
+
 // ── API Functions ──────────────────────────────────────────────────
+
 
 /**
  * Analyze a single design image — deep visual + buyer DNA.
