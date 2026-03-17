@@ -35,17 +35,17 @@ Plans: ✅ 08-01 (Supabase Schema + SDK), ✅ 08-02 (Hono Scaffold)
 
 **Architecture context:** Supabase SDK handles auth logic. Frontend cần: AuthContext provider, Login/Register screens, auth gate wrapper. Supabase dashboard cấu hình Google OAuth provider.
 
-Plans: TBD
+Plans: ✅ 09-01 (AuthContext), ✅ 09-02 (Login/Register), ✅ 09-03 (Auth Gate)
 
 **Success Criteria:**
-- [ ] User can register with email/password → redirected to app
-- [ ] User can login with email/password
-- [ ] User can login with Google OAuth
-- [ ] Session persists across page refresh (auto-refresh)
-- [ ] Unauthenticated users see only Login screen
-- [ ] User can logout → returned to Login screen
-- [ ] Login page has email/password form + Google button
-- [ ] Register page has email/password + name form
+- [x] User can register with email/password → redirected to app
+- [x] User can login with email/password
+- [x] User can login with Google OAuth
+- [x] Session persists across page refresh (auto-refresh)
+- [x] Unauthenticated users see only Login screen
+- [x] User can logout → returned to Login screen
+- [x] Login page has email/password form + Google button
+- [x] Register page has email/password + name form
 
 **Deliverable:** Direct code implementation
 
