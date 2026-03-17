@@ -1,10 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-    /* Font — Inter only */
+    /* Font — Inter + Dancing Script (logo) */
     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-logo: "Dancing Script", cursive;
 
     /* === SURFACES (light mode — Krea-inspired achromatic) === */
     --color-bg-base: #FAFAFA;
