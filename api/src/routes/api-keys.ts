@@ -3,7 +3,14 @@ import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { authMiddleware } from '../middleware/auth.js';
 import { encrypt } from '../lib/crypto.js';
 
-export const apiKeysRoute = new Hono();
+type Env = {
+    Variables: {
+        user: User;
+        supabase: SupabaseClient;
+    };
+};
+
+export const apiKeysRoute = new Hono<Env>();
 
 // All routes require authentication
 apiKeysRoute.use('/*', authMiddleware);
@@ -13,8 +20,8 @@ apiKeysRoute.use('/*', authMiddleware);
  * Returns { hasKey: boolean } — NEVER returns the actual key.
  */
 apiKeysRoute.get('/api-keys', async (c) => {
-    const user = c.get('user') as User;
-    const supabase = c.get('supabase') as SupabaseClient;
+    const user = c.get('user');
+    const supabase = c.get('supabase');
 
     try {
         const { data, error } = await supabase
@@ -46,8 +53,8 @@ apiKeysRoute.get('/api-keys', async (c) => {
  * Encrypts before storing. Upserts (replaces existing key for same provider).
  */
 apiKeysRoute.post('/api-keys', async (c) => {
-    const user = c.get('user') as User;
-    const supabase = c.get('supabase') as SupabaseClient;
+    const user = c.get('user');
+    const supabase = c.get('supabase');
 
     try {
         const body = await c.req.json<{ key: string }>();
@@ -112,8 +119,8 @@ apiKeysRoute.post('/api-keys', async (c) => {
  * DELETE /api/api-keys — Remove saved API key.
  */
 apiKeysRoute.delete('/api-keys', async (c) => {
-    const user = c.get('user') as User;
-    const supabase = c.get('supabase') as SupabaseClient;
+    const user = c.get('user');
+    const supabase = c.get('supabase');
 
     try {
         const { error } = await supabase
