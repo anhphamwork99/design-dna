@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Layers, Trash2 } from 'lucide-react';
-import { getPatterns, deletePattern, SavedPattern } from './patternStorage';
+import { ArrowLeft, Layers, Trash2, Loader2 } from 'lucide-react';
+import { listPatterns, deletePatternById, SavedPattern } from './apiClient';
+import { useAuth } from './contexts/AuthContext';
 
 interface PatternLibraryProps {
     onNavigate: (screen: string, data?: any) => void;
@@ -20,19 +21,55 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function PatternLibrary({ onNavigate }: PatternLibraryProps) {
+    const { session } = useAuth();
     const [patterns, setPatterns] = useState<SavedPattern[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
     useEffect(() => {
-        setPatterns(getPatterns());
-    }, []);
+        if (!session) return;
+        setIsLoading(true);
+        listPatterns(session.access_token)
+            .then(setPatterns)
+            .catch((err) => console.error('Failed to load patterns:', err))
+            .finally(() => setIsLoading(false));
+    }, [session]);
 
-    const handleDelete = (id: string, name: string, e: React.MouseEvent) => {
+    const handleDelete = async (id: string, name: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (window.confirm(`Delete pattern "${name}"?`)) {
-            deletePattern(id);
-            setPatterns(getPatterns());
+        if (!session) return;
+        if (!window.confirm(`Delete pattern "${name}"?`)) return;
+        setIsDeleting(id);
+        try {
+            await deletePatternById(session.access_token, id);
+            setPatterns(prev => prev.filter(p => p.id !== id));
+        } catch (err) {
+            console.error('Failed to delete pattern:', err);
+        } finally {
+            setIsDeleting(null);
         }
     };
+
+    if (isLoading) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="pt-8"
+            >
+                <button
+                    onClick={() => onNavigate('landing')}
+                    className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-2" /> Home
+                </button>
+                <div className="flex flex-col items-center justify-center text-center py-20">
+                    <Loader2 className="w-8 h-8 text-accent animate-spin mb-4" />
+                    <p className="text-[14px] text-text-secondary">Loading patterns...</p>
+                </div>
+            </motion.div>
+        );
+    }
 
     if (patterns.length === 0) {
         return (
@@ -93,10 +130,15 @@ export default function PatternLibrary({ onNavigate }: PatternLibraryProps) {
                                 </h3>
                                 <button
                                     onClick={(e) => handleDelete(pattern.id, pattern.name, e)}
-                                    className="p-1.5 text-text-tertiary hover:text-error rounded-lg hover:bg-error/10 transition-colors opacity-0 group-hover:opacity-100"
+                                    disabled={isDeleting === pattern.id}
+                                    className="p-1.5 text-text-tertiary hover:text-error rounded-lg hover:bg-error/10 transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
                                     aria-label={`Delete pattern ${pattern.name}`}
                                 >
-                                    <Trash2 className="w-3.5 h-3.5" />
+                                    {isDeleting === pattern.id ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    )}
                                 </button>
                             </div>
 
@@ -114,11 +156,11 @@ export default function PatternLibrary({ onNavigate }: PatternLibraryProps) {
 
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="text-[12px] text-text-tertiary">
-                                    {timeAgo(pattern.createdAt)}
+                                    {timeAgo(pattern.created_at)}
                                 </span>
                                 <span className="text-[12px] text-text-tertiary">·</span>
                                 <span className="text-[12px] text-text-tertiary">
-                                    {pattern.sourceImageCount} design{pattern.sourceImageCount !== 1 ? 's' : ''}
+                                    {pattern.source_image_count} design{pattern.source_image_count !== 1 ? 's' : ''}
                                 </span>
                             </div>
 
