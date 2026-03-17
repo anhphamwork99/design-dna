@@ -83,25 +83,25 @@ export function getDefaultShifts(goal: StudioGoal): Shifts {
     };
 }
 
-// Goal card metadata
+// Goal card metadata — icon references Lucide icon names
 export const goalCards = [
     {
         goal: 'clone' as StudioGoal,
-        icon: '🎯',
+        iconName: 'copy' as const,
         title: 'Clone Design',
         description: 'Extract and recreate the design on a clean canvas. Preserves every detail — style, colors, composition, text.',
         cta: 'Clone This Design',
     },
     {
         goal: 'variations' as StudioGoal,
-        icon: '🔄',
+        iconName: 'layers' as const,
         title: 'Make Variations',
         description: 'Keep what works, change what you want. AI creates 3 concept directions based on your shifts.',
         cta: 'Configure & Create',
     },
     {
         goal: 'explore' as StudioGoal,
-        icon: '✨',
+        iconName: 'sparkles' as const,
         title: 'Explore New Ideas',
         description: 'Use your design as a loose starting point. AI reimagines every dimension for wildly fresh concepts.',
         cta: 'Start Exploring',

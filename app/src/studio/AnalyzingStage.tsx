@@ -25,39 +25,40 @@ export default function AnalyzingStage({ image }: AnalyzingStageProps) {
         return () => clearInterval(timer);
     }, []);
 
+    const progress = ((stepIndex + 1) / analysisSteps.length) * 100;
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-6 relative">
-            {/* Image thumbnail — top-left corner */}
+            {/* Title */}
+            <motion.h2
+                className="text-[22px] font-semibold text-text-primary mb-8 tracking-tight"
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                AI analyzing your artwork
+            </motion.h2>
+
+            {/* Image thumbnail — centered above progress */}
             <motion.div
-                className="absolute top-6 left-6 flex items-center gap-3"
-                initial={{ opacity: 0, scale: 0.8 }}
+                className="mb-8 flex flex-col items-center gap-3"
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-                <img
-                    src={image.data}
-                    alt={image.name}
-                    className="w-[80px] h-[80px] rounded-xl object-cover border border-border-default shadow-sm"
-                />
-                <span className="text-[12px] text-text-tertiary max-w-[140px] truncate">
-                    {image.name}
-                </span>
-            </motion.div>
-
-            {/* Center loading */}
-            <div className="flex flex-col items-center gap-8">
-                {/* Pulsing glow ring */}
-                <div className="relative flex items-center justify-center">
-                    {/* Outer glow */}
+                <div className="relative">
+                    <img
+                        src={image.data}
+                        alt={image.name}
+                        className="w-[120px] h-[120px] rounded-2xl object-cover border border-border-default shadow-md"
+                    />
+                    {/* Scanning line animation */}
                     <motion.div
-                        className="absolute w-32 h-32 rounded-full"
-                        style={{
-                            background:
-                                'radial-gradient(circle, var(--color-accent-subtle) 0%, transparent 70%)',
-                        }}
+                        className="absolute left-0 right-0 h-[2px] rounded-full"
+                        style={{ background: 'var(--color-accent)' }}
                         animate={{
-                            scale: [1, 1.2, 1],
-                            opacity: [0.4, 0.7, 0.4],
+                            top: ['0%', '100%', '0%'],
+                            opacity: [0.8, 0.4, 0.8],
                         }}
                         transition={{
                             duration: 2.5,
@@ -65,65 +66,55 @@ export default function AnalyzingStage({ image }: AnalyzingStageProps) {
                             ease: 'easeInOut',
                         }}
                     />
-                    {/* Inner spinner ring */}
+                </div>
+                <span className="text-[12px] text-text-tertiary max-w-[180px] truncate text-center">
+                    {image.name}
+                </span>
+            </motion.div>
+
+            {/* Progress bar */}
+            <div className="w-[280px] mb-6">
+                <div className="h-[3px] rounded-full bg-border-default overflow-hidden">
                     <motion.div
-                        className="relative w-16 h-16 rounded-full border-[3px] border-border-default"
-                        style={{
-                            borderTopColor: 'var(--color-accent)',
-                        }}
-                        animate={{ rotate: 360 }}
-                        transition={{
-                            duration: 1.2,
-                            repeat: Infinity,
-                            ease: 'linear',
-                        }}
+                        className="h-full rounded-full"
+                        style={{ background: 'var(--color-accent)' }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 0.6, ease: 'easeInOut' }}
                     />
-                    {/* Center dot */}
+                </div>
+            </div>
+
+            {/* Step text — fades between analysis steps */}
+            <div className="h-6 relative flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                    <motion.p
+                        key={stepIndex}
+                        className="text-[14px] font-medium text-text-secondary whitespace-nowrap"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.35, ease: 'easeInOut' }}
+                    >
+                        {analysisSteps[stepIndex]}
+                    </motion.p>
+                </AnimatePresence>
+            </div>
+
+            {/* Step dots */}
+            <div className="flex gap-2 mt-4">
+                {analysisSteps.map((_, i) => (
                     <motion.div
-                        className="absolute w-3 h-3 rounded-full bg-accent"
+                        key={i}
+                        className="w-1.5 h-1.5 rounded-full"
                         animate={{
-                            scale: [1, 1.3, 1],
+                            backgroundColor:
+                                i <= stepIndex
+                                    ? 'var(--color-accent)'
+                                    : 'var(--color-border-default)',
                         }}
-                        transition={{
-                            duration: 1.5,
-                            repeat: Infinity,
-                            ease: 'easeInOut',
-                        }}
+                        transition={{ duration: 0.3 }}
                     />
-                </div>
-
-                {/* Step text — fades between analysis steps */}
-                <div className="h-6 relative flex items-center justify-center">
-                    <AnimatePresence mode="wait">
-                        <motion.p
-                            key={stepIndex}
-                            className="text-[15px] font-medium text-text-secondary whitespace-nowrap"
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -8 }}
-                            transition={{ duration: 0.35, ease: 'easeInOut' }}
-                        >
-                            {analysisSteps[stepIndex]}
-                        </motion.p>
-                    </AnimatePresence>
-                </div>
-
-                {/* Progress dots */}
-                <div className="flex gap-2">
-                    {analysisSteps.map((_, i) => (
-                        <motion.div
-                            key={i}
-                            className="w-1.5 h-1.5 rounded-full"
-                            animate={{
-                                backgroundColor:
-                                    i <= stepIndex
-                                        ? 'var(--color-accent)'
-                                        : 'var(--color-border-default)',
-                            }}
-                            transition={{ duration: 0.3 }}
-                        />
-                    ))}
-                </div>
+                ))}
             </div>
         </div>
     );

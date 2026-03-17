@@ -1,6 +1,13 @@
 import { motion } from 'motion/react';
+import { Copy, Layers, Sparkles } from 'lucide-react';
 import type { StudioGoal } from './types';
 import { goalCards } from './types';
+
+const iconMap = {
+    copy: Copy,
+    layers: Layers,
+    sparkles: Sparkles,
+} as const;
 
 interface GoalPickerProps {
     onSelectGoal: (goal: StudioGoal) => void;
@@ -41,35 +48,40 @@ export default function GoalPicker({ onSelectGoal, preloadedImage }: GoalPickerP
 
             {/* Goal cards grid */}
             <div className="flex gap-5 max-w-[920px] w-full">
-                {goalCards.map((card, index) => (
-                    <motion.button
-                        key={card.goal}
-                        className="flex-1 flex flex-col items-start text-left bg-bg-surface1 border border-border-default rounded-2xl p-7 cursor-pointer transition-colors hover:border-border-hover group"
-                        initial={{ opacity: 0, y: 24 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                            duration: 0.4,
-                            delay: index * 0.1,
-                            ease: [0.25, 0.46, 0.45, 0.94],
-                        }}
-                        whileHover={{
-                            scale: 1.02,
-                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-                        }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => onSelectGoal(card.goal)}
-                    >
-                        <span className="text-[36px] mb-4 block">{card.icon}</span>
-                        <h2 className="text-[18px] font-semibold mb-2">{card.title}</h2>
-                        <p className="text-[13px] text-text-secondary leading-relaxed mb-6 flex-1">
-                            {card.description}
-                        </p>
-                        <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-accent group-hover:text-accent-hover transition-colors">
-                            {card.cta}
-                            <span className="transition-transform group-hover:translate-x-0.5">→</span>
-                        </span>
-                    </motion.button>
-                ))}
+                {goalCards.map((card, index) => {
+                    const IconComponent = iconMap[card.iconName];
+                    return (
+                        <motion.button
+                            key={card.goal}
+                            className="flex-1 flex flex-col items-start text-left bg-bg-surface1 border border-border-default rounded-2xl p-7 cursor-pointer transition-colors hover:border-border-hover group"
+                            initial={{ opacity: 0, y: 24 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                                duration: 0.4,
+                                delay: index * 0.1,
+                                ease: [0.25, 0.46, 0.45, 0.94],
+                            }}
+                            whileHover={{
+                                scale: 1.02,
+                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                            }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => onSelectGoal(card.goal)}
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-bg-surface2 flex items-center justify-center mb-4">
+                                <IconComponent className="w-6 h-6 text-text-primary" fill="currentColor" strokeWidth={0} />
+                            </div>
+                            <h2 className="text-[18px] font-semibold mb-2">{card.title}</h2>
+                            <p className="text-[13px] text-text-secondary leading-relaxed mb-6 flex-1">
+                                {card.description}
+                            </p>
+                            <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-accent group-hover:text-accent-hover transition-colors">
+                                {card.cta}
+                                <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                            </span>
+                        </motion.button>
+                    );
+                })}
             </div>
         </div>
     );

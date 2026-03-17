@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
+import { X } from 'lucide-react';
 import type { Stage, StudioGoal, Shifts, AppliedPatternData, SynthesizedConcept } from '../studio/types';
 import { getDefaultShifts } from '../studio/types';
 import GoalPicker from '../studio/GoalPicker';
@@ -16,6 +17,7 @@ export default function StudioScreen() {
     // ── Auth ──
     const { session } = useAuth();
     const token = session?.access_token ?? '';
+    const navigate = useNavigate();
 
     // ── State machine ──
     const [stage, setStage] = useState<Stage>('goals');
@@ -79,7 +81,13 @@ export default function StudioScreen() {
             setUploadedImage(image);
             setError(null);
 
-            // Auto-analyze on drop
+            // Clone doesn't need DNA analysis — go straight to studio
+            if (goal === 'clone') {
+                setStage('studio');
+                return;
+            }
+
+            // Variations/Explore need analysis
             setStage('analyzing');
             try {
                 const result = await analyzeDesign(token, image.data, image.type);
@@ -90,7 +98,7 @@ export default function StudioScreen() {
                 setStage('upload');
             }
         },
-        [token],
+        [token, goal],
     );
 
     // ── Clone Handlers ──
@@ -250,7 +258,17 @@ export default function StudioScreen() {
 
     // ── Render by stage ──
     return (
-        <div className="flex flex-col h-full bg-bg-base">
+        <div className="flex flex-col h-full min-h-screen bg-bg-base relative">
+            {/* Exit button — always visible to leave studio */}
+            <button
+                onClick={() => navigate('/')}
+                className="absolute top-4 left-4 z-50 p-2 rounded-xl bg-bg-surface1 border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors shadow-sm"
+                aria-label="Exit Studio"
+                title="Exit Studio"
+            >
+                <X className="w-5 h-5" />
+            </button>
+
             <AnimatePresence mode="wait">
                 {stage === 'goals' && (
                     <motion.div
