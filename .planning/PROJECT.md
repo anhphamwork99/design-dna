@@ -23,7 +23,16 @@ DesignDNA là AI-powered design intelligence tool cho Print On Demand (POD) sell
 - "My Analyses" UI with auto-save, list, view, delete
 - Settings UI for API key management
 
-**Next milestone goals:** TBD — run `/gsd:new-milestone` to define
+## Current Milestone: v3.0 UI Redesign
+
+**Goal:** Full UI/UX redesign lấy cảm hứng từ Krea AI — chuyển từ dark mode sang light-first, left sidebar navigation, redesign tất cả screens với design system mới.
+
+**Target features:**
+- Extract & clone Krea AI design system (colors, typography, spacing, components, patterns)
+- Left sidebar navigation thay thế landing screen selection
+- Redesign tất cả screens: Analysis, Creative Studio, Compare, Pattern Library, My Analyses, Settings
+- Clear feature list & navigation flow
+- Light mode as default (giữ dark mode toggle nếu phù hợp)
 
 ## Architecture Principles (chốt 2026-03-16)
 
@@ -52,7 +61,7 @@ DesignDNA là AI-powered design intelligence tool cho Print On Demand (POD) sell
 
 ### Active
 
-(No active requirements — run `/gsd:new-milestone` to define next milestone)
+(Defining requirements for v3.0 UI Redesign)
 
 ### Out of Scope
 

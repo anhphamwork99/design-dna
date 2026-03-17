@@ -5,15 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-17)
 
 **Core value:** Giúp POD sellers hiểu CHÍNH XÁC tại sao một design bán tốt — rồi tạo designs original có cùng sức hấp dẫn
-**Current focus:** Planning next milestone
+**Current focus:** v3.0 UI Redesign — Krea AI-inspired
 
 ## Current Phase
 
 | Field | Value |
 |-------|-------|
-| Milestone | — (between milestones) |
-| Phase | — |
-| Status | v2.0 shipped, ready for next milestone |
+| Milestone | v3.0 — UI Redesign |
+| Phase | Not started (defining requirements) |
+| Status | Defining requirements |
+| Last activity | 2026-03-17 — Milestone v3.0 started |
 
 ## Milestone History
 
@@ -27,7 +28,7 @@ See `.planning/MILESTONES.md` for full history.
 ## Architecture Summary
 
 | Layer | Technology |
-|-------|-----------|
+|-------|------------|
 | Frontend | React + Vite SPA |
 | Backend API | Hono (TypeScript) |
 | Database | Supabase PostgreSQL + RLS |
@@ -42,6 +43,12 @@ See `.planning/MILESTONES.md` for full history.
 - **Image gen:** gemini-2.5-flash-image (multimodal input)
 - **Buyer fit:** gemini-3-flash-preview (scoring)
 
-Last session: 2026-03-17T15:09
-Stopped at: v2.0 milestone complete
-Next action: /gsd:new-milestone — define next milestone
+## Accumulated Context
+
+- v3.0 scope: 100% UI redesign, no new features
+- Design reference: Krea AI (light, clean, minimal, left sidebar)
+- All existing features preserved: Analysis, Creative Studio, Compare, Pattern Library, My Analyses, Settings
+
+Last session: 2026-03-17T16:58
+Stopped at: Defining v3.0 requirements
+Next action: Research → Requirements → Roadmap
