@@ -259,14 +259,14 @@ export default function App() {
             <span className="text-[12px] text-text-tertiary hidden sm:inline">{user.email}</span>
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="text-text-secondary hover:text-text-primary transition-colors"
+              className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors"
               aria-label="Open settings"
             >
               <Settings className="w-5 h-5" />
             </button>
             <button
               onClick={signOut}
-              className="text-text-secondary hover:text-text-primary transition-colors"
+              className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors"
               aria-label="Sign out"
             >
               <LogOut className="w-4 h-4" />
