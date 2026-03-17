@@ -4,7 +4,7 @@
 
 - **Milestone:** v3.0 — UI Redesign
 - **Phase:** 20 — Creative Studio Redesign
-- **Status:** Executing — Plan 01 ✅, Plan 02 & 03 in progress.
+- **Status:** ✅ Complete — Plans 01, 02, 03 all done. Build passes.
 
 ## Milestone History
 
@@ -21,6 +21,25 @@
 - `studio/GoalPicker.tsx`: 3 large cards with motion/react animations, preloaded image indicator
 - `StudioScreen.tsx` rewritten as stage-machine shell (79 LOC), fallback to CreativeStudio
 - Entry from Analyze via `useLocation().state` preloads image+DNA
+- Build: 0 errors
+
+### Plan 20-02: Upload + Analysis + Clone Flow ✅
+- `studio/UploadStage.tsx`: Goal-aware upload zone with descriptions
+- `studio/AnalyzingStage.tsx`: Premium loading animation with step progression
+- `studio/CloneStudio.tsx`: Preview → Cloning → Side-by-side result (284 LOC)
+- StudioScreen wired with clone state machine + error handling
+- Build: 0 errors
+
+### Plan 20-03: Variation/Explore + Concept Cards + Cleanup ✅
+- `studio/VariationStudio.tsx`: Sidebar (shifts, patterns, aspect ratio) + canvas (265 LOC)
+- `studio/ConceptCard.tsx`: Compact cards with artwork overlay (106 LOC)
+- `studio/ConceptDetailDialog.tsx`: Near fullscreen dialog (279 LOC)
+- `studio/PatternPicker.tsx`: Pattern selection with section dialog (230 LOC)
+- StudioScreen: Full variation/explore wiring, no more CreativeStudio fallback
+- AnalyzeScreen: "Go to Studio" button replaces inline CreativeStudio
+- **Deleted:** `CreativeStudio.tsx` (1,063 LOC) — replaced by ~10 focused components
+- analyzeBuyerFit REMOVED from studio entirely
+- Net LOC: -183 (less code, better organized)
 - Build: 0 errors
 
 ## Phase 17 Results
@@ -61,6 +80,7 @@
 
 **Current:** React + Vite + Supabase + Hono | React Router v7, sidebar nav, screen-per-file
 **App.tsx:** 74 LOC — auth gate + router shell only
+**Studio:** 9 components in `studio/` dir — stage-machine architecture
 
 ## Key Models
 
@@ -79,7 +99,9 @@
 | Mobile sidebar | Deferred (desktop only for now) |
 | Active state | bg highlight + bold (no left border) |
 | Back buttons | Removed — sidebar is primary navigation |
+| Buyer fit in Studio | ❌ Removed (no analyzeBuyerFit) |
 
 ## Stopping Point
 
-2026-03-18: Plans 20-01 + 20-02 complete (Wave 1). Studio has stage-based state machine, GoalPicker, Upload+Analyze+Clone flow end-to-end. Plan 03 (Wave 2) remaining: Variations/Explore + cleanup.
+2026-03-18: Phase 20 complete. Creative Studio redesigned from 1,063 LOC monolith to ~10 focused stage-machine components. All 3 flows (Clone, Variations, Explore) operational. "Go to Studio" wired from Analyze screen.
+
