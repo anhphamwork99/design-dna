@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight, Download, Sparkles, AlertCircle, X, Settings, Paintbrush, Loader2, RefreshCw, RotateCcw, Bookmark, Check } from 'lucide-react';
-import { synthesizeConcept, generateArtwork, analyzeBuyerFit, cloneDesign, SynthesizedConcept } from './api';
+import { synthesizeConcept, generateArtwork, analyzeBuyerFit, cloneDesign } from './apiClient';
+import type { SynthesizedConcept } from './api';
 import { getPatterns, SavedPattern } from './patternStorage';
+import { useAuth } from './contexts/AuthContext';
 
 // ── Types ──────────────────────────────────────────────────────────
 interface CreativeStudioProps {
@@ -91,6 +93,7 @@ export default function CreativeStudio({
     uploadedImage,
     onNavigate,
 }: CreativeStudioProps) {
+    const { session } = useAuth();
     // ── State ──
     const [creativity, setCreativity] = useState<number>(2);
     const [shifts, setShifts] = useState<Shifts>(() => getInitialShifts());
@@ -121,11 +124,8 @@ export default function CreativeStudio({
     // ── Handlers ──
 
     const handleSynthesize = async () => {
-        const apiKey = localStorage.getItem('designdna_api_key');
-        if (!apiKey) {
-            document.dispatchEvent(new CustomEvent('open-settings'));
-            return;
-        }
+        if (!session) return;
+        const token = session.access_token;
 
         // Subtle mode (creativity=1): skip concepts, clone directly
         if (creativity === 1) {
@@ -141,7 +141,7 @@ export default function CreativeStudio({
         setBuyerFitScores(null);
 
         try {
-            const result = await synthesizeConcept(apiKey, {
+            const result = await synthesizeConcept(token, {
                 originalDna: analysisResult,
                 shifts,
                 creativity,
@@ -154,12 +154,7 @@ export default function CreativeStudio({
             setCarouselIndex(0);
         } catch (err: any) {
             console.error(err);
-            let errMsg = err.message || 'Failed to create concepts';
-            if (errMsg.includes('location is not supported') || errMsg.includes('FAILED_PRECONDITION')) {
-                errMsg = 'Your location is not supported by Gemini API. Try turning off VPN or switching to a US/EU server.';
-            } else if (errMsg.includes('403') || errMsg.includes('API key not valid')) {
-                errMsg = 'Invalid API Key. Please check your settings.';
-            }
+            const errMsg = err.message || 'Failed to create concepts';
             setError(errMsg);
         } finally {
             setIsSynthesizing(false);
@@ -167,13 +162,11 @@ export default function CreativeStudio({
     };
 
     const handleCloneDesign = async () => {
-        const apiKey = localStorage.getItem('designdna_api_key');
-        if (!apiKey) {
-            document.dispatchEvent(new CustomEvent('open-settings'));
-            return;
-        }
+        if (!session) return;
+        const token = session.access_token;
 
         setIsGenerating(true);
+        setGenerationStep('Extracting & recreating design...');
         setError(null);
         setConcepts([]);
         setShowResult(false);
@@ -181,23 +174,17 @@ export default function CreativeStudio({
         setBuyerFitScores(null);
 
         try {
-            const imageBase64 = await cloneDesign(apiKey, {
+            const imageBase64 = await cloneDesign(token, {
                 originalDna: analysisResult,
                 originalImage: uploadedImage?.data || '',
                 originalMimeType: uploadedImage?.type || 'image/png',
                 aspectRatio,
-                onProgress: (step) => setGenerationStep(step),
             });
             setGeneratedImage(imageBase64);
             setShowResult(true);
         } catch (err: any) {
             console.error(err);
-            let errMsg = err.message || 'Failed to clone design';
-            if (errMsg.includes('location is not supported') || errMsg.includes('FAILED_PRECONDITION')) {
-                errMsg = 'Your location is not supported by Gemini API. Try turning off VPN or switching to a US/EU server.';
-            } else if (errMsg.includes('403') || errMsg.includes('API key not valid')) {
-                errMsg = 'Invalid API Key. Please check your settings.';
-            }
+            const errMsg = err.message || 'Failed to clone design';
             setError(errMsg);
             setShowResult(true);
         } finally {
@@ -206,38 +193,33 @@ export default function CreativeStudio({
     };
 
     const handleGenerateArtwork = async () => {
-        const apiKey = localStorage.getItem('designdna_api_key');
-        if (!apiKey || concepts.length === 0) return;
+        if (!session || concepts.length === 0) return;
+        const token = session.access_token;
 
         const selectedConcept = concepts[carouselIndex];
         setIsGenerating(true);
+        setGenerationStep('Generating artwork...');
         setError(null);
 
         try {
-            const imageBase64 = await generateArtwork(apiKey, {
+            const imageBase64 = await generateArtwork(token, {
                 concept: selectedConcept,
                 originalImage: uploadedImage?.data || '',
                 originalMimeType: uploadedImage?.type || 'image/png',
                 aspectRatio,
                 creativity,
-                onProgress: (step) => setGenerationStep(step),
             });
             setGeneratedImage(imageBase64);
             setSelectedConceptIndex(carouselIndex);
 
             // Run buyer fit scoring (fire-and-forget with state update)
             const fitPrompt = `${selectedConcept.title}: ${selectedConcept.description}. Visual: ${selectedConcept.visualDirection}. Target: ${selectedConcept.targetBuyer}. Text: "${selectedConcept.suggestedText?.primary || ''}". Made-for-me: ${selectedConcept.madeForMeHook || 'N/A'}`;
-            analyzeBuyerFit(apiKey, fitPrompt).then(setBuyerFitScores).catch(console.error);
+            analyzeBuyerFit(token, fitPrompt).then(setBuyerFitScores).catch(console.error);
 
             setShowResult(true);
         } catch (err: any) {
             console.error(err);
-            let errMsg = err.message || 'Failed to generate artwork';
-            if (errMsg.includes('location is not supported') || errMsg.includes('FAILED_PRECONDITION')) {
-                errMsg = 'Your location is not supported by Gemini API. Try turning off VPN or switching to a US/EU server.';
-            } else if (errMsg.includes('403') || errMsg.includes('API key not valid')) {
-                errMsg = 'Invalid API Key. Please check your settings.';
-            }
+            const errMsg = err.message || 'Failed to generate artwork';
             setError(errMsg);
             setShowResult(true);
         } finally {
