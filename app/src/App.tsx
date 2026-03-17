@@ -8,7 +8,7 @@ import CreativeStudio from './CreativeStudio';
 import { CompareUploadScreen, CompareAnalyzingScreen, CompareResultsScreen } from './CompareScreens';
 import PatternLibrary from './PatternLibrary';
 import PatternDetail from './PatternDetail';
-import { getPatterns } from './patternStorage';
+
 import { useAuth } from './contexts/AuthContext';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
