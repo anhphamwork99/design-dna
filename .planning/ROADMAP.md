@@ -14,15 +14,15 @@
 
 **Architecture context:** Tạo foundation: Supabase project (auth + DB), tables với RLS, Hono project cho API proxy. Monorepo structure: `app/` (existing FE) + `api/` (Hono) + shared types.
 
-Plans: TBD
+Plans: ✅ 08-01 (Supabase Schema + SDK), ✅ 08-02 (Hono Scaffold)
 
 **Success Criteria:**
-- [ ] Supabase project created with PostgreSQL tables (users profile, analyses, patterns, api_keys)
-- [ ] RLS policies active — users only access own rows
-- [ ] Hono backend scaffold running locally with health endpoint
-- [ ] Monorepo workspace configured (app/ + api/)
-- [ ] Rate-limit middleware configured on Hono
-- [ ] Environment variables documented (.env.example)
+- [x] Supabase project created with PostgreSQL tables (users profile, analyses, patterns, api_keys)
+- [x] RLS policies active — users only access own rows
+- [x] Hono backend scaffold running locally with health endpoint
+- [x] Monorepo workspace configured (app/ + api/)
+- [x] Rate-limit middleware configured on Hono
+- [x] Environment variables documented (.env.example)
 
 **Deliverable:** Direct code implementation
 

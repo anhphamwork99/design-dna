@@ -15,7 +15,7 @@
 
 - [ ] **PROXY-01**: All Gemini API calls route through backend — prompts/system instructions stored server-side only
 - [ ] **PROXY-02**: User's Gemini API key stored encrypted in Supabase DB (per user)
-- [ ] **PROXY-03**: Rate limiting applied per user on AI endpoints
+- [ ] **PROXY-03**: Rate limiting applied per user on AI endpoints *(scaffold — Phase 8 ✓)*
 - [ ] **PROXY-04**: Gemini errors mapped to consistent JSON format for frontend
 - [ ] **PROXY-05**: Proxy handles long-running generation calls (120s timeout)
 
@@ -25,7 +25,7 @@
 - [ ] **DATA-02**: Patterns (Compare results JSON + thumbnails) saved per user
 - [ ] **DATA-03**: User can list and delete their analyses
 - [ ] **DATA-04**: User can list and delete their patterns
-- [ ] **DATA-05**: Row Level Security ensures users only access their own data
+- [x] **DATA-05**: Row Level Security ensures users only access their own data *(Phase 8 ✓)*
 
 ### Frontend Auth & Data UI
 
@@ -64,10 +64,10 @@
 |-------------|-------|
 | AUTH-01..06 | 9 |
 | PROXY-01, PROXY-02, PROXY-04, PROXY-05 | 10 |
-| PROXY-03 | 8 |
+| PROXY-03 | 8 ✅ |
 | DATA-01, DATA-03 | 11 |
 | DATA-02, DATA-04 | 12 |
-| DATA-05 | 8 |
+| DATA-05 | 8 ✅ |
 | UI-01..03 | 9 |
 | UI-04, UI-05 | 11 |
 | UI-06 | 10 |
