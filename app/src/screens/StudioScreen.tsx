@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, ChevronRight, Copy, Layers, Sparkles } from 'lucide-react';
+import { LogOut, ChevronRight } from 'lucide-react';
 import type { Stage, StudioGoal, Shifts, AppliedPatternData, SynthesizedConcept } from '../studio/types';
 import { getDefaultShifts } from '../studio/types';
 import GoalPicker from '../studio/GoalPicker';
@@ -102,12 +102,12 @@ export default function StudioScreen() {
 
     // ── Clone Handlers ──
     const handleClone = useCallback(async () => {
-        if (!uploadedImage || !analysisResult) return;
+        if (!uploadedImage) return;
         setError(null);
         setStage('cloning');
         try {
             const result = await cloneDesign(token, {
-                originalDna: analysisResult,
+                originalDna: analysisResult ?? {},
                 originalImage: uploadedImage.data,
                 originalMimeType: uploadedImage.type,
                 aspectRatio,
@@ -284,10 +284,7 @@ export default function StudioScreen() {
                             {goal && (
                                 <>
                                     <ChevronRight className="w-3.5 h-3.5 text-text-tertiary" />
-                                    <span className="font-medium text-text-primary flex items-center gap-1.5">
-                                        {goal === 'clone' && <Copy className="w-3.5 h-3.5" />}
-                                        {goal === 'variations' && <Layers className="w-3.5 h-3.5" />}
-                                        {goal === 'explore' && <Sparkles className="w-3.5 h-3.5" />}
+                                    <span className="font-medium text-text-primary">
                                         {goal === 'clone' ? 'Clone Design' : goal === 'variations' ? 'Make Variations' : 'Explore New Ideas'}
                                     </span>
                                 </>

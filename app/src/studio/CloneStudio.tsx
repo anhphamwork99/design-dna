@@ -30,11 +30,8 @@ function ClonePreview({
     'uploadedImage' | 'aspectRatio' | 'onAspectRatioChange' | 'onClone' | 'error'
 >) {
     return (
-        <motion.div
-            className="flex gap-8 items-start justify-center min-h-[calc(100vh-64px)] py-12 px-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+        <div
+            className="flex gap-8 items-center justify-center min-h-screen py-12 px-6"
         >
             {/* Left — original image */}
             <div className="flex flex-col items-center gap-3 max-w-[480px] flex-1">
@@ -101,7 +98,7 @@ function ClonePreview({
                     the selected aspect ratio.
                 </p>
             </div>
-        </motion.div>
+        </div>
     );
 }
 
