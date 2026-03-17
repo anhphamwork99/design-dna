@@ -8,6 +8,7 @@ import { healthRoute } from './routes/health.js';
 import { apiKeysRoute } from './routes/api-keys.js';
 import { aiRoute } from './routes/ai.js';
 import { analysesRoute } from './routes/analyses.js';
+import { patternsRoute } from './routes/patterns.js';
 
 const app = new Hono();
 
@@ -31,6 +32,7 @@ app.route('/api', healthRoute);
 app.route('/api', apiKeysRoute);
 app.route('/api', aiRoute);
 app.route('/api', analysesRoute);
+app.route('/api', patternsRoute);
 
 // Start server
 const port = Number(process.env.PORT) || 4000;
