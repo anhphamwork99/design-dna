@@ -28,7 +28,7 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
             aria-label="Main navigation"
         >
             {/* Logo + Collapse toggle */}
-            <div className="h-14 flex items-center justify-between px-6 shrink-0">
+            <div className={`h-14 flex items-center shrink-0 ${collapsed ? 'justify-center px-3' : 'justify-between px-6'}`}>
                 {!collapsed && (
                     <span className="font-logo text-2xl font-bold text-text-primary truncate">
                         DesignDNA
@@ -36,8 +36,7 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                 )}
                 <button
                     onClick={() => setCollapsed(!collapsed)}
-                    className={`p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-surface2 transition-colors ${collapsed ? 'mx-auto' : ''
-                        }`}
+                    className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-bg-surface2 transition-colors"
                     aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                 >
                     {collapsed ? (
@@ -121,7 +120,7 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                     />
                     <button
                         onClick={signOut}
-                        className={`flex items-center h-11 rounded-lg px-3 text-text-secondary hover:bg-state-hover hover:text-text-primary transition-colors duration-150 ${collapsed ? 'justify-center' : 'gap-3'
+                        className={`flex items-center rounded-lg text-text-secondary hover:bg-state-hover hover:text-text-primary transition-colors duration-150 ${collapsed ? 'justify-center w-10 h-10 mx-auto' : 'h-11 px-3 gap-3'
                             }`}
                     >
                         <span className="w-5 h-5 shrink-0 flex items-center justify-center">

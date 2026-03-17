@@ -15,10 +15,10 @@ export function SidebarNavItem({ icon, label, to, collapsed, onClick }: SidebarN
             to={to}
             onClick={onClick}
             className={({ isActive }) =>
-                `flex items-center h-11 rounded-lg px-3 transition-colors duration-150 relative group ${isActive
+                `flex items-center rounded-lg transition-colors duration-150 relative group ${isActive
                     ? 'bg-bg-surface2 font-semibold text-text-primary'
                     : 'text-text-secondary hover:bg-state-hover hover:text-text-primary'
-                } ${collapsed ? 'justify-center' : 'gap-3'}`
+                } ${collapsed ? 'justify-center w-10 h-10 mx-auto' : 'h-11 px-3 gap-3'}`
             }
         >
             <span className="w-5 h-5 shrink-0 flex items-center justify-center">{icon}</span>
