@@ -106,7 +106,7 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
             <div className="flex-grow" />
 
             {/* FOOTER section */}
-            <div className="border-t border-border-default mx-3 pt-2 pb-3 px-3">
+            <div className="border-t border-border-default mx-3 pt-2 pb-3">
                 <nav className="flex flex-col gap-1">
                     <SidebarNavItem
                         icon={<Settings className="w-5 h-5" />}
