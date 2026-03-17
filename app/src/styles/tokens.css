@@ -1,0 +1,68 @@
+@theme {
+  /* Font — Inter only (Krea uses Suisse Intl, Inter is free alternative) */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* === SURFACES (light mode — Krea-inspired achromatic) === */
+  --color-bg-base: #FAFAFA;
+  --color-bg-surface1: #FFFFFF;
+  --color-bg-surface2: #F5F5F5;
+  --color-bg-surface3: #E5E5E5;
+
+  /* === BORDERS (light mode — subtle dark overlays) === */
+  --color-border-default: rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(0, 0, 0, 0.12);
+  --color-border-active: rgba(0, 0, 0, 0.18);
+
+  /* === ACCENT (keep — works on both themes) === */
+  --color-accent: #0096ED;
+  --color-accent-hover: #0082D4;
+  --color-accent-subtle: rgba(0, 150, 237, 0.08);
+  --color-accent-ring: rgba(0, 150, 237, 0.20);
+
+  /* === AI === */
+  --color-ai-purple: #7C3AED;
+
+  /* === TEXT (light mode — dark text on light bg) === */
+  --color-text-primary: #171717;
+  --color-text-secondary: #525252;
+  --color-text-tertiary: #A3A3A3;
+  --color-text-inverse: #FFFFFF;
+  --color-text-brand: #0096ED;
+
+  /* === SEMANTIC (universal — keep as-is) === */
+  --color-success: #22C55E;
+  --color-success-subtle: rgba(34, 197, 94, 0.08);
+  --color-warning: #F59E0B;
+  --color-warning-subtle: rgba(245, 158, 11, 0.08);
+  --color-error: #EF4444;
+  --color-error-subtle: rgba(239, 68, 68, 0.08);
+
+  /* === STATE OVERLAYS (light mode — dark tints) === */
+  --color-state-hover: rgba(0, 0, 0, 0.04);
+  --color-state-active: rgba(0, 0, 0, 0.06);
+
+  /* === SHADOWS (Krea: minimal, inset ring approach) === */
+  --shadow-sm: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0px 1px 3px rgba(0, 0, 0, 0.08), 0px 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0px 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0px 25px 50px -12px rgba(0, 0, 0, 0.15);
+
+  /* === RADIUS (Krea: rounded, generous) === */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+
+  /* === LAYOUT === */
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --content-max-width: 1200px;
+
+  /* === TRANSITIONS (Krea: ease-out micro, cubic-bezier content) === */
+  --transition-fast: 100ms ease-out;
+  --transition-base: 200ms ease-out;
+  --transition-smooth: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms ease;
+}
