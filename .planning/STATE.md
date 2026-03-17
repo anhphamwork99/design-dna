@@ -1,73 +1,47 @@
-# Project State — DesignDNA
+# DesignDNA — Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-16)
+See: .planning/PROJECT.md (updated 2026-03-17)
 
-**Core value:** Giúp POD sellers hiểu tại sao design bán tốt — visual + buyer psychology — rồi tạo original designs qua Creative Studio
-**Architecture:** Original (required) + Patterns (optional) → AI Synthesis (mandatory) → POD-ready Artwork
-**Current focus:** Milestone v2.0 — Backend System (defining requirements)
+**Core value:** Giúp POD sellers hiểu CHÍNH XÁC tại sao một design bán tốt — rồi tạo designs original có cùng sức hấp dẫn
+**Current focus:** Planning next milestone
 
 ## Current Phase
 
 | Field | Value |
 |-------|-------|
-| Milestone | v2.0 — Backend System |
-| Phase | 13 — localStorage Migration |
-| Status | ● Complete (1 plan, 1 wave) |
-| Plan 13-01 | ✅ localStorage Pattern Migration |
+| Milestone | — (between milestones) |
+| Phase | — |
+| Status | v2.0 shipped, ready for next milestone |
 
-## Phase Progress
+## Milestone History
 
-| Phase | Name | Status | Progress |
-|-------|------|--------|----------|
-| 8 | Supabase + Backend Scaffold | ● Complete | 100% |
-| 9 | Authentication | ● Complete | 100% |
-| 10 | API Proxy + Prompt Protection | ● Complete | 100% |
-| 11 | Server Persistence — Analyses | ● Complete | 100% |
-| 12 | Server Persistence — Patterns | ● Complete | 100% |
-| 13 | localStorage Migration | ● Complete | 100% |
+| Milestone | Phases | Status |
+|-----------|--------|--------|
+| v1.0 — Full Feature App | 1 → 7C (11 phases) | ✅ Shipped 2026-03-17 |
+| v2.0 — Backend System | 8 → 13 (6 phases) | ✅ Shipped 2026-03-17 |
 
-## Architecture Decisions (2026-03-16)
+See `.planning/MILESTONES.md` for full history.
 
-| Decision | Description |
-|----------|-------------|
-| Original = ground truth | Generation LUÔN bắt đầu từ 1 analyzed design |
-| Patterns = reusable assets | Compare results saved as named Patterns, apply 0/1/many |
-| Synthesis = mandatory | AI creates unified concept BEFORE artwork generation |
-| Multimodal generation | Original image + text prompt sent to Gemini |
-| POD-ready output | Flat illustration, white bg, no effects — enforced via prompt |
+## Architecture Summary
 
-## Research & References
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React + Vite SPA |
+| Backend API | Hono (TypeScript) |
+| Database | Supabase PostgreSQL + RLS |
+| Auth | Supabase Auth (email + Google OAuth) |
+| AI | Gemini (4 models via server-side proxy) |
+| Encryption | AES-256-GCM (API keys) |
 
-| File | Content |
-|------|---------|
-| `.planning/research/DESIGN-ANALYSIS-FRAMEWORK.md` | 6-Layer Design Analysis framework, SHIFT method |
-| `.planning/research/DESIGN-ANALYSIS-LEARNINGS.md` | Key learnings from design research |
-| `.planning/research/AI-STUDIO-CAPABILITIES.md` | Google AI Studio features, models, prompting |
-| `.planning/research/AI-STUDIO-LEARNINGS.md` | Key learnings from AI Studio research |
-| `.planning/references/APP-CONCEPT-V2.md` | Complete app concept v2 |
-| `.planning/deliverables/reference-pod-artwork/` | Desired POD output style |
+## Key Models
 
-## Key Context
+- **Analysis:** gemini-3.1-pro-preview
+- **Synthesis:** gemini-2.5-pro
+- **Image gen:** gemini-2.5-flash-image (multimodal input)
+- **Buyer fit:** gemini-3-flash-preview (scoring)
 
-- **Build method:** Direct code implementation in IDE (since Phase 6)
-- **UI Style:** Dark mode elegant, plain language (no jargon — Phase 6A)
-- **Analysis model:** gemini-3.1-pro-preview (unified deep analysis)
-- **Synthesis model:** gemini-2.5-pro (concept creation — reasoning)
-- **Image gen model:** gemini-2.5-flash-image (multimodal input)
-- **Buyer fit model:** gemini-3-flash-preview (scoring)
-
-Last session: 2026-03-17T14:55
-Stopped at: Phase 13 — Complete (all plans executed)
-Next action: Milestone v2.0 complete → /gsd:complete-milestone
-
-## Roadmap Evolution
-
-- Milestone v1.0 archived to MILESTONES.md (11 phases, all complete)
-- Milestone v2.0 started: Backend System
-- Stack: Supabase (Auth + DB) + Hono (API Proxy)
-- 22 requirements across 5 categories, mapped to 6 phases
-
----
-*Last updated: 2026-03-17 — Milestone v2.0 roadmap created*
+Last session: 2026-03-17T15:09
+Stopped at: v2.0 milestone complete
+Next action: /gsd:new-milestone — define next milestone
