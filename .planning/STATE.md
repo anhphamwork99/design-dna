@@ -13,12 +13,11 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 | Field | Value |
 |-------|-------|
 | Milestone | v2.0 — Backend System |
-| Phase | 10 — API Proxy + Prompt Protection |
-| Status | ● Complete (4 plans in 2 waves) |
-| Plan 10-01 | ✅ Backend API Key Management + Gemini SDK Setup |
-| Plan 10-02 | ✅ Backend Proxy Routes — Move Prompts Server-Side |
-| Plan 10-03 | ✅ Frontend API Client Refactor |
-| Plan 10-04 | ✅ Settings UI — Server-Side API Key Management |
+| Phase | 11 — Server Persistence — Analyses |
+| Status | ● In Progress (1/3 plans complete) |
+| Plan 11-01 | ✅ Backend Analyses CRUD Routes |
+| Plan 11-02 | ⬜ Auto-Save Analysis + Frontend API Integration |
+| Plan 11-03 | ⬜ My Analyses UI — Landing Card + List + View |
 
 ## Phase Progress
 
@@ -27,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 | 8 | Supabase + Backend Scaffold | ● Complete | 100% |
 | 9 | Authentication | ● Complete | 100% |
 | 10 | API Proxy + Prompt Protection | ● Complete | 100% |
-| 11 | Server Persistence — Analyses | ○ Not Started | 0% |
+| 11 | Server Persistence — Analyses | ◐ In Progress | 33% |
 | 12 | Server Persistence — Patterns | ○ Not Started | 0% |
 | 13 | localStorage Migration | ○ Not Started | 0% |
 
@@ -61,9 +60,9 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 - **Image gen model:** gemini-2.5-flash-image (multimodal input)
 - **Buyer fit model:** gemini-3-flash-preview (scoring)
 
-Last session: 2026-03-17T12:50
-Stopped at: Phase 10 complete — all prompts server-side, API key encrypted, Settings UI manages keys server-side
-Next action: Phase 11 — Server Persistence — Analyses
+Last session: 2026-03-17T13:20
+Stopped at: Phase 11-01 complete — analyses CRUD routes created
+Next action: Phase 11-02 — Auto-Save Analysis + Frontend API Integration
 
 ## Roadmap Evolution
 

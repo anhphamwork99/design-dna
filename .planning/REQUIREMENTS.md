@@ -13,11 +13,11 @@
 
 ### API Proxy (Hono Backend)
 
-- [ ] **PROXY-01**: All Gemini API calls route through backend — prompts/system instructions stored server-side only
-- [ ] **PROXY-02**: User's Gemini API key stored encrypted in Supabase DB (per user)
+- [x] **PROXY-01**: All Gemini API calls route through backend — prompts/system instructions stored server-side only *(Phase 10 ✓)*
+- [x] **PROXY-02**: User's Gemini API key stored encrypted in Supabase DB (per user) *(Phase 10 ✓)*
 - [ ] **PROXY-03**: Rate limiting applied per user on AI endpoints *(scaffold — Phase 8 ✓)*
-- [ ] **PROXY-04**: Gemini errors mapped to consistent JSON format for frontend
-- [ ] **PROXY-05**: Proxy handles long-running generation calls (120s timeout)
+- [x] **PROXY-04**: Gemini errors mapped to consistent JSON format for frontend *(Phase 10 ✓)*
+- [x] **PROXY-05**: Proxy handles long-running generation calls (120s timeout) *(Phase 10 ✓)*
 
 ### Server Persistence (Supabase PostgreSQL)
 
@@ -34,7 +34,7 @@
 - [x] **UI-03**: Auth gate redirects unauthenticated users to login *(Phase 9 ✓)*
 - [ ] **UI-04**: "My Analyses" card on Landing + list page showing saved analyses
 - [ ] **UI-05**: Clicking a saved analysis opens DNA Card in read mode
-- [ ] **UI-06**: Settings page: save/update/delete Gemini API key (stored server-side)
+- [x] **UI-06**: Settings page: save/update/delete Gemini API key (stored server-side) *(Phase 10 ✓)*
 
 ### Migration
 
@@ -63,12 +63,12 @@
 | Requirement | Phase |
 |-------------|-------|
 | AUTH-01..06 | 9 ✅ |
-| PROXY-01, PROXY-02, PROXY-04, PROXY-05 | 10 |
+| PROXY-01, PROXY-02, PROXY-04, PROXY-05 | 10 ✅ |
 | PROXY-03 | 8 ✅ |
 | DATA-01, DATA-03 | 11 |
 | DATA-02, DATA-04 | 12 |
 | DATA-05 | 8 ✅ |
 | UI-01..03 | 9 ✅ |
 | UI-04, UI-05 | 11 |
-| UI-06 | 10 |
+| UI-06 | 10 ✅ |
 | MIG-01..03 | 13 |
