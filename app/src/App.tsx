@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, UploadCloud, AlertTriangle, Settings, X, Microscope, Scale, Copy, Check, ImageOff, Layers } from 'lucide-react';
+import { ArrowLeft, UploadCloud, AlertTriangle, Settings, X, Microscope, Scale, Copy, Check, ImageOff, Layers, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { analyzeDesign, analyzeBatch } from './api';
 import CreativeStudio from './CreativeStudio';
@@ -7,10 +7,15 @@ import { CompareUploadScreen, CompareAnalyzingScreen, CompareResultsScreen } fro
 import PatternLibrary from './PatternLibrary';
 import PatternDetail from './PatternDetail';
 import { getPatterns } from './patternStorage';
+import { useAuth } from './contexts/AuthContext';
+import LoginScreen from './LoginScreen';
+import RegisterScreen from './RegisterScreen';
 
 type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results' | 'pattern_library' | 'pattern_detail';
 
 export default function App() {
+  const { user, loading, signOut } = useAuth();
+  const [authScreen, setAuthScreen] = useState<'login' | 'register'>('login');
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [uploadedImage, setUploadedImage] = useState<{ data: string; name: string; type: string } | null>(null);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
@@ -184,6 +189,30 @@ export default function App() {
 
   const isStudioMode = currentScreen === 'generation';
 
+  // Auth gate: show loading spinner while checking auth state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-bg-base flex items-center justify-center">
+        <div className="w-8 h-8 rounded ai-gradient animate-pulse" />
+      </div>
+    );
+  }
+
+  // Auth gate: show login/register if not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-bg-base text-text-primary font-sans">
+        <AnimatePresence mode="wait">
+          {authScreen === 'login' ? (
+            <LoginScreen key="login" onSwitchToRegister={() => setAuthScreen('register')} />
+          ) : (
+            <RegisterScreen key="register" onSwitchToLogin={() => setAuthScreen('login')} />
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-bg-base text-text-primary font-sans">
       {!isStudioMode && (
@@ -192,13 +221,23 @@ export default function App() {
             <div className="w-6 h-6 rounded ai-gradient mr-3"></div>
             <span className="font-semibold text-[16px]">DesignDNA</span>
           </button>
-          <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="text-text-secondary hover:text-text-primary transition-colors"
-            aria-label="Open settings"
-          >
-            <Settings className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-3">
+            <span className="text-[12px] text-text-tertiary hidden sm:inline">{user.email}</span>
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="text-text-secondary hover:text-text-primary transition-colors"
+              aria-label="Open settings"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+            <button
+              onClick={signOut}
+              className="text-text-secondary hover:text-text-primary transition-colors"
+              aria-label="Sign out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </header>
       )}
       <main className={isStudioMode ? '' : 'pt-14 max-w-[1200px] mx-auto px-8 pb-24'}>
