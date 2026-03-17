@@ -15,6 +15,21 @@ DesignDNA là AI-powered design intelligence tool cho Print On Demand (POD) sell
 3. **Synthesis bắt buộc — TRƯỚC KHI generate.** AI tổng hợp original DNA + modifications + applied patterns → 1 concept thống nhất có linh hồn riêng, không phải Frankenstein mix.
 4. **POD-ready output.** Generated artwork phải flat illustration, white bg, print-ready — enforce qua prompt constraints.
 
+## Current Milestone: v2.0 Backend System
+
+**Goal:** Chuyển DesignDNA từ client-side SPA sang full-stack application — backend cho persistence, auth, và bảo vệ nghiệp vụ.
+
+**Target features:**
+- Backend API proxy — giấu prompts/system instructions khỏi frontend
+- User accounts — email/password + Google OAuth, bắt buộc login
+- Server-side persistence — analysis results + patterns (JSON, không ảnh)
+- API key management — user nhập key riêng, lưu server-side per user
+- "My Analyses" — lưu + xem lại analysis history
+- Pattern migration — localStorage → server khi tạo account
+- Frontend auth UI — login, register, settings
+
+**Decisions (from discussion 2026-03-17):** See `.planning/references/BACKEND-CONTEXT.md`
+
 ## Requirements
 
 ### Validated

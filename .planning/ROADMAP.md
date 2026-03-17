@@ -1,235 +1,137 @@
-# Roadmap — DesignDNA v1
+# Roadmap — Milestone v2.0: Backend System
 
-## Milestone: v1.0 — Full Feature App
-
-**Architecture:** 3-layer pipeline: Understand (Analyze + Compare) → Ideate (Creative Studio + Synthesis) → Create (POD-ready Artwork)
-
----
-
-### Phase 1: UI/UX Style Definition ✅
-**Goal:** Chốt visual design direction, color tokens, component patterns, typography
-
-**Requirements:** APP-02, APP-04 (partial)
-
-Plans:
-- [x] 01-01-PLAN.md — Create comprehensive STYLE-GUIDE.md
-
-**Deliverable:** `.planning/deliverables/STYLE-GUIDE.md`
+**Milestone:** v2.0 — Backend System (Supabase + Hono API Proxy)
+**Created:** 2026-03-17
+**Total phases:** 6
+**Total requirements:** 22
 
 ---
 
-### Phase 2: AI Studio Configuration ✅
-**Goal:** Tạo System Instructions + Structured Output schemas + model selection config
+### Phase 8: Supabase + Backend Scaffold
+**Goal:** Setup Supabase project, database schema, Hono API proxy scaffold, and monorepo structure
 
-**Requirements:** Foundation cho tất cả features
+**Requirements:** DATA-05, PROXY-03
 
-Plans:
-- [x] 02-01-PLAN.md — Create AI-STUDIO-CONFIG.md
+**Architecture context:** Tạo foundation: Supabase project (auth + DB), tables với RLS, Hono project cho API proxy. Monorepo structure: `app/` (existing FE) + `api/` (Hono) + shared types.
 
-**Deliverable:** `.planning/deliverables/AI-STUDIO-CONFIG.md`
+Plans: TBD
 
----
-
-### Phase 3: Build — App Shell + F1 Analysis ✅
-**Goal:** Landing screen, upload flow, DNA analysis, DNA Card UI
-
-**Requirements:** APP-01, APP-03, APP-04, F1-01..F1-14
-
-Plans:
-- [x] 03-01-PLAN.md — App scaffold + API wiring
-
-**Deliverable:** `.planning/deliverables/BUILD-PROMPT-SHELL-F1.md`
-
----
-
-### Phase 4: Build — F2 Creative Generation (v1) ✅
-**Goal:** Generation mode selection, SHIFT+B controls, creativity slider, image gen, buyer fit, chat refinement
-
-**Requirements:** F2-01..F2-08 (original version, before architecture redesign)
-
-Plans:
-- [x] 04-01-PLAN.md — Generation UI scaffold, API wiring
-
-**Deliverable:** `.planning/deliverables/BUILD-PROMPT-F2.md`
-
----
-
-### Phase 5: Build — F3 Batch Compare ✅
-**Goal:** Multi-image upload, cross-design analysis, buyer overlap map, winning formula
-
-**Requirements:** F3-01..F3-05
-
-Plans:
-- [x] 05-01-PLAN.md — Batch Compare UI scaffold, API wiring
-
-**Deliverable:** `.planning/deliverables/BUILD-PROMPT-F3.md`
-
----
-
-### Phase 6A: Critical UX Fixes ✅
-**Goal:** Fix userflow issues identified in real user testing
-
-**Source:** User testing feedback — 2026-03-15 (Issues UX-1 through UX-6)
-
-Plans:
-- [x] 6A-01-PLAN.md — Landing simplification + button labels
-- [x] 6A-02-PLAN.md — Analyzing screen redesign (image visible + scan effect)
-- [x] 6A-03-PLAN.md — Merge Quick/Deep into unified analysis
-- [x] 6A-04-PLAN.md — UX copy overhaul (jargon → plain language)
+**Success Criteria:**
+- [ ] Supabase project created with PostgreSQL tables (users profile, analyses, patterns, api_keys)
+- [ ] RLS policies active — users only access own rows
+- [ ] Hono backend scaffold running locally with health endpoint
+- [ ] Monorepo workspace configured (app/ + api/)
+- [ ] Rate-limit middleware configured on Hono
+- [ ] Environment variables documented (.env.example)
 
 **Deliverable:** Direct code implementation
 
 ---
 
-### Phase 7A: Creative Studio — UI Redesign ✅
-**Goal:** Redesign Generation screen thành Creative Studio. Simplify 15+ controls thành layout rõ ràng với 3 sections: Original + Design Controls + Applied Patterns
+### Phase 9: Authentication
+**Goal:** Supabase Auth integration — email/password + Google OAuth + auth gate
 
-**Requirements:** F2-01, F2-02, F2-03, F2-04, F2-05
+**Requirements:** AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, UI-01, UI-02, UI-03
 
-**Architecture context:** Generation luôn bắt đầu từ 1 analyzed design (ground truth). Controls modify DNA dimensions. Patterns (từ Compare) là optional add-ons.
+**Architecture context:** Supabase SDK handles auth logic. Frontend cần: AuthContext provider, Login/Register screens, auth gate wrapper. Supabase dashboard cấu hình Google OAuth provider.
 
-Plans:
-- [x] 7A-01-PLAN.md — Creative Studio layout + simplified controls UI
-- [x] 7A-02-PLAN.md — Pattern integration UI (apply/remove patterns from Creative Studio)
+Plans: TBD
 
 **Success Criteria:**
-- [x] Creative Studio shows original design image + DNA summary (always visible)
-- [x] Design Controls simplified: 6 dimensions với keep/change toggle (no 3-mode card selector)
-- [x] Creativity Level slider retained (5 levels)
-- [x] "Applied Patterns" section: add patterns (from library or current compare result), remove
-- [x] ≤8 interactive elements visible before action (down from 15+)
+- [ ] User can register with email/password → redirected to app
+- [ ] User can login with email/password
+- [ ] User can login with Google OAuth
+- [ ] Session persists across page refresh (auto-refresh)
+- [ ] Unauthenticated users see only Login screen
+- [ ] User can logout → returned to Login screen
+- [ ] Login page has email/password form + Google button
+- [ ] Register page has email/password + name form
 
 **Deliverable:** Direct code implementation
 
 ---
 
-### Phase 7B: Concept Synthesis + POD-Ready Generation ✅
-**Goal:** Implement mandatory AI synthesis step (concept creation) + multimodal generation with POD quality enforcement
+### Phase 10: API Proxy + Prompt Protection
+**Goal:** Move all Gemini prompts server-side, proxy AI calls through Hono backend
 
-**Requirements:** F2-06, F2-07, F2-08, F2-09, F2-10, F2-11, F2-12
+**Requirements:** PROXY-01, PROXY-04, PROXY-05, UI-06, PROXY-02
 
-**Architecture context:** TRƯỚC KHI generate artwork, AI phải synthesize original DNA + modifications + applied patterns thành 1 unified concept. Generation gửi concept + original image (multimodal) + POD constraints.
+**Architecture context:** Đây là phase quan trọng nhất — chuyển toàn bộ business logic (prompts) từ `api.ts` client-side sang `api/src/prompts/` server-side. Frontend `apiClient.ts` gọi backend thay vì Gemini trực tiếp. API key management: user nhập key → encrypted → Supabase DB.
 
-Plans:
-- [x] 7B-01-PLAN.md — `synthesizeConcept()` + `generateArtwork()` API functions (multimodal, POD-enforced)
-- [x] 7B-02-PLAN.md — Concept carousel UI, retry tiers, aspect ratio dropdown
+Plans: TBD
 
 **Success Criteria:**
-- [x] "Create Concepts" → AI returns 3 SynthesizedConcept (title, description, visual direction, buyer target, coherence notes, key elements)
-- [x] User browses 3 concepts in horizontal carousel, selects one
-- [x] "Generate Artwork" sends concept + original image to Gemini (multimodal input)
-- [x] Output: flat illustration, white/transparent bg, no 3D/effects, print-ready (POD constraints in synthesis)
-- [x] Original uploaded image used as style reference (creativity level drives reference strength)
-- [x] 3 retry tiers: Regenerate Artwork, Try Different Concept, Start Over
-- [x] Download button works (filename from concept title)
-- [x] Aspect ratio options: 1:1, 4:5, 3:4, 4:3, 16:9, 9:16
-
-**Reference:** `.planning/deliverables/reference-pod-artwork/` for desired output quality
-
-**Deliverable:** Direct code implementation
-
-
----
-
-### Phase 7B.1: Pipeline Quality Redesign ✅ (INSERTED)
-**Goal:** Redesign synthesis → generation pipeline to maximize output quality. Fix DNA utilization gap (25% → 100%), add text content + color palette to concept schema, implement fidelity gradient for creativity×dimensions.
-
-**Depends on:** Phase 7B
-**Source:** Real user testing feedback (2026-03-16) + first-principles audit
-
-**Changes:**
-1. **Full DNA packaging** — synthesis receives ALL 30+ DNA fields (not cherry-picked 8)
-2. **Expanded concept schema** — add `suggestedText` (primary quote, tagline, text style), `colorPalette` (hex colors), `madeForMeHook`
-3. **Fidelity gradient** — creativity level modulates HOW STRICTLY each dimension is followed (not how much DNA to send)
-4. **Informed REIMAGINE** — "Change + empty" includes original value as context (not blind "freely")
-5. **Rich generation prompt** — inject text content, specific hex colors, background rules into image gen
-6. **UI updates** — concept card shows suggested text, color palette swatches, made-for-me hook
-
-Plans:
-- [x] 01: API pipeline redesign — full DNA, fidelity gradient, expanded schema
-- [x] 02: Concept card UI enrichment — text, palette, hook
-
-**Success Criteria:**
-- [x] Synthesis receives full DNA (visual_dna + buyer_dna complete) — packageFullDna() sends ALL fields
-- [x] Concepts include `suggestedText.primary`, `colorPalette[]`, `madeForMeHook`
-- [x] Creativity level uses fidelity gradient (CREATIVITY_FIDELITY replaces CREATIVITY_SYNTHESIS_LABELS)
-- [x] Generation prompt includes text content + hex palette from concept
-- [x] REIMAGINE directives include original value context via richContext()
-- [x] Concept card UI shows text preview + color swatches + made-for-me hook
-- [ ] Output quality improvement verified with same test image (manual testing)
-
-**Reference:** `.planning/phases/7B.1-pipeline-quality-redesign/DESIGN.md` (pipeline redesign spec)
+- [ ] All prompts removed from frontend code — zero prompt strings in `app/src/`
+- [ ] Backend proxy endpoints: /analyze, /compare, /synthesize, /generate, /evaluate
+- [ ] User's API key saved encrypted in Supabase, loaded per-request
+- [ ] Settings UI: save/update/delete API key (stored server-side)
+- [ ] Gemini errors mapped to consistent `{code, message}` JSON
+- [ ] Generation calls handle 120s timeout without proxy killing the request
+- [ ] Frontend DevTools shows NO prompt content in network requests
 
 **Deliverable:** Direct code implementation
 
 ---
 
-### Phase 7B.2: Typography & Decoration Quality ✅ (INSERTED — Resolved)
-**Goal:** Nâng chất lượng typography decoration trong generated artwork lên ngang bằng artwork gốc.
+### Phase 11: Server Persistence — Analyses
+**Goal:** Save analysis results to Supabase, "My Analyses" UI on Landing
 
-**Depends on:** Phase 7B.1
-**Source:** User testing feedback (2026-03-16)
+**Requirements:** DATA-01, DATA-03, UI-04, UI-05
 
-**Resolution:** Two-pass pipeline (Pass 1: illustration-only → Pass 2: text decoration overlay) đã được implement trong Phase 7B/7B.1 sessions, giải quyết root cause (single-pass AI generates both illustration AND text). Phase resolved without separate execution.
+**Architecture context:** Sau khi analyze → auto-save result to Supabase. Landing có "My Analyses" card. List page hiển thị saved analyses. Click → view DNA Card in read mode.
 
-**Current Architecture:**
-```
-Pass 1: generateArtwork() → illustration ONLY (no text in prompt)
-    ↓
-Pass 2: AI text decoration → integrates decorated typography as integral part of composition
-    ↓
-Original image passed as style reference in both passes
-```
-
-**Deliverable:** Already implemented in `app/src/api.ts` (lines 424-696)
-
----
-
-### Phase 7C: Pattern Library + Save Flow
-**Goal:** Enable saving Compare results as reusable Patterns + Pattern Library UI
-
-**Requirements:** F3-06, F3-07, F4-01..F4-05
-
-**Architecture context:** Patterns là tài sản tái sử dụng. User tích lũy patterns từ nhiều lần Compare, apply vào Creative Studio qua Library panel. Bỏ "Use Winning Formula" shortcut — flow duy nhất qua Library.
-
-**Plans:** 3 plans in 2 waves
-
-Plans:
-- [ ] 7C-01-PLAN.md — Pattern storage utility + Save flow on Compare Results (Wave 1)
-- [ ] 7C-02-PLAN.md — Pattern Library pages + Landing entry point (Wave 2)
-- [ ] 7C-03-PLAN.md — Apply Pattern in Creative Studio + remove prefilledBrief (Wave 2)
+Plans: TBD
 
 **Success Criteria:**
-- [ ] After Compare → "Save as Pattern" button with naming popup
-- [ ] Pattern saved to localStorage with full batch_analysis + resized thumbnails
-- [ ] Pattern Library accessible from Landing screen (if patterns exist)
-- [ ] Pattern list: name, thumbnails, created date, summary
-- [ ] Pattern detail: dedicated page with flat layout (like Compare Results)
-- [ ] Delete pattern with confirm dialog
-- [ ] Creative Studio: + Add Pattern → panel → section selection → apply as chip
-- [ ] Only 1 pattern applied at a time
-- [ ] "Use Winning Formula" completely removed
-- [ ] prefilledBrief prop chain completely removed
+- [ ] After analysis completes → result auto-saved to Supabase with thumbnail
+- [ ] "My Analyses" card visible on Landing (shows count)
+- [ ] Analysis list page: name, thumbnail, date, summary
+- [ ] Click analysis → opens DNA Card with full data (read mode)
+- [ ] Delete analysis with confirm dialog
+- [ ] Data persists across devices (login from different browser → same data)
 
 **Deliverable:** Direct code implementation
 
 ---
 
-### Phase 8: History & Persistence
-**Goal:** Client-side persistence for analysis results and generated artworks
+### Phase 12: Server Persistence — Patterns
+**Goal:** Migrate Pattern Library from localStorage to Supabase
 
-**Requirements:** F5-01..F5-05
+**Requirements:** DATA-02, DATA-04
 
-Plans:
-- [ ] 8-01-PLAN.md — localStorage persistence layer (analyses + artworks)
-- [ ] 8-02-PLAN.md — "My Designs" UI on Landing
+**Architecture context:** Replace `patternStorage.ts` (localStorage) với Supabase SDK calls. PatternLibrary + PatternDetail + CreativeStudio pattern picker đều đọc từ server thay vì localStorage. Save pattern trong CompareScreens cũng ghi lên server.
+
+Plans: TBD
 
 **Success Criteria:**
-- [ ] Analysis results persist across page refresh
-- [ ] Generated images saved with DNA context + synthesis concept
-- [ ] "My Designs" section on Landing shows saved items
-- [ ] Delete saved items
-- [ ] Graceful fallback when localStorage full
+- [ ] Save pattern (from Compare) writes to Supabase instead of localStorage
+- [ ] Pattern Library reads from Supabase
+- [ ] Pattern Detail reads from Supabase
+- [ ] Creative Studio pattern picker reads from Supabase
+- [ ] Delete pattern removes from Supabase
+- [ ] Patterns persist across devices
+- [ ] patternStorage.ts localStorage functions removed or deprecated
+
+**Deliverable:** Direct code implementation
+
+---
+
+### Phase 13: localStorage Migration
+**Goal:** One-time migration of existing localStorage patterns to Supabase on first login
+
+**Requirements:** MIG-01, MIG-02, MIG-03
+
+**Architecture context:** Users hiện tại có patterns trong localStorage. Khi họ login lần đầu, app detect và upload patterns lên Supabase. Idempotent — safe to run multiple times.
+
+Plans: TBD
+
+**Success Criteria:**
+- [ ] On first login, app detects existing localStorage patterns
+- [ ] Migration prompt shown to user (with pattern count)
+- [ ] Patterns uploaded to Supabase with original names, dates, data
+- [ ] Migration is idempotent (duplicate detection by name + created date)
+- [ ] localStorage cleared after successful migration
+- [ ] If no localStorage patterns, migration silently skipped
 
 **Deliverable:** Direct code implementation
 
@@ -237,17 +139,41 @@ Plans:
 
 ## Phase Summary
 
-| Phase | Name | Requirements | Status |
-|-------|------|-------------|--------|
-| 1 | UI/UX Style Definition | APP-02, APP-04 | ✅ Done |
-| 2 | AI Studio Configuration | Foundation | ✅ Done |
-| 3 | Build: Shell + F1 | APP-01..04 + F1-* | ✅ Done |
-| 4 | Build: F2 Generation (v1) | F2-* (original) | ✅ Done |
-| 5 | Build: F3 Batch Compare | F3-01..05 | ✅ Done |
-| 6A | Critical UX Fixes | UX-1..6 | ✅ Done |
-| **7A** | **Creative Studio — UI Redesign** | **F2-01..05** | ✅ Done |
-| **7B** | **Concept Synthesis + POD Generation** | **F2-06..12** | ✅ Done |
-| **7B.1** | **Pipeline Quality Redesign** | **Quality fix** | ✅ Done |
-| **7B.2** | **Typography & Decoration Quality** | **Quality fix** | ✅ Resolved |
-| **7C** | **Pattern Library + Save Flow** | **F3-06..07, F4-*** | 🔲 Planned |
-| 8 | History & Persistence | F5-* | 🔲 Planned |
+| # | Phase | Requirements | Status |
+|---|-------|-------------|--------|
+| 8 | Supabase + Backend Scaffold | DATA-05, PROXY-03 | 🔲 Planned |
+| 9 | Authentication | AUTH-01..06, UI-01..03 | 🔲 Planned |
+| 10 | API Proxy + Prompt Protection | PROXY-01..02,04..05, UI-06 | 🔲 Planned |
+| 11 | Server Persistence — Analyses | DATA-01, DATA-03, UI-04..05 | 🔲 Planned |
+| 12 | Server Persistence — Patterns | DATA-02, DATA-04 | 🔲 Planned |
+| 13 | localStorage Migration | MIG-01..03 | 🔲 Planned |
+
+## Requirement Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| AUTH-01 | 9 | 🔲 |
+| AUTH-02 | 9 | 🔲 |
+| AUTH-03 | 9 | 🔲 |
+| AUTH-04 | 9 | 🔲 |
+| AUTH-05 | 9 | 🔲 |
+| AUTH-06 | 9 | 🔲 |
+| PROXY-01 | 10 | 🔲 |
+| PROXY-02 | 10 | 🔲 |
+| PROXY-03 | 8 | 🔲 |
+| PROXY-04 | 10 | 🔲 |
+| PROXY-05 | 10 | 🔲 |
+| DATA-01 | 11 | 🔲 |
+| DATA-02 | 12 | 🔲 |
+| DATA-03 | 11 | 🔲 |
+| DATA-04 | 12 | 🔲 |
+| DATA-05 | 8 | 🔲 |
+| UI-01 | 9 | 🔲 |
+| UI-02 | 9 | 🔲 |
+| UI-03 | 9 | 🔲 |
+| UI-04 | 11 | 🔲 |
+| UI-05 | 11 | 🔲 |
+| UI-06 | 10 | 🔲 |
+| MIG-01 | 13 | 🔲 |
+| MIG-02 | 13 | 🔲 |
+| MIG-03 | 13 | 🔲 |

@@ -6,34 +6,27 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 
 **Core value:** Giúp POD sellers hiểu tại sao design bán tốt — visual + buyer psychology — rồi tạo original designs qua Creative Studio
 **Architecture:** Original (required) + Patterns (optional) → AI Synthesis (mandatory) → POD-ready Artwork
-**Current focus:** Phase 7C — Pattern Library + Save Flow
+**Current focus:** Milestone v2.0 — Backend System (defining requirements)
 
 ## Current Phase
 
 | Field | Value |
 |-------|-------|
-| Phase | 7C |
-| Name | Pattern Library + Save Flow |
-| Status | ● Complete |
-| Started | 2026-03-17 |
-| Completed | 2026-03-17 |
+| Milestone | v2.0 — Backend System |
+| Phase | 8 — Supabase + Backend Scaffold |
+| Status | ○ Not Started |
+| Started | — |
 
 ## Phase Progress
 
 | Phase | Name | Status | Progress |
 |-------|------|--------|----------|
-| 1 | UI/UX Style Definition | ● Complete | 100% |
-| 2 | AI Studio Configuration | ● Complete | 100% |
-| 3 | Build: Shell + F1 | ● Complete | 100% |
-| 4 | Build: F2 Generation (v1) | ● Complete | 100% |
-| 5 | Build: F3 Batch Compare | ● Complete | 100% |
-| 6A | Critical UX Fixes | ● Complete | 100% |
-| **7A** | **Creative Studio — UI Redesign** | ● Complete | 100% |
-| **7B** | **Concept Synthesis + POD Generation** | ● Complete | 100% |
-| **7B.1** | **Pipeline Quality Redesign (INSERTED)** | ● Complete | 100% |
-| **7B.2** | **Typography & Decoration Quality (INSERTED)** | ● Complete (resolved) | 100% |
-| **7C** | **Pattern Library + Save Flow** | ● Complete | 100% |
-| 8 | History & Persistence | ○ Not Started | 0% |
+| 8 | Supabase + Backend Scaffold | ○ Not Started | 0% |
+| 9 | Authentication | ○ Not Started | 0% |
+| 10 | API Proxy + Prompt Protection | ○ Not Started | 0% |
+| 11 | Server Persistence — Analyses | ○ Not Started | 0% |
+| 12 | Server Persistence — Patterns | ○ Not Started | 0% |
+| 13 | localStorage Migration | ○ Not Started | 0% |
 
 ## Architecture Decisions (2026-03-16)
 
@@ -65,17 +58,16 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 - **Image gen model:** gemini-2.5-flash-image (multimodal input)
 - **Buyer fit model:** gemini-3-flash-preview (scoring)
 
-## Session Continuity
-
-Last session: 2026-03-17T12:00
-Stopped at: Phase 7C complete — Pattern Library fully implemented (save, browse, detail, apply in Studio)
-Next action: Phase 8 — History & Persistence
+Last session: 2026-03-17T10:40
+Stopped at: Milestone v2.0 initialized — research complete, requirements defined, roadmap created (6 phases)
+Next action: /gsd:discuss-phase 8 or /gsd:plan-phase 8
 
 ## Roadmap Evolution
 
-- Phase 7B.2 inserted after Phase 7B.1: Typography & Decoration Quality (URGENT) — generated artwork visuals good but typography decoration doesn't match original quality
-- Phase 7B.2 resolved without execution: two-pass pipeline (Pass 1: illustration only → Pass 2: text decoration overlay) already implemented during 7B/7B.1 sessions, rendering the phase moot
-- Phase 7C completed: Pattern Library + Save Flow — save patterns from Compare, browse library, view details, apply patterns in Creative Studio with section selection
+- Milestone v1.0 archived to MILESTONES.md (11 phases, all complete)
+- Milestone v2.0 started: Backend System
+- Stack: Supabase (Auth + DB) + Hono (API Proxy)
+- 22 requirements across 5 categories, mapped to 6 phases
 
 ---
-*Last updated: 2026-03-17 after Phase 7C complete*
+*Last updated: 2026-03-17 — Milestone v2.0 roadmap created*
