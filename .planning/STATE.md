@@ -16,7 +16,7 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 | Phase | 12 — Server Persistence — Patterns |
 | Status | ● Planned (3 plans in 2 waves) |
 | Plan 12-01 | ✅ Backend Patterns CRUD Routes |
-| Plan 12-02 | ⬜ Frontend API Client & Storage Deprecation |
+| Plan 12-02 | ✅ Frontend API Client & Storage Deprecation |
 | Plan 12-03 | ⬜ Replace Local Storage with Patterns API |
 
 ## Phase Progress
@@ -60,9 +60,9 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 - **Image gen model:** gemini-2.5-flash-image (multimodal input)
 - **Buyer fit model:** gemini-3-flash-preview (scoring)
 
-Last session: 2026-03-17T13:31
-Stopped at: Phase 11 complete — My Analyses UI implemented
-Next action: Phase 12 — Server Persistence — Patterns
+Last session: 2026-03-17T14:10
+Stopped at: Phase 12 — Plan 12-02 complete (API Client + Storage Deprecation)
+Next action: Plan 12-03 — Replace Local Storage with Patterns API
 
 ## Roadmap Evolution
 
