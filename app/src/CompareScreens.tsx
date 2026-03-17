@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, UploadCloud, X, AlertTriangle, Bookmark, Check } from 'lucide-react';
+import { UploadCloud, X, AlertTriangle, Bookmark, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { savePattern, checkPatternSaved, resizeToThumbnail } from './apiClient';
 import { useAuth } from './contexts/AuthContext';
@@ -62,13 +62,6 @@ export function CompareUploadScreen({ onNavigate, compareImages, setCompareImage
       transition={{ duration: 0.2, ease: "easeOut" }}
       className="pt-8"
     >
-      <button
-        onClick={() => onNavigate('upload')}
-        className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" /> Home
-      </button>
-
       <div className="max-w-[800px] mx-auto text-center mb-8">
         <h1 className="text-[32px] font-bold tracking-tight mb-2">Compare Winning Designs</h1>
         <p className="text-[14px] text-text-secondary">
@@ -338,12 +331,6 @@ export function CompareResultsScreen({
       className="pt-8"
     >
       <div className="mb-8">
-        <button
-          onClick={() => onNavigate('upload')}
-          className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-4 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" /> Home
-        </button>
         <h1 className="text-[32px] font-bold tracking-tight">Winning Formula</h1>
       </div>
 

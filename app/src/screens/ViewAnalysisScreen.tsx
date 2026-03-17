@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowLeft, AlertTriangle, ImageOff, Copy, Check } from 'lucide-react';
+import { AlertTriangle, Copy, Check } from 'lucide-react';
 import { getAnalysis } from '../apiClient';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -99,13 +99,6 @@ export default function ViewAnalysisScreen() {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="pt-8 mb-24"
         >
-            <button
-                onClick={() => navigate('/library')}
-                className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-6 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
-            >
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Library
-            </button>
-
             <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
                 <div className="w-full md:w-[40%] md:sticky md:top-[80px] self-start">
                     <div className="bg-bg-surface2 p-2 rounded-xl border border-border-default">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Trash2, BookOpen } from 'lucide-react';
+import { Trash2, BookOpen } from 'lucide-react';
 import { listAnalyses, deleteAnalysis } from '../apiClient';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -60,13 +60,6 @@ export default function MyAnalysesList({ onNavigate, onViewAnalysis }: Props) {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="pt-8 mb-24 max-w-[1200px] mx-auto"
         >
-            <button
-                onClick={() => onNavigate('upload')}
-                className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
-            >
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
-            </button>
-
             <div className="mb-8">
                 <h1 className="text-[32px] font-bold tracking-tight mb-2 flex items-center gap-3">
                     <BookOpen className="w-8 h-8 text-[#34d399]" />

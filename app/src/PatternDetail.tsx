@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Trash2, Loader2 } from 'lucide-react';
+import { Trash2, Loader2 } from 'lucide-react';
 import { getPatternById, deletePatternById, SavedPattern } from './apiClient';
 import { useAuth } from './contexts/AuthContext';
 
@@ -73,16 +73,7 @@ export default function PatternDetail({ patternId, onNavigate }: PatternDetailPr
         >
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => onNavigate('pattern_library')}
-                        className="flex items-center text-text-secondary hover:text-text-primary text-[14px] transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-2" /> Library
-                    </button>
-                    <div className="w-px h-5 bg-border-default" />
-                    <h1 className="text-[24px] font-bold tracking-tight">{pattern.name}</h1>
-                </div>
+                <h1 className="text-[24px] font-bold tracking-tight">{pattern.name}</h1>
                 <button
                     onClick={() => setShowDeleteConfirm(true)}
                     className="p-2 text-text-tertiary hover:text-error rounded-lg hover:bg-error/10 transition-colors"

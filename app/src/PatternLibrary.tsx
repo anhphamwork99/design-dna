@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Layers, Trash2, Loader2 } from 'lucide-react';
+import { Layers, Trash2, Loader2 } from 'lucide-react';
 import { listPatterns, deletePatternById, SavedPattern } from './apiClient';
 import { useAuth } from './contexts/AuthContext';
 
@@ -57,12 +57,6 @@ export default function PatternLibrary({ onNavigate }: PatternLibraryProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="pt-8"
             >
-                <button
-                    onClick={() => onNavigate('upload')}
-                    className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-2" /> Home
-                </button>
                 <div className="flex flex-col items-center justify-center text-center py-20">
                     <Loader2 className="w-8 h-8 text-accent animate-spin mb-4" />
                     <p className="text-[14px] text-text-secondary">Loading patterns...</p>
@@ -78,12 +72,6 @@ export default function PatternLibrary({ onNavigate }: PatternLibraryProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="pt-8"
             >
-                <button
-                    onClick={() => onNavigate('upload')}
-                    className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-2" /> Home
-                </button>
                 <div className="flex flex-col items-center justify-center text-center py-20">
                     <Layers className="w-12 h-12 text-text-tertiary mb-4" />
                     <h2 className="text-[18px] font-semibold mb-2">No patterns saved yet</h2>
@@ -101,13 +89,6 @@ export default function PatternLibrary({ onNavigate }: PatternLibraryProps) {
             animate={{ opacity: 1, y: 0 }}
             className="pt-8"
         >
-            <button
-                onClick={() => onNavigate('upload')}
-                className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors"
-            >
-                <ArrowLeft className="w-4 h-4 mr-2" /> Home
-            </button>
-
             <div className="max-w-[800px] mx-auto">
                 <div className="mb-8">
                     <h1 className="text-[32px] font-bold tracking-tight mb-2">Pattern Library</h1>
