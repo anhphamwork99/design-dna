@@ -1,7 +1,9 @@
 // ── Pattern Storage Utility ─────────────────────────────────────
-// Persist patterns (Compare results) to localStorage with CRUD ops
+// DEPRECATED: This module uses localStorage. Use apiClient.ts for all new code.
+// Legacy functions retained for Phase 13 migration only.
 
-export interface SavedPattern {
+// DEPRECATED: Use SavedPattern from apiClient.ts for new code
+export interface LegacySavedPattern {
     id: string;
     name: string;
     createdAt: string;
@@ -13,13 +15,14 @@ export interface SavedPattern {
 
 const STORAGE_KEY = 'designdna_patterns';
 
-// ── CRUD ────────────────────────────────────────────────────────
+// ── DEPRECATED: For Phase 13 migration only ────────────────────
 
-export function getPatterns(): SavedPattern[] {
+/** @deprecated Use listPatterns() from apiClient.ts */
+export function legacyGetPatterns(): LegacySavedPattern[] {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return [];
-        const patterns: SavedPattern[] = JSON.parse(raw);
+        const patterns: LegacySavedPattern[] = JSON.parse(raw);
         // Sort newest first
         return patterns.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } catch {
@@ -27,54 +30,39 @@ export function getPatterns(): SavedPattern[] {
     }
 }
 
-export function getPattern(id: string): SavedPattern | null {
-    const patterns = getPatterns();
+/** @deprecated Use getPattern() from apiClient.ts */
+export function legacyGetPattern(id: string): LegacySavedPattern | null {
+    const patterns = legacyGetPatterns();
     return patterns.find(p => p.id === id) || null;
 }
 
-export async function savePattern(
-    name: string,
-    batchAnalysis: any,
-    sourceImages: { data: string }[]
-): Promise<SavedPattern> {
-    const thumbnails = await Promise.all(
-        sourceImages.map(img => resizeToThumbnail(img.data))
-    );
-
-    const pattern: SavedPattern = {
-        id: crypto.randomUUID(),
-        name,
-        createdAt: new Date().toISOString(),
-        sourceImageCount: sourceImages.length,
-        thumbnails,
-        summary: batchAnalysis?.winning_formula?.summary || 'No summary',
-        batchAnalysis,
-    };
-
-    const existing = getPatterns();
-    existing.unshift(pattern);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
-
-    return pattern;
-}
-
-export function deletePattern(id: string): void {
-    const patterns = getPatterns().filter(p => p.id !== id);
+/** @deprecated Use deletePattern() from apiClient.ts */
+export function legacyDeletePattern(id: string): void {
+    const patterns = legacyGetPatterns().filter(p => p.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(patterns));
 }
 
-// ── Duplicate Check ─────────────────────────────────────────────
+// ── Backward-compat re-exports (Phase 13 will remove) ──────────
+// Re-export legacy functions under original names so existing UI
+// components keep compiling until Plan 12-03 migrates them.
 
-export function isCompareResultSaved(batchAnalysis: any): boolean {
-    if (!batchAnalysis) return false;
-    const summary = batchAnalysis?.winning_formula?.summary || '';
-    const patterns = getPatterns();
-    return patterns.some(p => p.summary === summary && p.summary !== 'No summary');
-}
+/** @deprecated Import SavedPattern from apiClient.ts instead */
+export type SavedPattern = LegacySavedPattern;
 
-// ── Thumbnail Resize ────────────────────────────────────────────
+/** @deprecated Use listPatterns() from apiClient.ts */
+export const getPatterns = legacyGetPatterns;
 
-function resizeToThumbnail(dataUri: string, maxSize = 100): Promise<string> {
+/** @deprecated Use getPattern() from apiClient.ts */
+export const getPattern = legacyGetPattern;
+
+/** @deprecated Use deletePattern() from apiClient.ts */
+export const deletePattern = legacyDeletePattern;
+
+// ── Thumbnail Resize (moved to apiClient.ts as exported) ────────
+// Kept here as internal helper for legacy compatibility only.
+
+/** @deprecated Use resizeToThumbnail() from apiClient.ts */
+export function resizeToThumbnail(dataUri: string, maxSize = 100): Promise<string> {
     return new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
