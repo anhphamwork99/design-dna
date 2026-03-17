@@ -93,7 +93,7 @@ export function CompareUploadScreen({ onNavigate, compareImages, setCompareImage
 
             {compareImages.length < 5 && (
               <div
-                className={`w-[150px] h-[150px] bg-bg-surface2 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${isDragging ? 'border-accent bg-accent/10' : 'border-white/15 hover:border-white/25'}`}
+                className={`w-[150px] h-[150px] bg-bg-surface2 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${isDragging ? 'border-accent bg-accent/10' : 'border-border-default hover:border-border-hover'}`}
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                 onDragLeave={() => setIsDragging(false)}

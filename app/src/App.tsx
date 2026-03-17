@@ -580,7 +580,7 @@ function UploadScreen({
         <p className="text-[14px] text-text-secondary mb-8">Upload a design image to decode its visual DNA and buyer psychology.</p>
         {!uploadedImage ? (
           <div
-            className={`bg-bg-surface1 border-2 border-dashed rounded-xl py-12 px-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${isDragging ? 'border-accent bg-accent/5' : 'border-white/15 hover:border-accent'}`}
+            className={`bg-bg-surface1 border-2 border-dashed rounded-xl py-12 px-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${isDragging ? 'border-accent bg-accent/5' : 'border-border-default hover:border-accent'}`}
             onClick={() => fileInputRef.current?.click()}
             onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
             onDragLeave={() => setIsDragging(false)}
@@ -908,7 +908,7 @@ function ResultsScreen({
                   <div className="flex flex-wrap gap-4 mb-5">
                     {visualDNA.color?.palette?.map((c: any, i: number) => (
                       <div key={i} className="flex items-center gap-2 bg-bg-surface2 px-3 py-2 rounded-lg">
-                        <div className="w-5 h-5 rounded-full border border-white/20 shadow-sm" style={{ backgroundColor: c.hex }}></div>
+                        <div className="w-5 h-5 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: c.hex }}></div>
                         <div className="flex flex-col">
                           <span className="text-[12px] font-medium text-text-primary leading-tight">{c.name}</span>
                           <span className="text-[11px] text-text-tertiary uppercase tracking-wider">{c.role}</span>
@@ -1020,7 +1020,7 @@ function ResultsScreen({
                       <div className="flex flex-wrap gap-2">
                         {visualDNA.pod_technical?.recommended_garment_colors?.map((c: any, i: number) => (
                           <div key={i} className="flex items-center gap-2 bg-bg-surface2 px-3 py-1.5 rounded-full shadow-sm border border-border-default">
-                            <div className="w-3.5 h-3.5 rounded-full border border-white/20" style={{ backgroundColor: c.hex || c }}></div>
+                            <div className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ backgroundColor: c.hex || c }}></div>
                             <span className="text-[13px] text-text-primary font-medium">{c.name || c}</span>
                           </div>
                         ))}
