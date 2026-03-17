@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Trash2 } from 'lucide-react';
-import { getPattern, deletePattern, SavedPattern } from './patternStorage';
+import { ArrowLeft, Trash2, Loader2 } from 'lucide-react';
+import { getPatternById, deletePatternById, SavedPattern } from './apiClient';
+import { useAuth } from './contexts/AuthContext';
 
 interface PatternDetailProps {
     patternId: string;
@@ -9,17 +10,44 @@ interface PatternDetailProps {
 }
 
 export default function PatternDetail({ patternId, onNavigate }: PatternDetailProps) {
+    const { session } = useAuth();
     const [pattern, setPattern] = useState<SavedPattern | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
-        setPattern(getPattern(patternId));
-    }, [patternId]);
+        if (!session) return;
+        setIsLoading(true);
+        getPatternById(session.access_token, patternId)
+            .then(setPattern)
+            .catch((err) => {
+                console.error('Failed to load pattern:', err);
+                setPattern(null);
+            })
+            .finally(() => setIsLoading(false));
+    }, [session, patternId]);
 
-    const handleDelete = () => {
-        deletePattern(patternId);
-        onNavigate('pattern_library');
+    const handleDelete = async () => {
+        if (!session) return;
+        setIsDeleting(true);
+        try {
+            await deletePatternById(session.access_token, patternId);
+            onNavigate('pattern_library');
+        } catch (err) {
+            console.error('Failed to delete pattern:', err);
+            setIsDeleting(false);
+        }
     };
+
+    if (isLoading) {
+        return (
+            <div className="pt-8 flex flex-col items-center justify-center text-center py-20">
+                <Loader2 className="w-8 h-8 text-accent animate-spin mb-4" />
+                <p className="text-[14px] text-text-secondary">Loading pattern...</p>
+            </div>
+        );
+    }
 
     if (!pattern) {
         return (
@@ -35,7 +63,7 @@ export default function PatternDetail({ patternId, onNavigate }: PatternDetailPr
         );
     }
 
-    const analysis = pattern.batchAnalysis;
+    const analysis = pattern.batch_analysis;
 
     return (
         <motion.div
@@ -75,8 +103,8 @@ export default function PatternDetail({ patternId, onNavigate }: PatternDetailPr
                         ))}
                     </div>
                     <div className="text-[12px] text-text-tertiary space-y-1">
-                        <p>{pattern.sourceImageCount} source design{pattern.sourceImageCount !== 1 ? 's' : ''}</p>
-                        <p>Saved {new Date(pattern.createdAt).toLocaleDateString()}</p>
+                        <p>{pattern.source_image_count} source design{pattern.source_image_count !== 1 ? 's' : ''}</p>
+                        <p>Saved {new Date(pattern.created_at).toLocaleDateString()}</p>
                     </div>
                 </div>
 
@@ -222,9 +250,10 @@ export default function PatternDetail({ patternId, onNavigate }: PatternDetailPr
                             </button>
                             <button
                                 onClick={handleDelete}
-                                className="px-5 py-2 bg-error text-white text-[13px] font-medium rounded-lg hover:opacity-90 transition-opacity"
+                                disabled={isDeleting}
+                                className="px-5 py-2 bg-error text-white text-[13px] font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                             >
-                                Delete
+                                {isDeleting ? 'Deleting...' : 'Delete'}
                             </button>
                         </div>
                     </div>
