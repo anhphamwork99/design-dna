@@ -112,3 +112,34 @@ export async function resizeImageIfNeeded(dataUrl: string): Promise<string> {
     img.src = dataUrl;
   });
 }
+
+/**
+ * Generate a small thumbnail from a data URL (canvas-based).
+ */
+export async function generateThumbnail(dataUrl: string, maxWidth: number = 200): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      // Calculate new dimensions maintaining aspect ratio
+      let newWidth = img.width;
+      let newHeight = img.height;
+      if (newWidth > maxWidth) {
+        const scale = maxWidth / newWidth;
+        newWidth = Math.round(newWidth * scale);
+        newHeight = Math.round(newHeight * scale);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+      // Output as JPEG quality 0.7 for small size
+      const result = canvas.toDataURL('image/jpeg', 0.7);
+      resolve(result);
+    };
+    img.onerror = () => resolve(dataUrl); // fallback to original if error
+    img.src = dataUrl;
+  });
+}
