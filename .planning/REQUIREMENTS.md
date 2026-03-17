@@ -21,9 +21,9 @@
 
 ### Server Persistence (Supabase PostgreSQL)
 
-- [ ] **DATA-01**: Analysis results (DNA Card JSON) saved per user with thumbnail
+- [x] **DATA-01**: Analysis results (DNA Card JSON) saved per user with thumbnail *(Phase 11 ✓)*
 - [ ] **DATA-02**: Patterns (Compare results JSON + thumbnails) saved per user
-- [ ] **DATA-03**: User can list and delete their analyses
+- [x] **DATA-03**: User can list and delete their analyses *(Phase 11 ✓)*
 - [ ] **DATA-04**: User can list and delete their patterns
 - [x] **DATA-05**: Row Level Security ensures users only access their own data *(Phase 8 ✓)*
 
@@ -32,8 +32,8 @@
 - [x] **UI-01**: Login page with email/password form and Google sign-in button *(Phase 9 ✓)*
 - [x] **UI-02**: Register page with email/password form *(Phase 9 ✓)*
 - [x] **UI-03**: Auth gate redirects unauthenticated users to login *(Phase 9 ✓)*
-- [ ] **UI-04**: "My Analyses" card on Landing + list page showing saved analyses
-- [ ] **UI-05**: Clicking a saved analysis opens DNA Card in read mode
+- [x] **UI-04**: "My Analyses" card on Landing + list page showing saved analyses *(Phase 11 ✓)*
+- [x] **UI-05**: Clicking a saved analysis opens DNA Card in read mode *(Phase 11 ✓)*
 - [x] **UI-06**: Settings page: save/update/delete Gemini API key (stored server-side) *(Phase 10 ✓)*
 
 ### Migration
@@ -65,10 +65,10 @@
 | AUTH-01..06 | 9 ✅ |
 | PROXY-01, PROXY-02, PROXY-04, PROXY-05 | 10 ✅ |
 | PROXY-03 | 8 ✅ |
-| DATA-01, DATA-03 | 11 |
+| DATA-01, DATA-03 | 11 ✅ |
 | DATA-02, DATA-04 | 12 |
 | DATA-05 | 8 ✅ |
 | UI-01..03 | 9 ✅ |
-| UI-04, UI-05 | 11 |
+| UI-04, UI-05 | 11 ✅ |
 | UI-06 | 10 ✅ |
 | MIG-01..03 | 13 |
