@@ -58,7 +58,7 @@ export default function PatternLibrary({ onNavigate }: PatternLibraryProps) {
                 className="pt-8"
             >
                 <button
-                    onClick={() => onNavigate('landing')}
+                    onClick={() => onNavigate('upload')}
                     className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4 mr-2" /> Home
@@ -79,7 +79,7 @@ export default function PatternLibrary({ onNavigate }: PatternLibraryProps) {
                 className="pt-8"
             >
                 <button
-                    onClick={() => onNavigate('landing')}
+                    onClick={() => onNavigate('upload')}
                     className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4 mr-2" /> Home
@@ -102,7 +102,7 @@ export default function PatternLibrary({ onNavigate }: PatternLibraryProps) {
             className="pt-8"
         >
             <button
-                onClick={() => onNavigate('landing')}
+                onClick={() => onNavigate('upload')}
                 className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors"
             >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Home

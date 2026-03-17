@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { savePattern, checkPatternSaved, resizeToThumbnail } from './apiClient';
 import { useAuth } from './contexts/AuthContext';
 
-type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results';
+type Screen = 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results';
 
 interface CompareUploadScreenProps {
   key?: string;
@@ -63,7 +63,7 @@ export function CompareUploadScreen({ onNavigate, compareImages, setCompareImage
       className="pt-8"
     >
       <button
-        onClick={() => onNavigate('landing')}
+        onClick={() => onNavigate('upload')}
         className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
       >
         <ArrowLeft className="w-4 h-4 mr-2" /> Home
@@ -339,7 +339,7 @@ export function CompareResultsScreen({
     >
       <div className="mb-8">
         <button
-          onClick={() => onNavigate('landing')}
+          onClick={() => onNavigate('upload')}
           className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-4 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Home

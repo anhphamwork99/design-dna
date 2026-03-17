@@ -62,7 +62,7 @@ export default function MyAnalysesList({ onNavigate, onViewAnalysis }: Props) {
             className="pt-8 mb-24 max-w-[1200px] mx-auto"
         >
             <button
-                onClick={() => onNavigate('landing')}
+                onClick={() => onNavigate('upload')}
                 className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:rounded"
             >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home

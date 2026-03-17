@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useMigratePatterns } from './hooks/useMigratePatterns';
 import { ArrowLeft, UploadCloud, AlertTriangle, Settings, Microscope, Scale, Copy, Check, ImageOff, Layers, LogOut, BookOpen } from 'lucide-react';
 import MyAnalysesList from './components/MyAnalysesList';
@@ -14,13 +15,15 @@ import { useAuth } from './contexts/AuthContext';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
 import SettingsModal from './components/SettingsModal';
+import { AppShell } from './components/layout';
+import HomeScreen from './screens/HomeScreen';
 
-export type Screen = 'landing' | 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results' | 'pattern_library' | 'pattern_detail' | 'my_analyses' | 'view_analysis';
+export type Screen = 'upload' | 'analyzing' | 'results' | 'generation' | 'compare_upload' | 'compare_analyzing' | 'compare_results' | 'pattern_library' | 'pattern_detail' | 'my_analyses' | 'view_analysis';
 
 export default function App() {
   const { user, session, loading, signOut } = useAuth();
   const [authScreen, setAuthScreen] = useState<'login' | 'register'>('login');
-  const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
+  const [currentScreen, setCurrentScreen] = useState<Screen>('upload');
   const [uploadedImage, setUploadedImage] = useState<{ data: string; name: string; type: string } | null>(null);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [error, setError] = useState<{ type: string; message: string } | null>(null);
@@ -221,8 +224,6 @@ export default function App() {
     setCurrentScreen(currentScreen === 'compare_analyzing' ? 'compare_upload' : 'upload');
   };
 
-  const isStudioMode = currentScreen === 'generation';
-
   // Auth gate: show loading spinner while checking auth state
   if (loading) {
     return (
@@ -248,210 +249,179 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-base text-text-primary font-sans">
-      {!isStudioMode && (
-        <header className="h-14 bg-bg-surface1 border-b border-border-default fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6">
-          <button onClick={() => setCurrentScreen('landing')} className="flex items-center hover:opacity-80 transition-opacity" aria-label="Go to home page">
-            <div className="w-6 h-6 rounded ai-gradient mr-3"></div>
-            <span className="font-semibold text-[16px]">DesignDNA</span>
-          </button>
-          <div className="flex items-center gap-3">
-            <span className="text-[12px] text-text-tertiary hidden sm:inline">{user.email}</span>
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors"
-              aria-label="Open settings"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
-            <button
-              onClick={signOut}
-              className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors"
-              aria-label="Sign out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        </header>
-      )}
-
+    <AppShell onSettingsClick={() => setIsSettingsOpen(true)}>
       {/* Migration banner */}
-      {migrationState.status !== 'idle' && !isStudioMode && (
-        <div className="fixed top-14 left-0 right-0 z-40">
-          <div className="max-w-[1200px] mx-auto px-8 pt-3">
-            {migrationState.status === 'detected' && (
-              <div className="bg-bg-surface1 border border-accent/30 rounded-lg px-5 py-3 flex items-center justify-between gap-4 shadow-lg">
-                <p className="text-[13px] text-text-secondary">
-                  <span className="mr-2">📦</span>
-                  Found <span className="text-text-primary font-medium">{migrationState.localPatternCount}</span> pattern{migrationState.localPatternCount !== 1 ? 's' : ''} in local storage. Migrate to your account?
-                </p>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={startMigration}
-                    className="px-4 py-1.5 rounded-md ai-gradient text-white text-[12px] font-medium hover:opacity-90 transition-opacity"
-                  >
-                    Migrate Now
-                  </button>
-                  <button
-                    onClick={dismissMigration}
-                    className="px-3 py-1.5 rounded-md text-[12px] text-text-tertiary hover:text-text-secondary transition-colors"
-                  >
-                    Not Now
-                  </button>
-                </div>
+      {migrationState.status !== 'idle' && (
+        <div className="mb-4">
+          {migrationState.status === 'detected' && (
+            <div className="bg-bg-surface1 border border-accent/30 rounded-lg px-5 py-3 flex items-center justify-between gap-4 shadow-lg">
+              <p className="text-[13px] text-text-secondary">
+                <span className="mr-2">📦</span>
+                Found <span className="text-text-primary font-medium">{migrationState.localPatternCount}</span> pattern{migrationState.localPatternCount !== 1 ? 's' : ''} in local storage. Migrate to your account?
+              </p>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={startMigration}
+                  className="px-4 py-1.5 rounded-md ai-gradient text-white text-[12px] font-medium hover:opacity-90 transition-opacity"
+                >
+                  Migrate Now
+                </button>
+                <button
+                  onClick={dismissMigration}
+                  className="px-3 py-1.5 rounded-md text-[12px] text-text-tertiary hover:text-text-secondary transition-colors"
+                >
+                  Not Now
+                </button>
               </div>
-            )}
+            </div>
+          )}
 
-            {migrationState.status === 'migrating' && (
-              <div className="bg-bg-surface1 border border-accent/30 rounded-lg px-5 py-3 flex items-center gap-3 shadow-lg">
-                <div className="w-4 h-4 rounded-full border-2 border-accent border-t-transparent animate-spin shrink-0" />
-                <p className="text-[13px] text-text-secondary">
-                  Migrating patterns… <span className="text-text-primary font-medium">{migrationState.migratedCount}/{migrationState.localPatternCount}</span>
-                </p>
-              </div>
-            )}
+          {migrationState.status === 'migrating' && (
+            <div className="bg-bg-surface1 border border-accent/30 rounded-lg px-5 py-3 flex items-center gap-3 shadow-lg">
+              <div className="w-4 h-4 rounded-full border-2 border-accent border-t-transparent animate-spin shrink-0" />
+              <p className="text-[13px] text-text-secondary">
+                Migrating patterns… <span className="text-text-primary font-medium">{migrationState.migratedCount}/{migrationState.localPatternCount}</span>
+              </p>
+            </div>
+          )}
 
-            {migrationState.status === 'done' && (
-              <div className="bg-bg-surface1 border border-[#34d399]/30 rounded-lg px-5 py-3 flex items-center gap-3 shadow-lg">
-                <span className="text-[#34d399]">✓</span>
-                <p className="text-[13px] text-text-secondary">
-                  <span className="text-text-primary font-medium">{migrationState.migratedCount}</span> pattern{migrationState.migratedCount !== 1 ? 's' : ''} migrated successfully{migrationState.skippedCount > 0 ? `, ${migrationState.skippedCount} already existed` : ''}
-                </p>
-              </div>
-            )}
+          {migrationState.status === 'done' && (
+            <div className="bg-bg-surface1 border border-[#34d399]/30 rounded-lg px-5 py-3 flex items-center gap-3 shadow-lg">
+              <span className="text-[#34d399]">✓</span>
+              <p className="text-[13px] text-text-secondary">
+                <span className="text-text-primary font-medium">{migrationState.migratedCount}</span> pattern{migrationState.migratedCount !== 1 ? 's' : ''} migrated successfully{migrationState.skippedCount > 0 ? `, ${migrationState.skippedCount} already existed` : ''}
+              </p>
+            </div>
+          )}
 
-            {migrationState.status === 'error' && (
-              <div className="bg-bg-surface1 border border-error/30 rounded-lg px-5 py-3 flex items-center justify-between gap-4 shadow-lg">
-                <p className="text-[13px] text-text-secondary">
-                  Migration failed: {migrationState.error}. Your local patterns are safe — try again later.
-                </p>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={startMigration}
-                    className="px-4 py-1.5 rounded-md bg-accent text-white text-[12px] font-medium hover:bg-accent-hover transition-colors"
-                  >
-                    Retry
-                  </button>
-                  <button
-                    onClick={dismissMigration}
-                    className="px-3 py-1.5 rounded-md text-[12px] text-text-tertiary hover:text-text-secondary transition-colors"
-                  >
-                    Dismiss
-                  </button>
-                </div>
+          {migrationState.status === 'error' && (
+            <div className="bg-bg-surface1 border border-error/30 rounded-lg px-5 py-3 flex items-center justify-between gap-4 shadow-lg">
+              <p className="text-[13px] text-text-secondary">
+                Migration failed: {migrationState.error}. Your local patterns are safe — try again later.
+              </p>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={startMigration}
+                  className="px-4 py-1.5 rounded-md bg-accent text-white text-[12px] font-medium hover:bg-accent-hover transition-colors"
+                >
+                  Retry
+                </button>
+                <button
+                  onClick={dismissMigration}
+                  className="px-3 py-1.5 rounded-md text-[12px] text-text-tertiary hover:text-text-secondary transition-colors"
+                >
+                  Dismiss
+                </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
-      <main className={isStudioMode ? '' : 'pt-14 max-w-[1200px] mx-auto px-8 pb-24'}>
-        <AnimatePresence mode="wait">
-          {currentScreen === 'landing' && (
-            <LandingScreen key="landing" onNavigate={setCurrentScreen} />
-          )}
-          {currentScreen === 'upload' && (
-            <UploadScreen
-              key="upload"
-              onNavigate={setCurrentScreen}
-              uploadedImage={uploadedImage}
-              setUploadedImage={setUploadedImage}
-              onAnalyze={() => handleAnalyze()}
-            />
-          )}
-          {currentScreen === 'analyzing' && (
-            <AnalyzingScreen
-              key="analyzing"
-              uploadedImage={uploadedImage}
-              error={error}
-              onRetry={() => handleAnalyze()}
-              onCancel={handleCancelAnalysis}
-            />
-          )}
-          {currentScreen === 'results' && (
-            <ResultsScreen
-              key="results"
-              uploadedImage={uploadedImage}
-              analysisResult={analysisResult}
-              onNavigate={setCurrentScreen}
-              setInitialGenMode={setInitialGenMode}
-            />
-          )}
-          {currentScreen === 'generation' && (
-            <CreativeStudio
-              key="generation"
-              analysisResult={analysisResult}
-              uploadedImage={uploadedImage}
-              onNavigate={setCurrentScreen}
-            />
-          )}
-          {currentScreen === 'compare_upload' && (
-            <CompareUploadScreen
-              key="compare_upload"
-              onNavigate={setCurrentScreen}
-              compareImages={compareImages}
-              setCompareImages={setCompareImages}
-              onAnalyze={handleCompareAnalyze}
-              error={error}
-              onDismissError={() => setError(null)}
-            />
-          )}
-          {currentScreen === 'compare_analyzing' && (
-            <CompareAnalyzingScreen
-              key="compare_analyzing"
-              onNavigate={setCurrentScreen}
-              error={error}
-              onRetry={handleCompareAnalyze}
-              onCancel={handleCancelAnalysis}
-            />
-          )}
-          {currentScreen === 'compare_results' && (
-            <CompareResultsScreen
-              key="compare_results"
-              onNavigate={setCurrentScreen}
-              compareImages={compareImages}
-              setCompareImages={setCompareImages}
-              compareResult={compareResult}
-            />
-          )}
-          {currentScreen === 'pattern_library' && (
-            <PatternLibrary
-              key="pattern_library"
-              onNavigate={(screen: string, data?: any) => {
-                if (screen === 'pattern_detail' && data?.patternId) {
-                  setSelectedPatternId(data.patternId);
-                }
-                setCurrentScreen(screen as Screen);
-              }}
-            />
-          )}
-          {currentScreen === 'pattern_detail' && selectedPatternId && (
+      <Routes>
+        <Route path="/" element={<HomeScreen />} />
+        <Route path="/analyze" element={
+          <AnimatePresence mode="wait">
+            {currentScreen === 'analyzing' ? (
+              <AnalyzingScreen
+                key="analyzing"
+                uploadedImage={uploadedImage}
+                error={error}
+                onRetry={() => handleAnalyze()}
+                onCancel={handleCancelAnalysis}
+              />
+            ) : currentScreen === 'results' ? (
+              <ResultsScreen
+                key="results"
+                uploadedImage={uploadedImage}
+                analysisResult={analysisResult}
+                onNavigate={setCurrentScreen}
+                setInitialGenMode={setInitialGenMode}
+              />
+            ) : currentScreen === 'generation' ? (
+              <CreativeStudio
+                key="generation"
+                analysisResult={analysisResult}
+                uploadedImage={uploadedImage}
+                onNavigate={setCurrentScreen}
+              />
+            ) : (
+              <UploadScreen
+                key="upload"
+                onNavigate={setCurrentScreen}
+                uploadedImage={uploadedImage}
+                setUploadedImage={setUploadedImage}
+                onAnalyze={() => handleAnalyze()}
+              />
+            )}
+          </AnimatePresence>
+        } />
+        <Route path="/studio" element={
+          <CreativeStudio
+            analysisResult={analysisResult}
+            uploadedImage={uploadedImage}
+            onNavigate={setCurrentScreen}
+          />
+        } />
+        <Route path="/compare" element={
+          <AnimatePresence mode="wait">
+            {currentScreen === 'compare_analyzing' ? (
+              <CompareAnalyzingScreen
+                key="compare_analyzing"
+                onNavigate={setCurrentScreen}
+                error={error}
+                onRetry={handleCompareAnalyze}
+                onCancel={handleCancelAnalysis}
+              />
+            ) : currentScreen === 'compare_results' ? (
+              <CompareResultsScreen
+                key="compare_results"
+                onNavigate={setCurrentScreen}
+                compareImages={compareImages}
+                setCompareImages={setCompareImages}
+                compareResult={compareResult}
+              />
+            ) : (
+              <CompareUploadScreen
+                key="compare_upload"
+                onNavigate={setCurrentScreen}
+                compareImages={compareImages}
+                setCompareImages={setCompareImages}
+                onAnalyze={handleCompareAnalyze}
+                error={error}
+                onDismissError={() => setError(null)}
+              />
+            )}
+          </AnimatePresence>
+        } />
+        <Route path="/library" element={
+          <PatternLibrary
+            onNavigate={(screen: string, data?: any) => {
+              if (screen === 'pattern_detail' && data?.patternId) {
+                setSelectedPatternId(data.patternId);
+              }
+              setCurrentScreen(screen as Screen);
+            }}
+          />
+        } />
+        <Route path="/library/pattern/:id" element={
+          selectedPatternId ? (
             <PatternDetail
-              key="pattern_detail"
               patternId={selectedPatternId}
               onNavigate={(screen: string) => setCurrentScreen(screen as Screen)}
             />
-          )}
-          {currentScreen === 'my_analyses' && (
-            <MyAnalysesList
-              key="my_analyses"
-              onNavigate={setCurrentScreen}
-              onViewAnalysis={(id) => {
-                setViewingAnalysisId(id);
-                setCurrentScreen('view_analysis');
-              }}
-            />
-          )}
-          {currentScreen === 'view_analysis' && viewingAnalysisId && (
+          ) : null
+        } />
+        <Route path="/library/analysis/:id" element={
+          viewingAnalysisId ? (
             <ViewAnalysisScreen
-              key="view_analysis"
               analysisId={viewingAnalysisId}
               onNavigate={setCurrentScreen}
               setInitialGenMode={setInitialGenMode}
             />
-          )}
-        </AnimatePresence>
-      </main>
+          ) : null
+        } />
+      </Routes>
 
       <AnimatePresence>
         {isSettingsOpen && (
@@ -460,66 +430,13 @@ export default function App() {
           />
         )}
       </AnimatePresence>
-    </div>
+    </AppShell>
   );
 }
 
 
 
-function LandingScreen({ onNavigate }: { key?: string; onNavigate: (s: Screen) => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-      className="flex flex-col items-center pt-24 text-center"
-    >
-      <h1 className="text-[32px] font-bold tracking-tight mb-4">Decode Any Design's DNA</h1>
-      <p className="text-[14px] text-text-secondary max-w-[540px] mb-8">
-        Upload any design to uncover its Visual DNA and discover exactly who it's made for — and why.
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-[1200px]">
-        <div
-          onClick={() => onNavigate('upload')}
-          className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
-        >
-          <Microscope className="w-7 h-7 text-accent mb-4 group-hover:scale-110 transition-transform origin-left" />
-          <h3 className="text-[16px] font-semibold mb-1">Analyze Design</h3>
-          <p className="text-[12px] text-text-secondary">Upload a design to decode its visual DNA and buyer psychology</p>
-        </div>
-
-        <div
-          onClick={() => onNavigate('compare_upload')}
-          className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
-        >
-          <Scale className="w-7 h-7 text-accent mb-4 group-hover:scale-110 transition-transform origin-left" />
-          <h3 className="text-[16px] font-semibold mb-1">Compare Designs</h3>
-          <p className="text-[12px] text-text-secondary">Upload 2-5 designs to find winning patterns</p>
-        </div>
-
-        <div
-          onClick={() => onNavigate('pattern_library')}
-          className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
-        >
-          <Layers className="w-7 h-7 text-[#a78bfa] mb-4 group-hover:scale-110 transition-transform origin-left" />
-          <h3 className="text-[16px] font-semibold mb-1">Pattern Library</h3>
-          <p className="text-[12px] text-text-secondary">Browse saved patterns from Compare analysis</p>
-        </div>
-
-        <div
-          onClick={() => onNavigate('my_analyses')}
-          className="bg-bg-surface1 border border-border-default rounded-xl p-6 text-left cursor-pointer hover:bg-bg-surface2 hover:border-border-hover hover:-translate-y-0.5 transition-all duration-150 group"
-        >
-          <BookOpen className="w-7 h-7 text-[#34d399] mb-4 group-hover:scale-110 transition-transform origin-left" />
-          <h3 className="text-[16px] font-semibold mb-1">My Analyses</h3>
-          <p className="text-[12px] text-text-secondary">Browse your saved design analyses</p>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+// LandingScreen removed — sidebar replaces all navigation (Phase 16)
 
 function UploadScreen({
   onNavigate,
@@ -569,7 +486,7 @@ function UploadScreen({
       className="pt-8"
     >
       <button
-        onClick={() => onNavigate('landing')}
+        onClick={() => onNavigate('upload')}
         className="flex items-center text-text-secondary hover:text-text-primary text-[14px] mb-8 transition-colors"
       >
         <ArrowLeft className="w-4 h-4 mr-2" /> Home
