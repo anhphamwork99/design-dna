@@ -1,5 +1,4 @@
-import { config } from 'dotenv';
-config({ path: '.env.local' });
+import 'dotenv/config';
 
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
@@ -12,14 +11,31 @@ import { patternsRoute } from './routes/patterns.js';
 
 const app = new Hono();
 
-// CORS — only allow frontend origin
+// CORS — only allow frontend origin (MUST be before other middleware)
+const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000';
 app.use(
     '*',
     cors({
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: (origin) => {
+            // Return the origin if it matches, otherwise return null
+            if (origin === ALLOWED_ORIGIN || origin === 'http://localhost:3000') {
+                return origin;
+            }
+            return ALLOWED_ORIGIN;
+        },
         credentials: true,
+        allowHeaders: ['Content-Type', 'Authorization'],
+        allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     }),
 );
+
+// Request logger
+app.use('*', async (c, next) => {
+    const start = Date.now();
+    console.log(`→ ${c.req.method} ${c.req.url}`);
+    await next();
+    console.log(`← ${c.req.method} ${c.req.url} ${c.res.status} (${Date.now() - start}ms)`);
+});
 
 // Body size limit for AI routes (base64 images can be large)
 app.use('/api/ai/*', async (c, next) => {
