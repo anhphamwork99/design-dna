@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { UploadCloud, AlertTriangle, ImageOff, Copy, Check } from 'lucide-react';
+import { UploadCloud, AlertTriangle, ImageOff, Copy, Check, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { analyzeDesign, saveAnalysis, getAnalysis } from '../apiClient';
 import { generateThumbnail } from '../api';
-import CreativeStudio from '../CreativeStudio';
 import { useAuth } from '../contexts/AuthContext';
 
-type Step = 'upload' | 'analyzing' | 'results' | 'generation';
+type Step = 'upload' | 'analyzing' | 'results';
 
 export default function AnalyzeScreen() {
     const { session } = useAuth();
@@ -139,13 +139,6 @@ export default function AnalyzeScreen() {
                     analysisResult={analysisResult}
                     onNavigate={setCurrentStep}
                     setInitialGenMode={setInitialGenMode}
-                />
-            ) : currentStep === 'generation' ? (
-                <CreativeStudio
-                    key="generation"
-                    analysisResult={analysisResult}
-                    uploadedImage={uploadedImage}
-                    onNavigate={(screen: any) => setCurrentStep(screen as Step)}
                 />
             ) : (
                 <UploadStep
@@ -824,20 +817,10 @@ function ResultsStep({
                         <motion.div variants={itemVariants} className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-border-default">
                             {!readMode && (
                                 <>
-                                    <button
-                                        onClick={() => { setInitialGenMode('same_buyer'); onNavigate('generation'); }}
-                                        className="px-5 py-3 rounded-lg ai-gradient text-white text-[14px] font-medium hover:opacity-90 transition-opacity text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-                                    >
-                                        Create Similar Design
-                                        <p className="text-[12px] text-white/70 font-normal mt-0.5">Same audience, fresh design</p>
-                                    </button>
-                                    <button
-                                        onClick={() => { setInitialGenMode('new_buyer'); onNavigate('generation'); }}
-                                        className="px-5 py-3 rounded-lg border border-border-default text-[14px] font-medium hover:bg-bg-surface2 transition-colors text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-                                    >
-                                        Remix for Different Audience
-                                        <p className="text-[12px] text-text-tertiary font-normal mt-0.5">Keep the style, target new buyers</p>
-                                    </button>
+                                    <GoToStudioButton
+                                        uploadedImage={uploadedImage}
+                                        analysisResult={analysisResult}
+                                    />
                                     <button
                                         onClick={() => onNavigate('upload')}
                                         className="px-5 py-2 rounded-lg text-text-secondary hover:text-text-primary text-[14px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
@@ -861,5 +844,40 @@ function ResultsStep({
                 </div>
             </div>
         </motion.div>
+    );
+}
+
+
+// ── Go to Studio Button ────────────────────────────────────────────
+
+function GoToStudioButton({
+    uploadedImage,
+    analysisResult,
+}: {
+    uploadedImage: { data: string; name: string } | null;
+    analysisResult: any;
+}) {
+    const navigate = useNavigate();
+
+    return (
+        <button
+            onClick={() => navigate('/studio', {
+                state: {
+                    analysisResult,
+                    uploadedImage: uploadedImage ? {
+                        data: uploadedImage.data,
+                        name: uploadedImage.name,
+                        type: 'image/png',  // default; actual type not preserved in ResultsStep props
+                    } : null,
+                }
+            })}
+            className="px-5 py-3 rounded-lg ai-gradient text-white text-[14px] font-medium hover:opacity-90 transition-opacity text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base flex items-center gap-2"
+        >
+            <Sparkles className="w-4 h-4" />
+            <div>
+                Go to Studio
+                <p className="text-[12px] text-white/70 font-normal mt-0.5">Clone, remix, or explore new ideas</p>
+            </div>
+        </button>
     );
 }
