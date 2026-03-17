@@ -28,9 +28,9 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
             aria-label="Main navigation"
         >
             {/* Logo + Collapse toggle */}
-            <div className="h-14 flex items-center justify-between px-3 shrink-0">
+            <div className="h-14 flex items-center justify-between px-6 shrink-0">
                 {!collapsed && (
-                    <span className="font-logo text-xl font-semibold text-text-primary truncate">
+                    <span className="font-logo text-2xl font-bold text-text-primary truncate">
                         DesignDNA
                     </span>
                 )}
@@ -49,13 +49,13 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
             </div>
 
             {/* WORKSPACE section */}
-            <div className="px-3 mt-2">
+            <div className="px-3 mt-4">
                 {!collapsed && (
                     <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-3 mb-1">
                         Workspace
                     </p>
                 )}
-                <nav className="flex flex-col gap-0.5">
+                <nav className="flex flex-col gap-1">
                     <SidebarNavItem
                         icon={<Home className="w-5 h-5" />}
                         label="Home"
@@ -72,7 +72,7 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
             </div>
 
             {/* Divider */}
-            <div className="border-t border-border-default mx-3 my-2" />
+            <div className="border-t border-border-default mx-3 my-4" />
 
             {/* TOOLS section */}
             <div className="px-3">
@@ -81,7 +81,7 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                         Tools
                     </p>
                 )}
-                <nav className="flex flex-col gap-0.5">
+                <nav className="flex flex-col gap-1">
                     <SidebarNavItem
                         icon={<Palette className="w-5 h-5" />}
                         label="Studio"
@@ -108,7 +108,7 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
 
             {/* FOOTER section */}
             <div className="border-t border-border-default mx-3 pt-2 pb-3 px-3">
-                <nav className="flex flex-col gap-0.5">
+                <nav className="flex flex-col gap-1">
                     <SidebarNavItem
                         icon={<Settings className="w-5 h-5" />}
                         label="Settings"
@@ -121,7 +121,7 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                     />
                     <button
                         onClick={signOut}
-                        className={`flex items-center h-10 rounded-lg px-3 text-text-secondary hover:bg-bg-surface2 hover:text-text-primary transition-colors ${collapsed ? 'justify-center' : 'gap-3'
+                        className={`flex items-center h-11 rounded-lg px-3 text-text-secondary hover:bg-state-hover hover:text-text-primary transition-colors duration-150 ${collapsed ? 'justify-center' : 'gap-3'
                             }`}
                     >
                         <span className="w-5 h-5 shrink-0 flex items-center justify-center">

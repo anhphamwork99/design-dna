@@ -15,9 +15,9 @@ export function SidebarNavItem({ icon, label, to, collapsed, onClick }: SidebarN
             to={to}
             onClick={onClick}
             className={({ isActive }) =>
-                `flex items-center h-10 rounded-lg px-3 transition-colors relative group ${isActive
-                    ? 'bg-bg-surface2 font-semibold text-text-primary border-l-4 border-text-secondary -ml-px'
-                    : 'text-text-secondary hover:bg-bg-surface2 hover:text-text-primary'
+                `flex items-center h-11 rounded-lg px-3 transition-colors duration-150 relative group ${isActive
+                    ? 'bg-bg-surface2 font-semibold text-text-primary'
+                    : 'text-text-secondary hover:bg-state-hover hover:text-text-primary'
                 } ${collapsed ? 'justify-center' : 'gap-3'}`
             }
         >
