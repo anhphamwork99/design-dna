@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { Copy, Download, RefreshCw, RotateCcw } from 'lucide-react';
-import AiSphere from './AiSphere';
+import MascotLoader from './MascotLoader';
 
 interface CloneStudioProps {
     stage: 'studio' | 'cloning' | 'clone-result';
@@ -83,10 +83,7 @@ function ClonePreview({
 
                 {/* CTA */}
                 <motion.button
-                    className="w-full py-3.5 rounded-xl text-[15px] font-semibold text-white transition-all"
-                    style={{
-                        background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-hover))',
-                    }}
+                    className="w-full py-3.5 rounded-xl text-[15px] font-semibold text-white ai-gradient transition-all"
                     whileHover={{ scale: 1.02, boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}
                     whileTap={{ scale: 0.98 }}
                     onClick={onClone}
@@ -108,15 +105,15 @@ function ClonePreview({
 function CloningLoader({ image }: { image: { data: string; name: string } }) {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-6">
-            {/* Title */}
-            <h2 className="text-[22px] font-semibold text-text-primary mb-10 tracking-tight">
-                Extracting &amp; recreating design
-            </h2>
-
-            {/* AI Sphere */}
-            <div className="mb-10">
-                <AiSphere size={100} />
+            {/* Mascot animation */}
+            <div className="mb-8">
+                <MascotLoader size={140} />
             </div>
+
+            {/* Title */}
+            <h2 className="text-[22px] font-semibold shimmer-text mb-6 tracking-tight">
+                Extracting &amp; recreating design<span className="animated-dots"><span>.</span><span>.</span><span>.</span></span>
+            </h2>
 
             {/* Image indicator */}
             <div className="flex items-center gap-3 bg-bg-surface1 border border-border-default rounded-xl px-4 py-3">
