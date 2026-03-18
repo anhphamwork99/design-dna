@@ -26,8 +26,6 @@
 - CTA removed from panel (canvas-only), Clone flow untouched
 - Barrel exports updated with 3 new components
 
-## Phase 20.1 Results
-
 ### Plan 20.1-02: Navigation Bar + CTA + Empty State ✅
 - `StudioTopBar.tsx`: Home icon exit + breadcrumb (Studio > GoalLabel), clickable Studio → goal picker
 - StudioScreen: absolute breadcrumb removed, conditional TopBar for studio/concepts/generating/result/clone-result stages
