@@ -186,13 +186,20 @@ Plans:
 ### Phase 22: Library & Analyses Screens
 **Requirements:** SCREEN-06, SCREEN-07, UX-01..04 (lists)
 **Risk:** 🟡 MEDIUM
+**Plans:** 3 plans in 2 waves
 
 **Scope:**
 - Pattern Library: grid/list toggle, search bar, cards with context menu [⋮]
 - Pattern Detail: full pattern data, source designs, [Use in Studio] CTA
 - My Analyses: grid/list toggle, search bar, cards with context menu [⋮] (View, Studio, Compare, Delete)
-- Both screens share CardGrid component pattern
+- Both screens share DataGrid + ContextMenu component patterns
 - Empty states per screen with CTA
+- Image lightbox for fullscreen image viewing
+
+Plans:
+- [ ] 22-01-PLAN.md — Shared components (ContextMenu, DataGrid, ImageLightbox)
+- [ ] 22-02-PLAN.md — PatternLibraryScreen + PatternDetailScreen rewrite
+- [ ] 22-03-PLAN.md — MyAnalysesScreen + route/sidebar wiring
 
 **Verification:** Browse, search, context menu actions, empty states. Delete works with confirmation.
 
