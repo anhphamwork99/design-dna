@@ -164,24 +164,16 @@
 **Requirements:** POLISH-STUDIO-01..08
 **Risk:** 🟡 MEDIUM — UI polish, no architectural changes
 **Depends on:** Phase 20
+**Plans:** 3 plans in 2 waves
 
-**Goal:** Polish Studio flow — IA hierarchy, layout spacing, visual premium feel, interaction usability.
+**Goal:** Polish Studio flow — floating panel, dropdown shifts, responsive cards, unified loading.
 
-**Scope (P1 + P2 issues from review):**
+Plans:
+- [ ] 20.1-01: Floating Panel + Sidebar Redesign (wave 1)
+- [ ] 20.1-02: Navigation Bar + CTA + Empty State (wave 1)
+- [ ] 20.1-03: Loading States + Concept Cards + Transitions (wave 2, depends on 01+02)
 
-P1 — Critical:
-- Sidebar visual hierarchy: differentiate 5 sections by importance, widen shifts area
-- Shift toggle usability: increase touch targets, readable text, prevent truncation
-- Remove duplicate CTA: single "Create Concepts" source of truth
-
-P2 — Medium:
-- Empty state visual upgrade: illustration/gradient, workflow guidance
-- Breadcrumb + nav integration: integrate into sidebar or content header properly
-- ConceptCard responsive sizing: scale to available canvas space
-- Loading states consistency: unified premium loading across synthesize/generate
-- Canvas space utilization: concept cards use available width
-
-**Verification:** Sidebar readable at 260px+, shift toggles clickable, single CTA, loading states consistent, concept cards responsive.
+**Verification:** Floating panel works, shifts dropdown readable, single CTA, MascotLoader everywhere, concept cards responsive.
 
 ---
 
