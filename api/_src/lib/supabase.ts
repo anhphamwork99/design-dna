@@ -1,11 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 /**
- * Service role Supabase client — bypasses RLS.
+ * Create a service role Supabase client — bypasses RLS.
  * Use for server-side admin operations only.
  * For user-scoped queries, use the per-request client from auth middleware.
+ *
+ * In Cloudflare Workers, env vars are passed per-request via bindings.
+ * This factory creates a client from those bindings.
  */
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+export function createSupabaseAdmin(supabaseUrl: string, serviceRoleKey: string): SupabaseClient {
+    return createClient(supabaseUrl, serviceRoleKey);
+}

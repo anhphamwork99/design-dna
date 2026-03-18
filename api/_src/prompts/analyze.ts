@@ -1,25 +1,23 @@
 /**
- * analyzeDesign — Single design deep analysis.
- * Moved from app/src/api.ts (lines 254-322).
+ * analyzeDesign — Parallel dual-model analysis.
  *
- * Note: Image arrives already resized from frontend (resizeImageIfNeeded
- * uses Canvas API which is browser-only).
+ * Splits the analysis into two concurrent Gemini calls:
+ *   1. Visual DNA  → gemini-2.5-flash  (fast, ~5-10s)
+ *   2. Buyer DNA   → gemini-2.5-pro    (deep reasoning, ~20s)
+ *
+ * Both run in parallel via Promise.all(), so total time ≈ max(flash, pro) ≈ 20s
+ * instead of a single pro call doing both (~30s+).
  */
 
 import type { GoogleGenAI } from '@google/genai';
 import { cleanJsonResponse } from './helpers.js';
 
-export async function analyzeDesign(
-  ai: GoogleGenAI,
-  imageData: string,
-  mimeType: string,
-): Promise<any> {
-  const model = 'gemini-2.5-pro';
+// ── Visual DNA (Flash) ─────────────────────────────────────────────
 
-  const analysisPrompt = `Analyze this design completely. Output ONLY a JSON object with this exact structure:
+const VISUAL_DNA_PROMPT = `Analyze this design's VISUAL properties. Output ONLY a JSON object with this exact structure:
 {
   "visual_dna": {
-    "summary": "2-3 sentences max",
+    "summary": "2-3 sentences max describing the overall visual style",
     "composition": {"grid_type": "string", "symmetry": "string", "focal_point": "string", "visual_flow": "string", "density": "string"},
     "color": {
       "palette": [{"hex": "#HEX", "name": "string", "role": "Dominant/Secondary/Accent", "proportion": "integer proportion summing to 100"}],
@@ -32,7 +30,17 @@ export async function analyzeDesign(
     },
     "graphics": {"style": "string", "primary_element": "string", "secondary_elements": ["string"], "effects": ["string"], "detail_level": "string"},
     "pod_technical": {"best_print_method": "string", "suitable_products": ["string"], "recommended_garment_colors": [{"name": "string", "hex": "#HEX"}], "scalability": "string"}
-  },
+  }
+}
+
+Important Rules:
+- visual_dna.color.palette must have exactly 5 colors. Proportions sum to 100 following a dominant-secondary-accent pattern.
+- Focus ONLY on observable visual properties — do NOT infer buyer psychology.`;
+
+// ── Buyer DNA (Pro) ────────────────────────────────────────────────
+
+const BUYER_DNA_PROMPT = `Analyze this design to understand WHO would buy it and WHY. Focus on buyer psychology, identity, and emotional triggers. Output ONLY a JSON object with this exact structure:
+{
   "buyer_dna": {
     "persona": {"age_range": "25-35", "gender_lean": "string", "interests": ["string"], "values": ["string"], "lifestyle": "string", "spending_mindset": "string", "online_communities": ["string"]},
     "identity_signals": {"primary": "string", "message_to_world": "string", "tribe": "string", "aesthetic_identity": "string"},
@@ -43,26 +51,35 @@ export async function analyzeDesign(
 }
 
 Important Rules:
-- visual_dna.color.palette must have exactly 5 colors. Proportions sum to 100 following a dominant-secondary-accent pattern.
-- buyer_dna.made_for_me_decisions must have exactly 3-5 items.
-- Commit to one primary buyer profile. If design is ambiguous, add a brief note in lifestyle.`;
+- made_for_me_decisions must have exactly 3-5 items.
+- Commit to one primary buyer profile. If design is ambiguous, add a brief note in lifestyle.
+- Study the design's visual style, colors, text content, and imagery to infer buyer psychology — but output ONLY buyer_dna, not visual analysis.`;
 
-  // Strip data URI prefix if present (e.g. "data:image/png;base64,...")
+// ── Shared helpers ─────────────────────────────────────────────────
+
+function buildImageParts(imageData: string, mimeType: string) {
   const base64Data = imageData.includes(',') ? imageData.split(',')[1] : imageData;
+  return {
+    inlineData: {
+      data: base64Data,
+      mimeType,
+    },
+  };
+}
 
+async function callGemini(
+  ai: GoogleGenAI,
+  model: string,
+  imageData: string,
+  mimeType: string,
+  prompt: string,
+): Promise<any> {
   const response = await ai.models.generateContent({
     model,
     contents: {
       parts: [
-        {
-          inlineData: {
-            data: base64Data,
-            mimeType,
-          },
-        },
-        {
-          text: analysisPrompt,
-        },
+        buildImageParts(imageData, mimeType),
+        { text: prompt },
       ],
     },
     config: {
@@ -71,6 +88,32 @@ Important Rules:
   });
 
   const text = response.text;
-  if (!text) throw new Error('No response from Gemini');
+  if (!text) throw new Error(`No response from ${model}`);
   return JSON.parse(cleanJsonResponse(text));
+}
+
+// ── Main export ────────────────────────────────────────────────────
+
+export async function analyzeDesign(
+  ai: GoogleGenAI,
+  imageData: string,
+  mimeType: string,
+): Promise<any> {
+  const t0 = Date.now();
+
+  // Fire both in parallel — Flash for visual, Pro for buyer
+  const [visualResult, buyerResult] = await Promise.all([
+    callGemini(ai, 'gemini-2.5-flash', imageData, mimeType, VISUAL_DNA_PROMPT)
+      .then(r => { console.log(`  ⚡ Visual DNA (flash): ${Date.now() - t0}ms`); return r; }),
+    callGemini(ai, 'gemini-2.5-pro', imageData, mimeType, BUYER_DNA_PROMPT)
+      .then(r => { console.log(`  🧠 Buyer DNA (pro): ${Date.now() - t0}ms`); return r; }),
+  ]);
+
+  console.log(`  ✅ Total analysis: ${Date.now() - t0}ms`);
+
+  // Merge into unified DNA object
+  return {
+    visual_dna: visualResult.visual_dna,
+    buyer_dna: buyerResult.buyer_dna,
+  };
 }

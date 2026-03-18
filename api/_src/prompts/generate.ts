@@ -69,11 +69,6 @@ ${input.concept.description}
 ## Visual Direction (ILLUSTRATION ONLY)
 ${input.concept.visualDirection}
 
-## Composition Layout
-The illustration should be composed to leave appropriate space for text overlay:
-Text layout plan: ${textLayout}
-Leave clear space in those areas for text that will be added separately.
-
 ## Color Palette (USE these specific colors)
 ${paletteInstruction || 'Use colors appropriate for the concept'}
 
@@ -85,7 +80,8 @@ ${imageRole}
 - Follow the composition edge style described in Visual Direction above (open/fading edges, badge, freeform, etc.).
 - Illustration-based only. No photorealistic rendering, no 3D effects.
 - ABSOLUTELY NO TEXT: Do NOT render any words, letters, numbers, labels, captions, or typography of ANY kind.
-- The illustration should be a complete composition that works on its own but leaves room for text.
+- The illustration should FILL the canvas confidently — avoid leaving excessive empty space.
+- Compose the illustration so it naturally works with text above and/or below it (like a professional POD design), but do NOT shrink the illustration to "make room" — let it be bold and dominant.
 
 Generate exactly ONE image.`;
 
@@ -113,38 +109,37 @@ Generate exactly ONE image.`;
 
     const illustrationBase64 = illustrationDataUrl.split(',')[1];
 
-    const textPrompt = `You are given an illustration base for a Print-on-Demand design. Complete this design by integrating decorated typography as a core part of the composition.
+    const textPrompt = `You are given an illustration (FIRST image) for a Print-on-Demand design. Your job: add professional styled typography to complete the design.
 
-The text is NOT a layer on top — it is an INTEGRAL part of the design, woven into the composition alongside the illustration.
+Study the SECOND image (the original design) carefully — match the WEIGHT, CHARACTER, and ENERGY of its typography. If the original uses bold black hand-drawn text, your text should have similar boldness and character. If it uses clean sans-serif, follow that direction.
 
-## Text Content to Render — RENDER EXACTLY THESE AND NOTHING ELSE
+## Text Content — RENDER EXACTLY THESE WORDS, NOTHING ELSE
 Primary text: "${input.concept.suggestedText?.primary || ''}"
 ${validSecondary ? `Secondary text: "${validSecondary}"` : ''}
 
-## Typography Style and Decoration
-Text style: ${input.concept.suggestedText?.textStyle || 'bold decorative'}
+## Typography Direction
+Text style: ${input.concept.suggestedText?.textStyle || 'bold, high-impact'}
 Text layout: ${textLayout}
 
-## CRITICAL TYPOGRAPHY DECORATION INSTRUCTIONS
-Create DECORATED, ARTISTIC typography that feels like it was designed together with the illustration:
-- Design each word with creative typography decoration matching the concept theme
-- Use decorative elements INTEGRATED into the letters (e.g., thematic icons replacing dots, decorative fills inside letters, ornamental borders around words)
-- Apply creative text effects: embossing, outlines, shadows, gradient fills, textured fills, banner/badge backgrounds behind key words
-- Make the text itself a work of art — like a professional POD typography design
-- Mix font sizes, weights, and decorative treatments across different text lines for visual hierarchy
-- The typography should feel like an integral part of the design — not a sticker placed on top
-- Text and illustration should share the same visual language, energy, and quality level
+## TYPOGRAPHY RULES (CRITICAL)
+1. **PROFESSIONAL CUSTOM FONT LOOK** — the text should look like a premium custom typeface, NOT like over-decorated WordArt. Think: professional POD designs on Etsy/Redbubble that sell well.
+2. **MINIMAL DECORATION** — do NOT add extra decorative elements like stars, paw prints, banners, badges, icons, or ornamental borders UNLESS they were present in the original design. Less is more.
+3. **1-2 COLORS MAXIMUM for text** — use black or dark colors as default. Only use a color from the palette if it makes sense for the concept. Do NOT rainbow the text or force multiple colors.
+4. **BOLD AND IMPACTFUL** — text should be confident, large, and command attention. Avoid thin, small, or timid typography.
+5. **CONSISTENT STYLE** — all text lines should feel like they belong to the same design language. Do not mix wildly different font styles.
 
-## Color Palette (USE these for the text decoration)
-${paletteInstruction || 'Use bold, contrasting colors appropriate for the concept'}
+## TEXT PLACEMENT (CRITICAL)
+- Place text in CLEAR AREAS only — above and/or below the illustration.
+- Do NOT overlay text on top of illustration elements.
+- The text and illustration together should FILL the canvas — minimize empty whitespace around the edges.
+- The final composition should feel tight and balanced, like a professional design ready for print.
 
 ## MANDATORY OUTPUT RULES
-- PRESERVE the existing illustration — do NOT remove or significantly alter the illustration elements.
-- INTEGRATE the decorated text into the composition naturally — text should feel designed together with the illustration.
-- The text must be clearly legible.
-- Background MUST remain solid white (#FFFFFF) where the original illustration had white.
-- Do NOT add any extra text, labels, or captions beyond what is specified above.
-- Do NOT add unrelated illustration elements.
+- PRESERVE the existing illustration — do NOT remove, shrink, or significantly alter it.
+- The text must be clearly legible at print size.
+- Background MUST remain solid white (#FFFFFF) where the original had white.
+- Do NOT add any extra text, labels, or captions beyond what is specified.
+- Do NOT add extra illustration elements, decorations, or embellishments.
 
 Generate exactly ONE image.`;
 

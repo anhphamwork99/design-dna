@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { Stage, StudioGoal, Shifts, AppliedPatternData, SynthesizedConcept } from '../studio/types';
 import { getDefaultShifts, goalCards } from '../studio/types';
@@ -24,6 +24,11 @@ export default function StudioScreen() {
     const [goal, setGoal] = useState<StudioGoal | null>(null);
     const [uploadedImage, setUploadedImage] = useState<{ data: string; name: string; type: string } | null>(null);
     const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+    // ── Deferred analysis state ──
+    const [analysisStatus, setAnalysisStatus] = useState<'idle' | 'pending' | 'complete' | 'error'>('idle');
+    const analysisPromiseRef = useRef<Promise<any> | null>(null);
+    const analyzingAnimDone = useRef(false);
 
     // Clone-specific state
     const [clonedImage, setClonedImage] = useState<string | null>(null);
@@ -83,11 +88,12 @@ export default function StudioScreen() {
         }
     };
 
-    // ── Image Upload + Auto-analyze ──
+    // ── Image Upload + Deferred Analysis ──
     const handleImageReady = useCallback(
-        async (image: { data: string; name: string; type: string }) => {
+        (image: { data: string; name: string; type: string }) => {
             setUploadedImage(image);
             setError(null);
+            analyzingAnimDone.current = false;
 
             // Clone doesn't need DNA analysis — go straight to studio
             if (goal === 'clone') {
@@ -95,19 +101,33 @@ export default function StudioScreen() {
                 return;
             }
 
-            // Variations/Explore need analysis
+            // Variations/Explore: show analyzing animation + start analysis in background
             setStage('analyzing');
-            try {
-                const result = await analyzeDesign(token, image.data, image.type);
-                setAnalysisResult(result);
-                setStage('studio');
-            } catch (err: any) {
-                setError(err.message || 'Analysis failed. Please try again.');
-                setStage('upload');
-            }
+            setAnalysisStatus('pending');
+
+            // Fire-and-forget: analysis runs in background
+            const promise = analyzeDesign(token, image.data, image.type)
+                .then((result) => {
+                    setAnalysisResult(result);
+                    setAnalysisStatus('complete');
+                    return result;
+                })
+                .catch((err: any) => {
+                    setAnalysisStatus('error');
+                    setError(err.message || 'Analysis failed. Please try again.');
+                    throw err;
+                });
+            analysisPromiseRef.current = promise;
         },
         [token, goal],
     );
+
+    // ── Callback when analyzing animation (5 dots) completes ──
+    const handleAnalyzingAnimComplete = useCallback(() => {
+        analyzingAnimDone.current = true;
+        // Transition to studio regardless of analysis status
+        setStage('studio');
+    }, []);
 
     // ── Clone Handlers ──
     const handleClone = useCallback(async () => {
@@ -146,7 +166,7 @@ export default function StudioScreen() {
     // ── Variation/Explore Handlers ──
 
     const handleCreateConcepts = useCallback(async () => {
-        if (!session || !analysisResult) return;
+        if (!session) return;
         setError(null);
         setConcepts([]);
         setConceptArtworks(new Map());
@@ -155,8 +175,19 @@ export default function StudioScreen() {
         setStage('synthesizing');
 
         try {
+            // If analysis still pending, wait for it
+            let dna = analysisResult;
+            if (!dna && analysisPromiseRef.current) {
+                dna = await analysisPromiseRef.current;
+            }
+            if (!dna) {
+                setError('Analysis not available. Please try again.');
+                setStage('studio');
+                return;
+            }
+
             const result = await synthesizeConcept(token, {
-                originalDna: analysisResult,
+                originalDna: dna,
                 shifts,
                 creativity: goal === 'explore' ? 4 : 2,
                 appliedPattern: appliedPattern ? {
@@ -176,7 +207,6 @@ export default function StudioScreen() {
         if (!session || concepts.length === 0 || !uploadedImage) return;
         const selectedConcept = concepts[conceptIndex];
 
-        setSelectedConceptIndex(conceptIndex);
         setGenerationStep('Generating artwork...');
         // Per-card generating: add to set instead of global stage
         setGeneratingCardIds(prev => {
@@ -199,7 +229,6 @@ export default function StudioScreen() {
                 next.set(conceptIndex, imageBase64);
                 return next;
             });
-            setSelectedConceptIndex(null); // Close dialog
             // Remove from generating set
             setGeneratingCardIds(prev => {
                 const next = new Set(prev);
@@ -346,7 +375,10 @@ export default function StudioScreen() {
 
             {stage === 'analyzing' && uploadedImage && (
                 <div className="flex-1">
-                    <AnalyzingStage image={{ data: uploadedImage.data, name: uploadedImage.name }} />
+                    <AnalyzingStage
+                        image={{ data: uploadedImage.data, name: uploadedImage.name }}
+                        onComplete={handleAnalyzingAnimComplete}
+                    />
                 </div>
             )}
 
@@ -377,6 +409,7 @@ export default function StudioScreen() {
                         stage={stage}
                         uploadedImage={uploadedImage}
                         analysisResult={analysisResult}
+                        analysisStatus={analysisStatus}
                         shifts={shifts}
                         onShiftsChange={setShifts}
                         appliedPattern={appliedPattern}

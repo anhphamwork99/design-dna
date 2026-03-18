@@ -10,6 +10,7 @@ import { Hono } from 'hono';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { authMiddleware } from '../middleware/auth.js';
 import { getGeminiClient } from '../lib/gemini.js';
+import type { CloudflareBindings } from '../app.js';
 
 import { analyzeDesign } from '../prompts/analyze.js';
 import { synthesizeConcept } from '../prompts/synthesize.js';
@@ -28,6 +29,7 @@ import type {
 // ── Hono Env typing ────────────────────────────────────────────────
 
 type Env = {
+    Bindings: CloudflareBindings;
     Variables: {
         user: User;
         supabase: SupabaseClient;
@@ -80,7 +82,7 @@ aiRoute.post('/ai/analyze', async (c) => {
             return c.json({ code: 'VALIDATION_ERROR', message: 'imageData and mimeType are required' }, 400);
         }
 
-        const ai = await getGeminiClient(supabase, user.id);
+        const ai = await getGeminiClient(supabase, user.id, c.env.ENCRYPTION_KEY);
         const result = await analyzeDesign(ai, imageData, mimeType);
         return c.json(result);
     } catch (err) {
@@ -105,7 +107,7 @@ aiRoute.post('/ai/compare', async (c) => {
             return c.json({ code: 'VALIDATION_ERROR', message: 'Maximum 5 images allowed for comparison' }, 400);
         }
 
-        const ai = await getGeminiClient(supabase, user.id);
+        const ai = await getGeminiClient(supabase, user.id, c.env.ENCRYPTION_KEY);
         const result = await analyzeBatch(ai, images);
         return c.json(result);
     } catch (err) {
@@ -126,7 +128,7 @@ aiRoute.post('/ai/synthesize', async (c) => {
             return c.json({ code: 'VALIDATION_ERROR', message: 'originalDna and shifts are required' }, 400);
         }
 
-        const ai = await getGeminiClient(supabase, user.id);
+        const ai = await getGeminiClient(supabase, user.id, c.env.ENCRYPTION_KEY);
         const concepts = await synthesizeConcept(ai, input);
         return c.json(concepts);
     } catch (err) {
@@ -147,7 +149,7 @@ aiRoute.post('/ai/generate', async (c) => {
             return c.json({ code: 'VALIDATION_ERROR', message: 'concept and aspectRatio are required' }, 400);
         }
 
-        const ai = await getGeminiClient(supabase, user.id);
+        const ai = await getGeminiClient(supabase, user.id, c.env.ENCRYPTION_KEY);
         const dataUrl = await generateArtwork(ai, input);
         return c.json({ imageDataUrl: dataUrl });
     } catch (err) {
@@ -168,7 +170,7 @@ aiRoute.post('/ai/clone', async (c) => {
             return c.json({ code: 'VALIDATION_ERROR', message: 'originalImage and aspectRatio are required' }, 400);
         }
 
-        const ai = await getGeminiClient(supabase, user.id);
+        const ai = await getGeminiClient(supabase, user.id, c.env.ENCRYPTION_KEY);
         const dataUrl = await cloneDesign(ai, input);
         return c.json({ imageDataUrl: dataUrl });
     } catch (err) {
@@ -189,7 +191,7 @@ aiRoute.post('/ai/buyer-fit', async (c) => {
             return c.json({ code: 'VALIDATION_ERROR', message: 'conceptText is required' }, 400);
         }
 
-        const ai = await getGeminiClient(supabase, user.id);
+        const ai = await getGeminiClient(supabase, user.id, c.env.ENCRYPTION_KEY);
         const scores = await analyzeBuyerFit(ai, conceptText);
         return c.json(scores);
     } catch (err) {

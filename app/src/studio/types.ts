@@ -30,6 +30,7 @@ export interface ShiftState {
 }
 
 export interface Shifts {
+    [key: string]: ShiftState;
     S: ShiftState;
     H: ShiftState;
     I: ShiftState;

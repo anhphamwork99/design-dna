@@ -2,6 +2,31 @@
 
 All notable changes to DesignDNA are documented in this file.
 
+## [3.1.0] — 2026-03-19
+
+### ☁️ Cloudflare Workers Migration
+- **Single Worker deployment** — API (Hono) + Frontend (React SPA) served from one Worker
+- **Smart Placement** — Worker runs in US East to avoid Gemini API geo-restrictions on Asian IPs
+- **Static Assets** — React SPA served via Workers Assets with SPA fallback routing
+- **Removed Vercel** — deleted `vercel.json`, migrated from Vercel serverless to Cloudflare Workers
+
+### 🎨 Artwork Generation Quality
+- **Illustration prompt rewrite (Pass 1)** — removed forced "leave space for text" instruction; illustration now fills canvas confidently
+- **Text decoration prompt rewrite (Pass 2)** — professional styled typography instead of aggressive WordArt decoration; 1-2 colors max (black default), clear text placement rules, canvas-filling composition
+
+### ✨ Studio UX Polish
+- **Skeleton loading cards** — replaced full-screen MascotLoader with 3 staggered skeleton cards during concept synthesis
+- **Mesh gradient animations** — slow-drift gradient with floating color orbs and noise texture overlay on loading cards
+- **Dynamic cycling text** — each skeleton card shows rotating status messages (e.g., "Exploring visual styles…", "Crafting composition…")
+- **Canvas-first generation** — Generate Artwork button triggers generation directly on canvas card (no dialog), loading state with mesh gradient on card
+- **Card click = view details** — clicking card opens dialog, clicking button generates artwork (separated concerns)
+- **Image preview mesh glow** — subtle animated mesh gradient behind uploaded image during DNA analysis, fades out on completion
+- **Hidden CTA during analysis** — Create Concepts button only appears after analysis completes
+- **Removed shimmer tags** — removed 4 placeholder tag boxes during analysis loading
+- **Increased card sizes** — minmax from 240px to 260px, gap from 4 to 5
+
+---
+
 ## [3.0.0] — 2026-03-18
 
 ### 🎨 UI Redesign (v3.0 Milestone)

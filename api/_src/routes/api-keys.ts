@@ -2,8 +2,10 @@ import { Hono } from 'hono';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { authMiddleware } from '../middleware/auth.js';
 import { encrypt } from '../lib/crypto.js';
+import type { CloudflareBindings } from '../app.js';
 
 type Env = {
+    Bindings: CloudflareBindings;
     Variables: {
         user: User;
         supabase: SupabaseClient;
@@ -65,7 +67,7 @@ apiKeysRoute.post('/api-keys', async (c) => {
             );
         }
 
-        const encryptedKey = encrypt(body.key.trim());
+        const encryptedKey = encrypt(body.key.trim(), c.env.ENCRYPTION_KEY);
 
         // Check if key already exists for this user + provider
         const { data: existing } = await supabase

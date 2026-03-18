@@ -21,13 +21,11 @@ export function Spinner({ size = 'md', className = '' }: SpinnerProps) {
     );
 }
 
-interface SkeletonProps {
-    className?: string;
-}
+type SkeletonProps = React.ComponentProps<'div'>;
 
-export function Skeleton({ className = '' }: SkeletonProps) {
+export function Skeleton({ className = '', ...props }: SkeletonProps) {
     return (
-        <div className={`bg-bg-surface2 rounded-[8px] animate-pulse ${className}`} />
+        <div className={`bg-bg-surface2 rounded-[8px] animate-pulse ${className}`} {...props} />
     );
 }
 

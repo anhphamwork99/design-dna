@@ -23,7 +23,6 @@ export default function AnalyzeScreen() {
             upload: 'DesignDNA — Analyze',
             analyzing: 'DesignDNA — Analyzing…',
             results: 'DesignDNA — Results',
-            generation: 'DesignDNA — Studio',
         };
         document.title = titles[currentStep];
     }, [currentStep]);

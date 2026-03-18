@@ -1,5 +1,6 @@
 import { createMiddleware } from 'hono/factory';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
+import type { CloudflareBindings } from '../app.js';
 
 /**
  * Auth middleware — verifies Supabase JWT from Authorization header.
@@ -8,7 +9,10 @@ import { createClient } from '@supabase/supabase-js';
  * - `user` — the authenticated Supabase user object
  * - `supabase` — a per-request Supabase client scoped to the user's JWT (respects RLS)
  */
-export const authMiddleware = createMiddleware(async (c, next) => {
+export const authMiddleware = createMiddleware<{
+    Bindings: CloudflareBindings;
+    Variables: { user: User; supabase: SupabaseClient };
+}>(async (c, next) => {
     const authHeader = c.req.header('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
         return c.json(
@@ -21,8 +25,8 @@ export const authMiddleware = createMiddleware(async (c, next) => {
 
     // Create a per-request Supabase client with the user's JWT
     const supabase = createClient(
-        process.env.SUPABASE_URL!,
-        process.env.SUPABASE_ANON_KEY!,
+        c.env.SUPABASE_URL,
+        c.env.SUPABASE_ANON_KEY,
         { global: { headers: { Authorization: `Bearer ${token}` } } },
     );
 

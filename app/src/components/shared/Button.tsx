@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+type ButtonProps = React.ComponentProps<'button'> & {
     variant?: 'primary' | 'secondary' | 'ghost' | 'icon';
     size?: 'sm' | 'md' | 'lg';
     loading?: boolean;
     children: React.ReactNode;
-}
+};
 
 export function Button({
     variant = 'primary',

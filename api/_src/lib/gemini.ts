@@ -18,11 +18,15 @@ async function getGoogleGenAI() {
  * Fetches the user's encrypted API key from DB, decrypts it,
  * and returns a ready-to-use GoogleGenAI instance.
  *
+ * @param supabase - User-scoped Supabase client
+ * @param userId - The authenticated user's ID
+ * @param encryptionKey - The raw encryption key (from env binding)
  * @throws {{ code: string; message: string }} if no API key found
  */
 export async function getGeminiClient(
     supabase: SupabaseClient,
     userId: string,
+    encryptionKey: string,
 ) {
     const { data, error } = await supabase
         .from('api_keys')
@@ -39,7 +43,7 @@ export async function getGeminiClient(
         };
     }
 
-    const apiKey = decrypt(data.encrypted_key);
+    const apiKey = decrypt(data.encrypted_key, encryptionKey);
     const GoogleGenAI = await getGoogleGenAI();
     return new GoogleGenAI({ apiKey });
 }

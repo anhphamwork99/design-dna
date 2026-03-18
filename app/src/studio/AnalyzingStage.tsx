@@ -4,6 +4,7 @@ import MascotLoader from './MascotLoader';
 
 interface AnalyzingStageProps {
     image: { data: string; name: string };
+    onComplete?: () => void;
 }
 
 const analysisSteps = [
@@ -14,17 +15,25 @@ const analysisSteps = [
     'Building design DNA…',
 ];
 
-const STEP_INTERVAL_MS = 3000;
+const STEP_INTERVAL_MS = 2500;
 
-export default function AnalyzingStage({ image }: AnalyzingStageProps) {
+export default function AnalyzingStage({ image, onComplete }: AnalyzingStageProps) {
     const [stepIndex, setStepIndex] = useState(0);
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setStepIndex((prev) => (prev + 1) % analysisSteps.length);
+            setStepIndex((prev) => {
+                const next = prev + 1;
+                if (next >= analysisSteps.length - 1) {
+                    clearInterval(timer);
+                    // Fire onComplete after the last dot settles
+                    setTimeout(() => onComplete?.(), 1500);
+                }
+                return Math.min(next, analysisSteps.length - 1);
+            });
         }, STEP_INTERVAL_MS);
         return () => clearInterval(timer);
-    }, []);
+    }, [onComplete]);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-6">

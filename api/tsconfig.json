@@ -7,9 +7,15 @@
         "esModuleInterop": true,
         "outDir": "dist",
         "rootDir": "_src",
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "types": [
+            "@cloudflare/workers-types"
+        ]
     },
     "include": [
         "_src/**/*"
+    ],
+    "exclude": [
+        "_src/index.ts"
     ]
 }

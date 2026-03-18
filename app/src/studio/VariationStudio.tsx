@@ -1,14 +1,89 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, AlertCircle } from 'lucide-react';
-import MascotLoader from './MascotLoader';
 import type { Stage, StudioGoal, Shifts, AppliedPatternData, SynthesizedConcept } from './types';
 import FloatingPanel from './FloatingPanel';
 import AccordionSection from './AccordionSection';
 import DimensionShifts from './DimensionShifts';
 import ConceptCard from './ConceptCard';
 import PatternPicker from './PatternPicker';
-import emptyStudioIllus from '../assets/empty-studio.png';
+
+// ── Skeleton card for synthesizing state ───────────────────────────
+
+const SKELETON_LABELS = [
+    ['Exploring visual styles', 'Analyzing color harmony', 'Crafting composition'],
+    ['Interpreting buyer DNA', 'Mixing design elements', 'Defining visual direction'],
+    ['Building concept story', 'Selecting typography', 'Finalizing palette'],
+];
+
+const NOISE_BG = 'url("data:image/svg+xml,%3Csvg viewBox=%270 0 256 256%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27noise%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23noise)%27/%3E%3C/svg%3E")';
+
+function SkeletonConceptCard({ index }: { index: number }) {
+    const labels = SKELETON_LABELS[index];
+    const [labelIdx, setLabelIdx] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setLabelIdx((prev) => (prev + 1) % labels.length);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [labels.length]);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.15, duration: 0.3 }}
+            className="rounded-xl border border-border-default overflow-hidden"
+        >
+            <div className="aspect-[3/4] relative overflow-hidden bg-[#f8f7f5]">
+                {/* Mesh gradient — slow drift */}
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background: 'var(--gradient-mesh)',
+                        backgroundSize: '400% 400%',
+                        animation: `mesh-shift ${8 + index * 1.5}s ease-in-out infinite`,
+                        opacity: 0.5,
+                    }}
+                />
+                {/* Floating color orbs */}
+                {[0, 1, 2].map((j) => (
+                    <div
+                        key={j}
+                        className="absolute rounded-full blur-2xl"
+                        style={{
+                            width: 60 + j * 20,
+                            height: 60 + j * 20,
+                            background: ['#f9a8d4', '#c084fc', '#60a5fa'][j],
+                            opacity: 0.25,
+                            left: `${20 + j * 25}%`,
+                            top: `${15 + j * 20}%`,
+                            animation: `float-orb-${j + 1} ${6 + j * 2}s ease-in-out infinite`,
+                        }}
+                    />
+                ))}
+                {/* Noise texture overlay */}
+                <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: NOISE_BG }} />
+                {/* Dynamic cycling text */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <AnimatePresence mode="wait">
+                        <motion.span
+                            key={labelIdx}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.3 }}
+                            className="text-[13px] text-white/70 font-medium"
+                        >
+                            {labels[labelIdx]}…
+                        </motion.span>
+                    </AnimatePresence>
+                </div>
+            </div>
+        </motion.div>
+    );
+}
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -17,6 +92,7 @@ interface VariationStudioProps {
     stage: Stage;
     uploadedImage: { data: string; name: string; type: string };
     analysisResult: any;
+    analysisStatus: 'idle' | 'pending' | 'complete' | 'error';
 
     // Shift state
     shifts: Shifts;
@@ -54,6 +130,7 @@ export default function VariationStudio({
     stage,
     uploadedImage,
     analysisResult,
+    analysisStatus,
     shifts,
     onShiftsChange,
     appliedPattern,
@@ -103,27 +180,29 @@ export default function VariationStudio({
             {/* ═══ CANVAS — full width ═══ */}
             <div className="flex flex-col items-center justify-center w-full h-full p-6 overflow-y-auto bg-bg-base">
                 <AnimatePresence mode="wait">
-                    {/* Synthesizing state — full canvas takeover */}
+                    {/* Synthesizing state — skeleton concept cards */}
                     {isSynthesizing && (
                         <motion.div
                             key="synthesizing"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 z-20"
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -16 }}
+                            transition={{ duration: 0.35 }}
+                            className="w-full max-w-[900px]"
                         >
-                            <MascotLoader size={120} />
-                            <motion.p
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="mt-4 text-[15px] font-medium shimmer-text"
-                            >
-                                Creating your concepts...
-                            </motion.p>
-                            <p className="text-[13px] text-text-tertiary mt-1">
-                                Synthesizing design variations from your shifts
-                            </p>
+                            <div className="text-center mb-8">
+                                <h2 className="text-[24px] font-semibold mb-1.5 text-text-primary">
+                                    Creating Concepts
+                                </h2>
+                                <p className="text-text-tertiary text-[14px]">
+                                    AI is crafting 3 unique design directions from your shifts
+                                </p>
+                            </div>
+                            <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-5">
+                                {[0, 1, 2].map((i) => (
+                                    <SkeletonConceptCard key={i} index={i} />
+                                ))}
+                            </div>
                         </motion.div>
                     )}
 
@@ -167,10 +246,10 @@ export default function VariationStudio({
                                 <p className="text-text-tertiary text-[14px]">
                                     {hasAnyArtwork
                                         ? 'Click a card to view details or generate more artwork'
-                                        : 'Click a card to see details and generate artwork'}
+                                        : 'Click any card to generate artwork'}
                                 </p>
                             </div>
-                            <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+                            <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-5">
                                 {concepts.map((concept, i) => (
                                     <ConceptCard
                                         key={i}
@@ -198,32 +277,107 @@ export default function VariationStudio({
                         </motion.div>
                     )}
 
-                    {/* Empty state — CTA lives here on canvas */}
+                    {/* Canvas preview — shows uploaded image + DNA insights */}
                     {!isSynthesizing && !error && !hasConcepts && (
                         <motion.div
-                            key="empty"
-                            initial={{ opacity: 0, scale: 1 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                            key="preview"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.25 }}
-                            className="flex flex-col items-center justify-center text-center max-w-[320px]"
+                            transition={{ duration: 0.35 }}
+                            className="flex flex-col items-center justify-center text-center max-w-[480px] w-full"
                         >
-                            <img src={emptyStudioIllus} alt="" className="w-32 h-32 mb-5 opacity-90" />
-                            <h2 className="text-[18px] font-medium text-text-primary mb-1.5">
-                                {goal === 'explore' ? 'Ready to Explore' : 'Ready for Variations'}
+                            {/* Uploaded image — hero display with mesh glow */}
+                            <div className="relative mb-6 w-full max-w-[320px]">
+                                {/* Mesh gradient glow behind image — only during analysis */}
+                                <AnimatePresence>
+                                    {analysisStatus === 'pending' && (
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 0.3 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.6 }}
+                                            className="absolute -inset-4 rounded-3xl blur-3xl"
+                                            style={{
+                                                background: 'var(--gradient-mesh)',
+                                                backgroundSize: '400% 400%',
+                                                animation: 'mesh-shift 10s ease-in-out infinite',
+                                            }}
+                                        />
+                                    )}
+                                </AnimatePresence>
+                                <div className="relative rounded-2xl overflow-hidden border border-border-default shadow-lg bg-bg-surface1">
+                                    <img
+                                        src={uploadedImage.data}
+                                        alt="Your design"
+                                        className="w-full object-contain max-h-[280px]"
+                                    />
+                                    {/* Shimmer overlay while analysis pending */}
+                                    {analysisStatus === 'pending' && (
+                                        <div className="absolute inset-0 pointer-events-none rounded-2xl animate-shimmer" />
+                                    )}
+                                </div>
+
+                                {/* DNA tag badges — flow in as analysis completes */}
+                                {analysisStatus === 'complete' && analysisResult && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.2, duration: 0.3 }}
+                                        className="flex flex-wrap justify-center gap-1.5 mt-3"
+                                    >
+                                        {[
+                                            analysisResult?.visual_dna?.graphics?.style,
+                                            analysisResult?.visual_dna?.color?.harmony,
+                                            analysisResult?.buyer_dna?.identity_signals?.tribe,
+                                            analysisResult?.buyer_dna?.emotional_triggers?.primary_emotion,
+                                        ]
+                                            .filter(Boolean)
+                                            .map((tag, i) => (
+                                                <motion.span
+                                                    key={tag}
+                                                    initial={{ opacity: 0, scale: 0.8 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    transition={{ delay: 0.3 + i * 0.1 }}
+                                                    className="bg-bg-surface2 px-2.5 py-1 rounded-full text-[11px] text-text-secondary border border-border-default"
+                                                >
+                                                    {tag}
+                                                </motion.span>
+                                            ))}
+                                    </motion.div>
+                                )}
+                            </div>
+
+                            {/* Status text */}
+                            <h2 className="text-[17px] font-medium text-text-primary mb-1">
+                                {analysisStatus === 'complete'
+                                    ? 'Design DNA Decoded'
+                                    : 'Decoding Design DNA…'}
                             </h2>
-                            <p className="text-text-tertiary text-[13px] mb-6 leading-relaxed">
-                                {goal === 'explore'
-                                    ? 'Configure your dimension shifts in the panel, then create wildly fresh concepts'
-                                    : 'Adjust what to keep and change in the panel, then create concept variations'}
+                            <p className="text-text-tertiary text-[13px] mb-5 leading-relaxed max-w-[280px]">
+                                {analysisStatus === 'complete'
+                                    ? goal === 'explore'
+                                        ? 'Tune the dimension shifts, then create wildly fresh concepts'
+                                        : 'Adjust what to keep and change, then create variations'
+                                    : 'AI is extracting visual and buyer DNA from your design…'}
                             </p>
-                            <button
-                                onClick={onCreateConcepts}
-                                disabled={isSynthesizing}
-                                className="px-6 py-2.5 ai-gradient text-white rounded-lg font-medium text-[14px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center gap-2"
-                            >
-                                <Sparkles className="w-4 h-4" /> Create Concepts
-                            </button>
+
+                            {/* CTA — only visible when analysis is complete */}
+                            {analysisStatus === 'complete' && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3, duration: 0.3 }}
+                                >
+                                    <button
+                                        onClick={onCreateConcepts}
+                                        disabled={isSynthesizing}
+                                        className="px-6 py-2.5 ai-gradient text-white rounded-lg font-medium text-[14px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center gap-2"
+                                    >
+                                        <Sparkles className="w-4 h-4" /> Create Concepts
+                                    </button>
+                                </motion.div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -240,10 +394,21 @@ export default function VariationStudio({
                             className="w-10 h-10 rounded-lg object-cover border border-border-default flex-shrink-0"
                         />
                         <div className="flex flex-wrap gap-1">
-                            {style && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{style}</span>}
-                            {harmony && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{harmony}</span>}
-                            {tribe && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{tribe}</span>}
-                            {emotion && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{emotion}</span>}
+                            {analysisStatus === 'pending' ? (
+                                /* Shimmer placeholders while analysis pending */
+                                <>
+                                    <span className="bg-bg-surface2 px-3 py-0.5 rounded text-[10px] text-transparent animate-pulse">analyzing</span>
+                                    <span className="bg-bg-surface2 px-3 py-0.5 rounded text-[10px] text-transparent animate-pulse">design</span>
+                                    <span className="bg-bg-surface2 px-3 py-0.5 rounded text-[10px] text-transparent animate-pulse">dna</span>
+                                </>
+                            ) : (
+                                <>
+                                    {style && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{style}</span>}
+                                    {harmony && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{harmony}</span>}
+                                    {tribe && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{tribe}</span>}
+                                    {emotion && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{emotion}</span>}
+                                </>
+                            )}
                         </div>
                     </div>
                 </AccordionSection>

@@ -1,10 +1,10 @@
 import React from 'react';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+type InputProps = React.ComponentProps<'input'> & {
     label?: string;
     error?: string;
     helperText?: string;
-}
+};
 
 export function Input({
     label,
@@ -26,8 +26,8 @@ export function Input({
             <input
                 id={inputId}
                 className={`w-full bg-bg-surface2 border rounded-[8px] px-4 py-2.5 text-[14px] text-text-primary placeholder:text-text-tertiary transition-colors duration-150 focus:outline-none focus:ring-1 ${error
-                        ? 'border-error focus:border-error focus:ring-error'
-                        : 'border-border-default focus:border-accent focus:ring-accent'
+                    ? 'border-error focus:border-error focus:ring-error'
+                    : 'border-border-default focus:border-accent focus:ring-accent'
                     } ${className}`}
                 {...props}
             />
