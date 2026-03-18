@@ -23,6 +23,11 @@
 - `shared/ImageLightbox.tsx`: Fullscreen overlay with download + close, scroll lock
 - Barrel updated with 3 new exports + ContextMenuItem type
 
+### Plan 22-02: PatternLibraryScreen + PatternDetailScreen ✅
+- `LibraryScreen.tsx`: Full rewrite — DataGrid, ContextMenu, search, grid/list toggle, empty state (214 LOC)
+- `PatternDetailScreen.tsx`: Full rewrite — side-by-side layout, generic analysis renderer, actions (206 LOC)
+- Deleted `PatternLibrary.tsx` (158 LOC) + `PatternDetail.tsx` (256 LOC) — net -194 LOC
+
 ### Plan 22-03: MyAnalysesScreen + Wiring ✅
 - `screens/MyAnalysesScreen.tsx`: DataGrid grid/list + search + 4-action ContextMenu + empty state (231 LOC)
 - Route `/analyses` wired in App.tsx
