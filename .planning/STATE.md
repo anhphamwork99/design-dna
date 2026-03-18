@@ -4,8 +4,8 @@
 
 - **Milestone:** v3.0 — UI Redesign
 - **Phase:** 22 — Library & Analyses Screens
-- **Plan:** 01 of 03
-- **Status:** 🔄 In progress — Plan 01 (shared components) complete. Plans 02-03 pending.
+- **Plan:** 03 of 03
+- **Status:** ✅ Phase 22 complete — all 3 plans delivered.
 
 ## Milestone History
 
@@ -22,6 +22,12 @@
 - `shared/DataGrid.tsx`: Generic grid/list toggle with search bar, skeleton loading, empty state
 - `shared/ImageLightbox.tsx`: Fullscreen overlay with download + close, scroll lock
 - Barrel updated with 3 new exports + ContextMenuItem type
+
+### Plan 22-03: MyAnalysesScreen + Wiring ✅
+- `screens/MyAnalysesScreen.tsx`: DataGrid grid/list + search + 4-action ContextMenu + empty state (231 LOC)
+- Route `/analyses` wired in App.tsx
+- Sidebar: "My Analyses" nav item with BookOpen icon under WORKSPACE
+- Old `MyAnalysesList.tsx` deleted (144 LOC)
 
 ## Phase 21 Results
 
@@ -132,5 +138,5 @@
 
 ## Stopping Point
 
-2026-03-18: Phase 22 Plan 01 complete. 3 shared components created (ContextMenu, DataGrid, ImageLightbox) for PatternLibraryScreen and MyAnalysesScreen. Plans 02-03 pending.
+2026-03-18: Phase 22 complete. All 3 plans delivered: shared components (22-01), library screen (22-02 parallel), analyses screen (22-03). Ready for Phase 23.
 
