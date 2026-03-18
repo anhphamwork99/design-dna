@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
-import { Download, RefreshCw, Maximize2 } from 'lucide-react';
+import { Download, RefreshCw, Maximize2, Sparkles } from 'lucide-react';
 import type { SynthesizedConcept } from './types';
+import MascotLoader from './MascotLoader';
 
 interface ConceptCardProps {
     concept: SynthesizedConcept;
@@ -9,6 +10,7 @@ interface ConceptCardProps {
     isGenerating: boolean;
     onClick: () => void;
     onQuickAction: (action: 'download' | 'regenerate' | 'zoom') => void;
+    onGenerateArtwork?: () => void;
 }
 
 export default function ConceptCard({
@@ -18,89 +20,88 @@ export default function ConceptCard({
     isGenerating,
     onClick,
     onQuickAction,
+    onGenerateArtwork,
 }: ConceptCardProps) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.3 }}
             onClick={onClick}
-            className="group relative w-[280px] h-[200px] rounded-xl border border-border-default overflow-hidden cursor-pointer transition-shadow hover:shadow-lg bg-bg-surface1 flex-shrink-0"
+            className="group flex flex-col rounded-xl border border-border-default overflow-hidden cursor-pointer transition-shadow hover:shadow-lg bg-white"
         >
-            {artwork ? (
-                /* ── With Artwork ── */
-                <>
-                    <img
-                        src={artwork}
-                        alt={concept.title}
-                        className="w-full h-full object-cover"
-                    />
-                    {/* Hover overlay with quick actions */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-200 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onQuickAction('download'); }}
-                            className="p-2.5 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors"
-                            aria-label="Download"
-                        >
-                            <Download className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onQuickAction('regenerate'); }}
-                            className="p-2.5 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors"
-                            aria-label="Regenerate"
-                        >
-                            <RefreshCw className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onQuickAction('zoom'); }}
-                            className="p-2.5 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors"
-                            aria-label="View full size"
-                        >
-                            <Maximize2 className="w-4 h-4" />
-                        </button>
+            {/* ── Top area — artwork, generating, or placeholder ── */}
+            <div className="aspect-[4/3] relative bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+                {artwork ? (
+                    <>
+                        <img
+                            src={artwork}
+                            alt={concept.title}
+                            className="w-full h-full object-cover"
+                        />
+                        {/* Hover actions overlay */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors duration-200 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onQuickAction('download'); }}
+                                className="p-2.5 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors"
+                                aria-label="Download"
+                            >
+                                <Download className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onQuickAction('regenerate'); }}
+                                className="p-2.5 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors"
+                                aria-label="Regenerate"
+                            >
+                                <RefreshCw className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onQuickAction('zoom'); }}
+                                className="p-2.5 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors"
+                                aria-label="View full size"
+                            >
+                                <Maximize2 className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </>
+                ) : isGenerating ? (
+                    /* Generating state — MascotLoader inside card + wave gradient */
+                    <div className="w-full h-full flex flex-col items-center justify-center relative">
+                        <MascotLoader size={60} />
+                        <p className="text-[11px] text-text-tertiary mt-2">Generating...</p>
+                        {/* Wave gradient at bottom */}
+                        <div className="absolute bottom-0 left-0 right-0 h-8 wave-gradient" />
                     </div>
-                    {/* Title strip at bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
-                        <p className="text-white text-[12px] font-medium truncate">{concept.title}</p>
-                    </div>
-                </>
-            ) : (
-                /* ── Without Artwork ── */
-                <div className="flex flex-col h-full p-4 group-hover:bg-bg-surface2/50 transition-colors">
-                    <div className="flex-1 min-h-0">
-                        <h3 className="text-[14px] font-semibold mb-1.5 line-clamp-1">
-                            {concept.title}
-                        </h3>
-                        <p className="text-[12px] text-text-secondary leading-relaxed line-clamp-3">
-                            {concept.description}
-                        </p>
-                    </div>
-
-                    {/* Color palette dots */}
-                    {concept.colorPalette && concept.colorPalette.length > 0 && (
-                        <div className="flex items-center gap-1.5 mt-3">
-                            {concept.colorPalette.slice(0, 4).map((color, i) => (
+                ) : (
+                    /* Gradient placeholder with color palette dots */
+                    <div className="w-full h-full flex items-center justify-center">
+                        <div className="flex gap-2">
+                            {concept.colorPalette?.slice(0, 5).map((color, i) => (
                                 <div
                                     key={i}
-                                    className="w-5 h-5 rounded-full border border-border-default shadow-sm"
+                                    className="w-6 h-6 rounded-full border border-white/60 shadow-sm"
                                     style={{ backgroundColor: color.hex }}
                                     title={`${color.name} (${color.role})`}
                                 />
                             ))}
-                            <span className="text-[11px] text-text-tertiary ml-1">
-                                View Details →
-                            </span>
                         </div>
-                    )}
-                </div>
-            )}
+                    </div>
+                )}
+            </div>
 
-            {/* Generating overlay */}
-            {isGenerating && !artwork && (
-                <div className="absolute inset-0 bg-bg-surface1/80 flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                </div>
-            )}
+            {/* ── Bottom area — title + description + CTA ── */}
+            <div className="p-3">
+                <h4 className="text-[13px] font-semibold text-text-primary truncate">{concept.title}</h4>
+                <p className="text-[11px] text-text-secondary line-clamp-2 mt-0.5">{concept.description}</p>
+                {!artwork && !isGenerating && onGenerateArtwork && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onGenerateArtwork(); }}
+                        className="mt-2 text-[11px] text-accent font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
+                    >
+                        <Sparkles className="w-3 h-3" /> Generate Artwork →
+                    </button>
+                )}
+            </div>
         </motion.div>
     );
 }

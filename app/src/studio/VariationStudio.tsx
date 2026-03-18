@@ -33,11 +33,13 @@ interface VariationStudioProps {
     // Concepts
     concepts: SynthesizedConcept[];
     conceptArtworks: Map<number, string>;
+    generatingCardIds: Set<number>;
 
     // Actions
     onCreateConcepts: () => void;
     onSelectConcept: (index: number) => void;
     onQuickAction: (index: number, action: 'download' | 'regenerate' | 'zoom') => void;
+    onGenerateArtwork?: (index: number) => void;
     onStartOver: () => void;
 
     // Loading states
@@ -60,9 +62,11 @@ export default function VariationStudio({
     onAspectRatioChange,
     concepts,
     conceptArtworks,
+    generatingCardIds,
     onCreateConcepts,
     onSelectConcept,
     onQuickAction,
+    onGenerateArtwork,
     onStartOver,
     error,
 }: VariationStudioProps) {
@@ -75,7 +79,7 @@ export default function VariationStudio({
     const emotion = analysisResult?.buyer_dna?.emotional_triggers?.primary_emotion;
 
     const isSynthesizing = stage === 'synthesizing';
-    const isGenerating = stage === 'generating';
+    const isAnyGenerating = generatingCardIds.size > 0;
     const hasConcepts = concepts.length > 0;
     const hasAnyArtwork = conceptArtworks.size > 0;
 
@@ -145,16 +149,17 @@ export default function VariationStudio({
                                         : 'Click a card to see details and generate artwork'}
                                 </p>
                             </div>
-                            <div className="flex gap-4 justify-center flex-wrap">
+                            <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
                                 {concepts.map((concept, i) => (
                                     <ConceptCard
                                         key={i}
                                         concept={concept}
                                         artwork={conceptArtworks.get(i) || null}
                                         index={i}
-                                        isGenerating={isGenerating}
+                                        isGenerating={generatingCardIds.has(i)}
                                         onClick={() => onSelectConcept(i)}
                                         onQuickAction={(action) => onQuickAction(i, action)}
+                                        onGenerateArtwork={() => onGenerateArtwork?.(i)}
                                     />
                                 ))}
                             </div>
@@ -162,7 +167,7 @@ export default function VariationStudio({
                                 <div className="flex justify-center gap-3 mt-6">
                                     <button
                                         onClick={onCreateConcepts}
-                                        disabled={isSynthesizing || isGenerating}
+                                        disabled={isSynthesizing || isAnyGenerating}
                                         className="px-5 py-2.5 ai-gradient text-white rounded-xl font-medium text-[13px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                                     >
                                         <Sparkles className="w-4 h-4" /> Regenerate Concepts

@@ -113,3 +113,22 @@
 .animated-dots span:nth-child(3) {
     animation-delay: 0.4s;
 }
+
+/* Wave gradient — bottom of generating concept card */
+@keyframes wave-slide {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.wave-gradient {
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(99, 102, 241, 0.15),
+            transparent);
+    animation: wave-slide 2s ease-in-out infinite;
+}
