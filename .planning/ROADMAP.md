@@ -162,15 +162,24 @@
 ### Phase 21: Compare Screen Redesign
 **Requirements:** SCREEN-05
 **Risk:** 🟡 MEDIUM
+**Plans:** 2 plans in 2 waves
 
 **Scope:**
-- 4-slot design selector (cards with [+] buttons, ✓ selected state)
-- Selection modal: pick from My Analyses
-- Compare button (enabled when 2+ selected)
-- Results: comparison matrix table
-- Winning formula card with [Save as Pattern] + [Use in Studio]
+- Break `CompareScreens.tsx` (565 LOC) into focused `compare/` components (types, upload, analyzing, results)
+- Stage-machine shell pattern (matching Studio Phase 20)
+- Upload: multi-image (2-5) drag & drop with image grid
+- Analyzing: chibi GIF mascot (not skeleton shimmer)
+- Results: redesigned layout with winning formula, visual patterns, buyer overlap, pattern analysis
+- Button layout: Row 1 = Save as Pattern (full-width primary), Row 2 = Use in Studio + New Comparison
+- "Use in Studio" navigates to `/studio` with winning formula pre-loaded
+- No confirm dialog on New Comparison
+- Full UX copy rewrite
 
-**Verification:** Select 2+ designs → compare → view matrix → save pattern.
+Plans:
+- [ ] 21-01-PLAN.md — Types + CompareUpload + CompareAnalyzing (foundation)
+- [ ] 21-02-PLAN.md — CompareResults + shell rewrite + delete old monolith
+
+**Verification:** Upload 2+ images → analyzing (GIF) → results → save pattern / use in studio / new comparison.
 
 ---
 
