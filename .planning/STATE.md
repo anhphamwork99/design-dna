@@ -42,6 +42,16 @@
 - Smooth transitions: scale exit for empty state, eased entrance for concepts
 - Loader2 fully removed from studio, barrel exports updated
 
+### Post-Plan Polish (User Feedback) ✅
+- MascotLoader: `height: auto` fixes GIF distortion
+- Floating panel: auto-collapse during synthesizing, scrollbar hidden
+- All accordion sections default open
+- TopBar shows on ALL stages after goal selection
+- Sidebar visible on Goal picker (useStudioActive hook)
+- "Generate Artwork" → full-width primary button, heading 24px matches Goal picker
+- "Start Over" removed, "Regenerate Concepts" demoted to secondary
+- Wave effect: 40 pulsating gradient-mesh bars (audio visualizer), full-width
+
 ## Phase 22 Results
 
 ### Plan 22-01: Shared Components ✅
@@ -174,5 +184,5 @@
 
 ## Stopping Point
 
-2026-03-18: Phase 20.1 COMPLETE (all 3 plans). Studio flow polish done — floating panel, top bar, empty state illustration, responsive cards, MascotLoader for all loading, per-card generating, smooth transitions.
+2026-03-18: Phase 20.1 COMPLETE + polished. All 3 plans executed + post-plan user feedback applied.
 
