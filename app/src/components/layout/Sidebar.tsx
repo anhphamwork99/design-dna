@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
     Home,
     Library,
+    BookOpen,
     Palette,
     Microscope,
     Scale,
@@ -65,6 +66,12 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                         icon={<Library className="w-5 h-5" />}
                         label="Library"
                         to="/library"
+                        collapsed={collapsed}
+                    />
+                    <SidebarNavItem
+                        icon={<BookOpen className="w-5 h-5" />}
+                        label="My Analyses"
+                        to="/analyses"
                         collapsed={collapsed}
                     />
                 </nav>

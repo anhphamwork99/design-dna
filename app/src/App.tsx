@@ -14,6 +14,7 @@ import {
   LibraryScreen,
   ViewAnalysisScreen,
   PatternDetailScreen,
+  MyAnalysesScreen,
 } from './screens';
 
 export default function App() {
@@ -62,6 +63,7 @@ export default function App() {
         <Route path="/library" element={<LibraryScreen />} />
         <Route path="/library/pattern/:id" element={<PatternDetailScreen />} />
         <Route path="/library/analysis/:id" element={<ViewAnalysisScreen />} />
+        <Route path="/analyses" element={<MyAnalysesScreen />} />
       </Routes>
 
       <AnimatePresence>

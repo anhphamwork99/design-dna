@@ -5,3 +5,4 @@ export { default as StudioScreen } from './StudioScreen';
 export { default as LibraryScreen } from './LibraryScreen';
 export { default as ViewAnalysisScreen } from './ViewAnalysisScreen';
 export { default as PatternDetailScreen } from './PatternDetailScreen';
+export { default as MyAnalysesScreen } from './MyAnalysesScreen';
