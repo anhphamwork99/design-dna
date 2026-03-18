@@ -4,8 +4,8 @@
 
 - **Milestone:** v3.0 — UI Redesign
 - **Phase:** 20.1 — Studio Flow Polish (INSERTED)
-- **Plan:** 03 of 03
-- **Status:** ✅ Phase planned — 3 plans in 2 waves. Ready for execution.
+- **Plan:** 01 ✅ + 02 ✅ → next: 03 (wave 2)
+- **Status:** 🔄 Wave 1 complete (Plans 01 + 02). Plan 03 (wave 2) pending.
 
 ## Milestone History
 
@@ -14,6 +14,25 @@
 | v1.0 Full Feature App | 1–7 | ✅ Complete |
 | v2.0 Backend System | 8–13 | ✅ Complete |
 | v3.0 UI Redesign | 14–24 | 🔄 Active |
+
+## Phase 20.1 Results
+
+### Plan 20.1-01: Floating Panel + Sidebar Redesign ✅
+- `FloatingPanel.tsx`: 260px overlay card, slide-in animation, toggle button (73 LOC)
+- `AccordionSection.tsx`: Collapsible sections with ChevronDown + height animation (56 LOC)
+- `DimensionShifts.tsx`: Dropdown-per-dimension replacing 3-button toggle (108 LOC)
+- `VariationStudio.tsx`: Rewritten — docked sidebar → floating panel overlay, canvas full width
+- `PatternPicker.tsx`: Container stripped — wrapped by AccordionSection
+- CTA removed from panel (canvas-only), Clone flow untouched
+- Barrel exports updated with 3 new components
+
+## Phase 20.1 Results
+
+### Plan 20.1-02: Navigation Bar + CTA + Empty State ✅
+- `StudioTopBar.tsx`: Home icon exit + breadcrumb (Studio > GoalLabel), clickable Studio → goal picker
+- StudioScreen: absolute breadcrumb removed, conditional TopBar for studio/concepts/generating/result/clone-result stages
+- Empty state: Sparkles icon → generated illustration (`empty-studio.png`)
+- CTA verified canvas-only: panel is config-only (shifts, patterns, output size)
 
 ## Phase 22 Results
 
@@ -147,5 +166,5 @@
 
 ## Stopping Point
 
-2026-03-18: Phase 22 complete. Phase 20.1 inserted for Studio polish (P1+P2 issues: sidebar hierarchy, shift toggles, duplicate CTA, empty state, concept cards responsive, loading consistency).
+2026-03-18: Phase 20.1 Plan 01 complete (FloatingPanel + Sidebar Redesign). Plan 02 (Canvas CTA + Empty State + Top Bar) next.
 
