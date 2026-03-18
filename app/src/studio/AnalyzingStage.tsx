@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import AiSphere from './AiSphere';
+import MascotLoader from './MascotLoader';
 
 interface AnalyzingStageProps {
     image: { data: string; name: string };
@@ -28,18 +28,18 @@ export default function AnalyzingStage({ image }: AnalyzingStageProps) {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-6">
-            {/* Title */}
-            <h2 className="text-[22px] font-semibold text-text-primary mb-10 tracking-tight">
-                AI analyzing your artwork
-            </h2>
-
-            {/* AI Sphere */}
-            <div className="mb-10">
-                <AiSphere size={100} />
+            {/* Mascot animation */}
+            <div className="mb-8">
+                <MascotLoader size={140} />
             </div>
 
+            {/* Title */}
+            <h2 className="text-[22px] font-semibold shimmer-text mb-6 tracking-tight">
+                AI analyzing your artwork<span className="animated-dots"><span>.</span><span>.</span><span>.</span></span>
+            </h2>
+
             {/* Uploaded image — small indicator */}
-            <div className="flex items-center gap-3 mb-8 bg-bg-surface1 border border-border-default rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3 mb-6 bg-bg-surface1 border border-border-default rounded-xl px-4 py-3">
                 <img
                     src={image.data}
                     alt={image.name}

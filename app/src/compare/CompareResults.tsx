@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Bookmark, Sparkles, RefreshCw } from 'lucide-react';
+import { Check, Bookmark, Sparkles, RefreshCw, CircleCheck, FlaskConical, CircleX } from 'lucide-react';
 import { savePattern, checkPatternSaved, resizeToThumbnail } from '../apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { Modal } from '../components/shared/Modal';
@@ -126,8 +126,8 @@ export default function CompareResults({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                         {/* Keep */}
                         <div className="bg-success-subtle border border-success/20 rounded-lg p-4">
-                            <span className="text-[12px] text-success uppercase tracking-wider font-semibold block mb-2">
-                                ✅ Keep Doing
+                            <span className="text-[12px] text-success uppercase tracking-wider font-semibold flex items-center gap-1.5 mb-2">
+                                <CircleCheck className="w-4 h-4" /> Keep Doing
                             </span>
                             <ul className="flex flex-col gap-1.5">
                                 {analysis?.winning_formula?.keep?.map(
@@ -144,8 +144,8 @@ export default function CompareResults({
                         </div>
                         {/* Experiment */}
                         <div className="bg-warning-subtle border border-warning/20 rounded-lg p-4">
-                            <span className="text-[12px] text-warning uppercase tracking-wider font-semibold block mb-2">
-                                🧪 Try Changing
+                            <span className="text-[12px] text-warning uppercase tracking-wider font-semibold flex items-center gap-1.5 mb-2">
+                                <FlaskConical className="w-4 h-4" /> Try Changing
                             </span>
                             <ul className="flex flex-col gap-1.5">
                                 {analysis?.winning_formula?.experiment_with?.map(
@@ -162,8 +162,8 @@ export default function CompareResults({
                         </div>
                         {/* Avoid */}
                         <div className="bg-error-subtle border border-error/20 rounded-lg p-4">
-                            <span className="text-[12px] text-error uppercase tracking-wider font-semibold block mb-2">
-                                ❌ Stop Doing
+                            <span className="text-[12px] text-error uppercase tracking-wider font-semibold flex items-center gap-1.5 mb-2">
+                                <CircleX className="w-4 h-4" /> Stop Doing
                             </span>
                             <ul className="flex flex-col gap-1.5">
                                 {analysis?.winning_formula?.avoid?.map(

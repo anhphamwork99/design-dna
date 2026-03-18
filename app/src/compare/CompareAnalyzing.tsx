@@ -79,8 +79,8 @@ export default function CompareAnalyzing({
                 <MascotLoader size={160} />
 
                 <div>
-                    <p className="text-[16px] font-medium text-text-primary mb-1">
-                        Discovering what makes your designs special…
+                    <p className="text-[16px] font-medium shimmer-text mb-1">
+                        Discovering what makes your designs special<span className="animated-dots"><span>.</span><span>.</span><span>.</span></span>
                     </p>
                     <p className="text-[13px] text-text-tertiary">
                         {elapsed}s elapsed
