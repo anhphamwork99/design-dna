@@ -26,17 +26,24 @@ export default function CompareUpload({
         const remainingSlots = 5 - images.length;
         const filesToAdd = validFiles.slice(0, remainingSlots);
 
-        filesToAdd.forEach((file) => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const newImage: CompareImage = {
-                    data: event.target?.result as string,
-                    name: file.name,
-                    type: file.type,
-                };
-                onImagesChange([...images, newImage]);
-            };
-            reader.readAsDataURL(file);
+        // Read all files in parallel, then update state once to avoid race condition
+        Promise.all(
+            filesToAdd.map(
+                (file) =>
+                    new Promise<CompareImage>((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            resolve({
+                                data: event.target?.result as string,
+                                name: file.name,
+                                type: file.type,
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    })
+            )
+        ).then((newImages) => {
+            onImagesChange([...images, ...newImages]);
         });
     };
 
@@ -97,8 +104,8 @@ export default function CompareUpload({
                         {images.length < 5 && (
                             <div
                                 className={`w-[150px] h-[150px] bg-bg-surface2 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${isDragging
-                                        ? 'border-accent bg-accent/10'
-                                        : 'border-border-default hover:border-border-hover'
+                                    ? 'border-accent bg-accent/10'
+                                    : 'border-border-default hover:border-border-hover'
                                     }`}
                                 onClick={() => fileInputRef.current?.click()}
                                 onDragOver={(e) => {

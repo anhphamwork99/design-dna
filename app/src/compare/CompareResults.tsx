@@ -198,32 +198,32 @@ export default function CompareResults({
                         {isSaved ? (
                             <button
                                 disabled
-                                className="w-full border border-success/30 text-success font-medium py-3 px-6 rounded-lg opacity-70 cursor-not-allowed flex items-center justify-center gap-2"
+                                className="w-full border border-success/30 text-success font-medium py-3.5 px-6 rounded-xl text-[15px] opacity-70 cursor-not-allowed flex items-center justify-center gap-2"
                             >
-                                <Check className="w-4 h-4" /> Pattern Saved
+                                <Check className="w-5 h-5" /> Pattern Saved
                             </button>
                         ) : (
                             <button
                                 onClick={() => setShowSaveModal(true)}
-                                className="w-full ai-gradient text-white font-medium py-3 px-6 rounded-lg hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base flex items-center justify-center gap-2"
+                                className="w-full ai-gradient text-white font-medium py-3.5 px-6 rounded-xl text-[15px] hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base flex items-center justify-center gap-2"
                             >
-                                <Bookmark className="w-4 h-4" /> Save as Pattern
+                                <Bookmark className="w-5 h-5" /> Save as Pattern
                             </button>
                         )}
 
-                        {/* Row 2: Use in Studio + New Comparison */}
+                        {/* Row 2: Use in Studio + New Comparison — identical secondary style */}
                         <div className="flex gap-3">
                             <button
                                 onClick={handleUseInStudio}
-                                className="flex-1 border border-border-default text-text-primary font-medium py-3 px-6 rounded-lg hover:bg-bg-surface2 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base flex items-center justify-center gap-2"
+                                className="flex-1 border border-border-default text-text-primary font-medium py-3.5 px-6 rounded-xl text-[15px] hover:bg-bg-surface2 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base flex items-center justify-center gap-2"
                             >
-                                <Sparkles className="w-4 h-4" /> Use in Studio
+                                <Sparkles className="w-5 h-5" /> Use in Studio
                             </button>
                             <button
                                 onClick={onNewComparison}
-                                className="flex-1 text-text-secondary font-medium py-3 px-6 rounded-lg hover:bg-bg-surface2 hover:text-text-primary transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base flex items-center justify-center gap-2"
+                                className="flex-1 border border-border-default text-text-primary font-medium py-3.5 px-6 rounded-xl text-[15px] hover:bg-bg-surface2 transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base flex items-center justify-center gap-2"
                             >
-                                <RefreshCw className="w-4 h-4" /> New Comparison
+                                <RefreshCw className="w-5 h-5" /> New Comparison
                             </button>
                         </div>
                     </div>
