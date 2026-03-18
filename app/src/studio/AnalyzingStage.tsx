@@ -34,7 +34,7 @@ export default function AnalyzingStage({ image }: AnalyzingStageProps) {
             </div>
 
             {/* Title */}
-            <h2 className="text-[22px] font-semibold shimmer-text mb-6 tracking-tight">
+            <h2 className="text-[20px] font-semibold shimmer-text mb-6 tracking-tight">
                 AI analyzing your artwork<span className="animated-dots"><span>.</span><span>.</span><span>.</span></span>
             </h2>
 

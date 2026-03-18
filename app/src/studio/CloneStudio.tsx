@@ -111,7 +111,7 @@ function CloningLoader({ image }: { image: { data: string; name: string } }) {
             </div>
 
             {/* Title */}
-            <h2 className="text-[22px] font-semibold shimmer-text mb-6 tracking-tight">
+            <h2 className="text-[20px] font-semibold shimmer-text mb-6 tracking-tight">
                 Extracting &amp; recreating design<span className="animated-dots"><span>.</span><span>.</span><span>.</span></span>
             </h2>
 

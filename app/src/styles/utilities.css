@@ -58,10 +58,10 @@
     animation: scan-line 2s ease-in-out infinite;
 }
 
-/* Shimmer Text — gradient sweep across text for loading states */
+/* Shimmer Text — bright highlight sweeps left-to-right for loading states */
 @keyframes shimmer-text {
     0% {
-        background-position: -200% center;
+        background-position: -100% center;
     }
 
     100% {
@@ -71,16 +71,18 @@
 
 .shimmer-text {
     background: linear-gradient(90deg,
-            var(--color-text-secondary) 0%,
-            var(--color-text-secondary) 35%,
-            var(--color-text-primary) 50%,
-            var(--color-text-secondary) 65%,
-            var(--color-text-secondary) 100%);
+            var(--color-text-tertiary) 0%,
+            var(--color-text-tertiary) 30%,
+            var(--color-text-primary) 45%,
+            #fff 50%,
+            var(--color-text-primary) 55%,
+            var(--color-text-tertiary) 70%,
+            var(--color-text-tertiary) 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer-text 2.5s ease-in-out infinite;
+    animation: shimmer-text 2s ease-in-out infinite;
 }
 
 /* Animated dots — cycling 1→2→3 dots */
