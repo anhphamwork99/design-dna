@@ -19,7 +19,7 @@
 | 19 | Analyze Screen Redesign | SCREEN-03, UX-01..06 (analyze) | 🟡 MED | Large |
 | 20 | Creative Studio Redesign | SCREEN-04 | 🔴 HIGH | Large |
 | 21 | Compare Screen Redesign ✅ | SCREEN-05 | 🟡 MED | Medium |
-| 22 | Library & Analyses Screens | SCREEN-06, SCREEN-07, UX-01..04 (lists) | 🟡 MED | Medium |
+| 22 | Library & Analyses Screens ✅ | SCREEN-06, SCREEN-07, UX-01..04 (lists) | 🟡 MED | Medium |
 | 23 | Settings & Auth Screens | SCREEN-08, AUTH-01, AUTH-02 | 🟢 LOW | Small |
 | 24 | Polish & Verification | POLISH-01..03, UX-02..03 | 🟢 LOW | Small |
 
@@ -183,7 +183,7 @@ Plans:
 
 ---
 
-### Phase 22: Library & Analyses Screens
+### Phase 22: Library & Analyses Screens ✅
 **Requirements:** SCREEN-06, SCREEN-07, UX-01..04 (lists)
 **Risk:** 🟡 MEDIUM
 **Plans:** 3 plans in 2 waves
@@ -197,9 +197,9 @@ Plans:
 - Image lightbox for fullscreen image viewing
 
 Plans:
-- [ ] 22-01-PLAN.md — Shared components (ContextMenu, DataGrid, ImageLightbox)
-- [ ] 22-02-PLAN.md — PatternLibraryScreen + PatternDetailScreen rewrite
-- [ ] 22-03-PLAN.md — MyAnalysesScreen + route/sidebar wiring
+- [x] 22-01-PLAN.md — Shared components (ContextMenu, DataGrid, ImageLightbox)
+- [x] 22-02-PLAN.md — PatternLibraryScreen + PatternDetailScreen rewrite
+- [x] 22-03-PLAN.md — MyAnalysesScreen + route/sidebar wiring
 
 **Verification:** Browse, search, context menu actions, empty states. Delete works with confirmation.
 

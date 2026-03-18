@@ -74,8 +74,8 @@
 | SCREEN-03 | **AnalyzeScreen** — upload zone → analyzing progress → side-by-side results (image + DNA accordion) | 3-state flow |
 | SCREEN-04 | **CreativeStudioScreen** — 3-panel (Source + Workspace + Output) | Most complex |
 | ~~SCREEN-05~~ | ~~**CompareScreen** — 4-slot selector + comparison matrix + winning formula card~~ | ✅ Complete |
-| SCREEN-06 | **PatternLibraryScreen** — grid/list toggle, search, cards with context menu [⋮] | Browse patterns |
-| SCREEN-07 | **MyAnalysesScreen** — grid/list toggle, search, cards with context menu [⋮] | Browse analyses |
+| ~~SCREEN-06~~ | ~~**PatternLibraryScreen** — grid/list toggle, search, cards with context menu [⋮]~~ | ✅ Complete |
+| ~~SCREEN-07~~ | ~~**MyAnalysesScreen** — grid/list toggle, search, cards with context menu [⋮]~~ | ✅ Complete |
 | SCREEN-08 | **SettingsScreen** — full page (not modal), API key + account section | From modal → screen |
 
 ### AUTH — Auth Screens Redesign
@@ -89,10 +89,10 @@
 
 | ID | Requirement | Notes |
 |----|-------------|-------|
-| UX-01 | Context menus [⋮] on cards — View, Use in Studio, Compare, Delete | Consistent actions |
-| UX-02 | Fullscreen image lightbox — click image → overlay with download + close | Modal viewer |
-| UX-03 | Cross-feature quick actions — 12 links mapped (Analyze→Studio, Compare→Save Pattern, etc.) | Navigation shortcuts |
-| UX-04 | All empty states designed per screen with icon + message + CTA | Onboarding experience |
+| ~~UX-01~~ | ~~Context menus [⋮] on cards — View, Use in Studio, Compare, Delete~~ | ✅ Complete |
+| ~~UX-02~~ | ~~Fullscreen image lightbox — click image → overlay with download + close~~ | ✅ Complete |
+| ~~UX-03~~ | ~~Cross-feature quick actions — 12 links mapped (Analyze→Studio, Compare→Save Pattern, etc.)~~ | ✅ Complete |
+| ~~UX-04~~ | ~~All empty states designed per screen with icon + message + CTA~~ | ✅ Complete |
 | UX-05 | Loading states — progress bars (determinate), skeleton cards, inline button spinners | Consistent loading |
 | UX-06 | Error states — banner (API key), toast (API failure), overlay (offline) | Error handling |
 
