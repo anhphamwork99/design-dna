@@ -160,11 +160,11 @@ export default function VariationStudio({
                             transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
                             className="w-full max-w-[900px]"
                         >
-                            <div className="text-center mb-6">
-                                <h2 className="text-[18px] font-semibold mb-1">
+                            <div className="text-center mb-8">
+                                <h2 className="text-[24px] font-semibold mb-1.5">
                                     {hasAnyArtwork ? 'Your Concepts' : 'Choose a Concept'}
                                 </h2>
-                                <p className="text-text-tertiary text-[13px]">
+                                <p className="text-text-tertiary text-[14px]">
                                     {hasAnyArtwork
                                         ? 'Click a card to view details or generate more artwork'
                                         : 'Click a card to see details and generate artwork'}

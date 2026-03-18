@@ -69,15 +69,16 @@ export default function ConceptCard({
                     <div className="w-full h-full flex flex-col items-center justify-center relative">
                         <MascotLoader size={60} />
                         <p className="text-[11px] text-text-tertiary mt-2">Generating...</p>
-                        {/* Wave pulse bars at bottom — audio visualizer style */}
-                        <div className="absolute bottom-0 left-0 right-0 h-10 wave-gradient">
-                            {Array.from({ length: 24 }).map((_, i) => (
+                        {/* Wave pulse bars at bottom — audio visualizer, full width */}
+                        <div className="absolute bottom-0 left-0 right-0 h-10 wave-gradient" style={{ padding: 0 }}>
+                            {Array.from({ length: 40 }).map((_, i) => (
                                 <div
                                     key={i}
                                     className="wave-gradient-bar"
                                     style={{
+                                        flex: 1,
                                         height: `${20 + Math.sin(i * 0.7) * 14 + Math.random() * 6}px`,
-                                        animationDelay: `${i * 0.08}s`,
+                                        animationDelay: `${i * 0.06}s`,
                                         animationDuration: `${0.8 + Math.sin(i * 0.5) * 0.4}s`,
                                     }}
                                 />
@@ -102,15 +103,15 @@ export default function ConceptCard({
             </div>
 
             {/* ── Bottom area — title + description + CTA ── */}
-            <div className="p-3">
-                <h4 className="text-[13px] font-semibold text-text-primary truncate">{concept.title}</h4>
-                <p className="text-[11px] text-text-secondary line-clamp-2 mt-0.5">{concept.description}</p>
+            <div className="p-4">
+                <h4 className="text-[14px] font-semibold text-text-primary truncate">{concept.title}</h4>
+                <p className="text-[12px] text-text-secondary line-clamp-2 mt-1">{concept.description}</p>
                 {!artwork && !isGenerating && onGenerateArtwork && (
                     <button
                         onClick={(e) => { e.stopPropagation(); onGenerateArtwork(); }}
-                        className="mt-2 text-[11px] text-accent font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
+                        className="mt-3 w-full px-4 py-2.5 ai-gradient text-white rounded-lg font-medium text-[13px] shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                     >
-                        <Sparkles className="w-3 h-3" /> Generate Artwork →
+                        <Sparkles className="w-3.5 h-3.5" /> Generate Artwork
                     </button>
                 )}
             </div>
