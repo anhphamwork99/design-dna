@@ -18,7 +18,7 @@
 | 18 | Home Screen | SCREEN-02, UX-04 (home) | 🟡 MED | Small |
 | 19 | Analyze Screen Redesign | SCREEN-03, UX-01..06 (analyze) | 🟡 MED | Large |
 | 20 | Creative Studio Redesign | SCREEN-04 | 🔴 HIGH | Large |
-| 21 | Compare Screen Redesign | SCREEN-05 | 🟡 MED | Medium |
+| 21 | Compare Screen Redesign ✅ | SCREEN-05 | 🟡 MED | Medium |
 | 22 | Library & Analyses Screens | SCREEN-06, SCREEN-07, UX-01..04 (lists) | 🟡 MED | Medium |
 | 23 | Settings & Auth Screens | SCREEN-08, AUTH-01, AUTH-02 | 🟢 LOW | Small |
 | 24 | Polish & Verification | POLISH-01..03, UX-02..03 | 🟢 LOW | Small |
@@ -159,7 +159,7 @@
 
 ---
 
-### Phase 21: Compare Screen Redesign
+### Phase 21: Compare Screen Redesign ✅
 **Requirements:** SCREEN-05
 **Risk:** 🟡 MEDIUM
 **Plans:** 2 plans in 2 waves
@@ -176,8 +176,8 @@
 - Full UX copy rewrite
 
 Plans:
-- [ ] 21-01-PLAN.md — Types + CompareUpload + CompareAnalyzing (foundation)
-- [ ] 21-02-PLAN.md — CompareResults + shell rewrite + delete old monolith
+- [x] 21-01-PLAN.md — Types + CompareUpload + CompareAnalyzing (foundation)
+- [x] 21-02-PLAN.md — CompareResults + shell rewrite + delete old monolith
 
 **Verification:** Upload 2+ images → analyzing (GIF) → results → save pattern / use in studio / new comparison.
 
