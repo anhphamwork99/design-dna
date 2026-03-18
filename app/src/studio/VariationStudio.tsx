@@ -7,6 +7,7 @@ import AccordionSection from './AccordionSection';
 import DimensionShifts from './DimensionShifts';
 import ConceptCard from './ConceptCard';
 import PatternPicker from './PatternPicker';
+import emptyStudioIllus from '../assets/empty-studio.png';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -186,9 +187,7 @@ export default function VariationStudio({
                             exit={{ opacity: 0 }}
                             className="flex flex-col items-center justify-center text-center max-w-[320px]"
                         >
-                            <div className="w-16 h-16 rounded-2xl bg-bg-surface1/80 border border-border-default/50 flex items-center justify-center mb-5">
-                                <Sparkles className="w-7 h-7 text-text-tertiary" />
-                            </div>
+                            <img src={emptyStudioIllus} alt="" className="w-32 h-32 mb-5 opacity-90" />
                             <h2 className="text-[18px] font-medium text-text-primary mb-1.5">
                                 {goal === 'explore' ? 'Ready to Explore' : 'Ready for Variations'}
                             </h2>
