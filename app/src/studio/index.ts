@@ -10,4 +10,5 @@ export { default as PatternPicker } from './PatternPicker';
 export { default as FloatingPanel } from './FloatingPanel';
 export { default as AccordionSection } from './AccordionSection';
 export { default as DimensionShifts } from './DimensionShifts';
-
+export { default as MascotLoader } from './MascotLoader';
+export { default as StudioTopBar } from './StudioTopBar';
