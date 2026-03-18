@@ -94,15 +94,20 @@ export default function MyAnalysesScreen() {
             className={`bg-bg-surface1 border border-border-default rounded-xl cursor-pointer hover:border-border-hover transition-colors ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
             {/* Thumbnail */}
-            <div className="w-full aspect-[4/3] bg-bg-surface2 overflow-hidden flex items-center justify-center rounded-t-xl">
+            <div
+                className="w-full aspect-[4/3] overflow-hidden flex items-center justify-center rounded-t-xl"
+                style={{ backgroundColor: analysis.thumbnail ? '#e8e8e8' : undefined }}
+            >
                 {analysis.thumbnail ? (
                     <img
                         src={analysis.thumbnail}
                         alt={analysis.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                     />
                 ) : (
-                    <BookOpen className="w-8 h-8 text-text-tertiary" />
+                    <div className="w-full h-full bg-bg-surface2 flex items-center justify-center">
+                        <BookOpen className="w-8 h-8 text-text-tertiary" />
+                    </div>
                 )}
             </div>
 
@@ -147,9 +152,12 @@ export default function MyAnalysesScreen() {
             className={`bg-bg-surface1 border border-border-default rounded-xl p-3 hover:border-border-hover cursor-pointer flex items-center gap-4 transition-colors ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
             {/* Thumbnail */}
-            <div className="w-12 h-12 rounded-lg bg-bg-surface2 overflow-hidden flex-shrink-0 flex items-center justify-center">
+            <div
+                className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
+                style={{ backgroundColor: analysis.thumbnail ? '#e8e8e8' : undefined }}
+            >
                 {analysis.thumbnail ? (
-                    <img src={analysis.thumbnail} alt="" className="w-full h-full object-cover" />
+                    <img src={analysis.thumbnail} alt="" className="w-full h-full object-contain" />
                 ) : (
                     <BookOpen className="w-5 h-5 text-text-tertiary" />
                 )}
