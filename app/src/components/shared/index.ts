@@ -7,3 +7,7 @@ export { UploadZone } from './UploadZone';
 export { EmptyState } from './EmptyState';
 export { ErrorBanner } from './ErrorBanner';
 export { Spinner, Skeleton, SkeletonCard } from './LoadingSpinner';
+export { ContextMenu } from './ContextMenu';
+export type { ContextMenuItem } from './ContextMenu';
+export { DataGrid } from './DataGrid';
+export { ImageLightbox } from './ImageLightbox';
