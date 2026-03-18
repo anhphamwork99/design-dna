@@ -86,11 +86,7 @@ export default function PatternPicker({
 
     return (
         <>
-            <div className="bg-bg-surface1 p-3 rounded-xl border border-border-default">
-                <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-2">
-                    Applied Patterns
-                </div>
-
+            <div>
                 {appliedPattern ? (
                     <div className="flex flex-wrap gap-1.5">
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-accent/10 text-accent text-[11px] rounded-lg border border-accent/20 max-w-full">
@@ -186,8 +182,8 @@ export default function PatternPicker({
                                         <label
                                             key={key}
                                             className={`flex items-center gap-3 p-2.5 rounded-lg border transition-colors cursor-pointer ${selectedSections[key]
-                                                    ? 'border-accent/30 bg-accent/5'
-                                                    : 'border-border-default hover:bg-bg-surface2'
+                                                ? 'border-accent/30 bg-accent/5'
+                                                : 'border-border-default hover:bg-bg-surface2'
                                                 } ${!hasData ? 'opacity-40 cursor-not-allowed' : ''}`}
                                         >
                                             <input
