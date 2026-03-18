@@ -91,10 +91,10 @@ export default function MyAnalysesScreen() {
         <div
             key={analysis.id}
             onClick={() => navigate(`/library/analysis/${analysis.id}`)}
-            className={`bg-bg-surface1 border border-border-default rounded-xl overflow-hidden cursor-pointer hover:border-border-hover transition-colors ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''}`}
+            className={`bg-bg-surface1 border border-border-default rounded-xl cursor-pointer hover:border-border-hover transition-colors ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
             {/* Thumbnail */}
-            <div className="w-full aspect-[4/3] bg-bg-surface2 overflow-hidden flex items-center justify-center">
+            <div className="w-full aspect-[4/3] bg-bg-surface2 overflow-hidden flex items-center justify-center rounded-t-xl">
                 {analysis.thumbnail ? (
                     <img
                         src={analysis.thumbnail}

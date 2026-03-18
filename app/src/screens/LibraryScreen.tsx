@@ -93,10 +93,10 @@ export default function LibraryScreen() {
         <div
             key={pattern.id}
             onClick={() => navigate(`/library/pattern/${pattern.id}`)}
-            className={`bg-bg-surface1 border border-border-default rounded-xl overflow-hidden cursor-pointer hover:border-border-hover transition-colors ${deletingId === pattern.id ? 'opacity-50 pointer-events-none' : ''}`}
+            className={`bg-bg-surface1 border border-border-default rounded-xl cursor-pointer hover:border-border-hover transition-colors ${deletingId === pattern.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
             {/* Thumbnail area */}
-            <div className="w-full aspect-[4/3] bg-bg-surface2 overflow-hidden flex items-center justify-center">
+            <div className="w-full aspect-[4/3] bg-bg-surface2 overflow-hidden flex items-center justify-center rounded-t-xl">
                 {pattern.thumbnails.length > 0 ? (
                     <img
                         src={pattern.thumbnails[0]}
