@@ -18,7 +18,7 @@
 | 18 | Home Screen | SCREEN-02, UX-04 (home) | 🟡 MED | Small |
 | 19 | Analyze Screen Redesign | SCREEN-03, UX-01..06 (analyze) | 🟡 MED | Large |
 | 20 | Creative Studio Redesign ✅ | SCREEN-04 | 🔴 HIGH | Large |
-| 20.1 | Studio Flow Polish (INSERTED) | POLISH-STUDIO-01..08 | 🟡 MED | Medium |
+| 20.1 | Studio Flow Polish ✅ | POLISH-STUDIO-01..08 | 🟡 MED | Medium |
 | 21 | Compare Screen Redesign ✅ | SCREEN-05 | 🟡 MED | Medium |
 | 22 | Library & Analyses Screens ✅ | SCREEN-06, SCREEN-07, UX-01..04 (lists) | 🟡 MED | Medium |
 | 23 | Settings & Auth Screens | SCREEN-08, AUTH-01, AUTH-02 | 🟢 LOW | Small |
@@ -160,20 +160,22 @@
 
 ---
 
-### Phase 20.1: Studio Flow Polish (INSERTED)
+### Phase 20.1: Studio Flow Polish ✅ COMPLETE
 **Requirements:** POLISH-STUDIO-01..08
 **Risk:** 🟡 MEDIUM — UI polish, no architectural changes
 **Depends on:** Phase 20
-**Plans:** 3 plans in 2 waves
 
-**Goal:** Polish Studio flow — floating panel, dropdown shifts, responsive cards, unified loading.
+**Delivered:**
+- Floating panel (260px, solid card + shadow-xl) replaces docked sidebar for Variation/Explore
+- AccordionSection with all sections open, FloatingPanel with toggle show/hide
+- DimensionShifts: dropdown per dimension replaces cramped 3-button toggle
+- StudioTopBar: Home icon + breadcrumb, absolute breadcrumb removed
+- Responsive concept cards (CSS grid auto-fill minmax 240px) with unified layout
+- MascotLoader for all loading states (synthesizing full canvas, generating per-card)
+- Per-card generating state with wave gradient animation (parallel generation)
+- Post-plan polish: GIF fix, wave effect (40 pulsating bars), button hierarchy
 
-Plans:
-- [ ] 20.1-01: Floating Panel + Sidebar Redesign (wave 1)
-- [ ] 20.1-02: Navigation Bar + CTA + Empty State (wave 1)
-- [ ] 20.1-03: Loading States + Concept Cards + Transitions (wave 2, depends on 01+02)
-
-**Verification:** Floating panel works, shifts dropdown readable, single CTA, MascotLoader everywhere, concept cards responsive.
+**Verification:** ✅ All flows operational. Build passes.
 
 ---
 
