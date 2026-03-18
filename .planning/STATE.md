@@ -3,8 +3,9 @@
 ## Current
 
 - **Milestone:** v3.0 — UI Redesign
-- **Phase:** 20 — Creative Studio Redesign
-- **Status:** ✅ Complete — Plans 01, 02, 03 all done. Build passes.
+- **Phase:** 21 — Compare Screen Redesign
+- **Plan:** 01 of 02
+- **Status:** 🔄 In progress — Plan 01 complete (types + upload + analyzing). Plan 02 pending (results + shell wiring).
 
 ## Milestone History
 
