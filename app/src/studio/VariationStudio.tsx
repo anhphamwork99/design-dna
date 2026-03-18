@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import type { Stage, StudioGoal, Shifts, AppliedPatternData, SynthesizedConcept } from './types';
-import { dimensionConfig } from './types';
+import FloatingPanel from './FloatingPanel';
+import AccordionSection from './AccordionSection';
+import DimensionShifts from './DimensionShifts';
 import ConceptCard from './ConceptCard';
 import PatternPicker from './PatternPicker';
 
 // ── Types ──────────────────────────────────────────────────────────
-
-type ShiftMode = 'keep' | 'change' | 'reimagine';
 
 interface VariationStudioProps {
     goal: 'variations' | 'explore';
@@ -43,29 +43,6 @@ interface VariationStudioProps {
     error: string | null;
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────
-
-function getShiftMode(shift: { keep: boolean; value: string }): ShiftMode {
-    if (shift.keep) return 'keep';
-    if (shift.value === '') return 'reimagine';
-    return 'change';
-}
-
-function applyShiftMode(
-    shifts: Shifts,
-    key: keyof Shifts,
-    mode: ShiftMode,
-): Shifts {
-    switch (mode) {
-        case 'keep':
-            return { ...shifts, [key]: { keep: true, value: '' } };
-        case 'reimagine':
-            return { ...shifts, [key]: { keep: false, value: '' } };
-        case 'change':
-            return { ...shifts, [key]: { keep: false, value: shifts[key].value } };
-    }
-}
-
 // ── Component ──────────────────────────────────────────────────────
 
 export default function VariationStudio({
@@ -88,7 +65,7 @@ export default function VariationStudio({
     onStartOver,
     error,
 }: VariationStudioProps) {
-    const [expandedDim, setExpandedDim] = useState<string | null>(null);
+    const [panelVisible, setPanelVisible] = useState(true);
 
     // Derived data from analysis
     const style = analysisResult?.visual_dna?.graphics?.style;
@@ -102,155 +79,9 @@ export default function VariationStudio({
     const hasAnyArtwork = conceptArtworks.size > 0;
 
     return (
-        <div className="flex h-full overflow-hidden">
-            {/* ═══ LEFT SIDEBAR ═══ */}
-            <div className="w-[260px] flex-shrink-0 border-r border-border-default overflow-y-auto p-4 space-y-3 bg-bg-surface1/50">
-                {/* ── Original Image ── */}
-                <div className="bg-bg-surface2/50 p-3 rounded-xl border border-border-default">
-                    <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-2">
-                        Your Original
-                    </div>
-                    <div className="flex items-start gap-3">
-                        <img
-                            src={uploadedImage.data}
-                            alt={uploadedImage.name}
-                            className="w-[64px] h-[64px] rounded-lg object-cover border border-border-default flex-shrink-0"
-                        />
-                        <div className="min-w-0">
-                            <div className="text-[12px] font-medium truncate mb-1.5">
-                                {uploadedImage.name}
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                                {style && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{style}</span>}
-                                {harmony && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{harmony}</span>}
-                                {tribe && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{tribe}</span>}
-                                {emotion && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{emotion}</span>}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ── Dimension Shifts ── */}
-                <div className="bg-bg-surface1 p-3 rounded-xl border border-border-default">
-                    <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-2.5">
-                        Dimension Shifts
-                    </div>
-                    <div className="space-y-0.5">
-                        {dimensionConfig.map((dim) => {
-                            const mode = getShiftMode(shifts[dim.key]);
-                            const isExpanded = expandedDim === dim.key && mode === 'change';
-                            return (
-                                <div key={dim.key} className="py-1.5 border-b border-border-default/30 last:border-0">
-                                    <div className="flex items-center justify-between gap-1.5 mb-1">
-                                        <span className="text-[12px] font-medium flex-shrink-0">
-                                            {dim.name}
-                                        </span>
-                                        <div className="flex items-center bg-bg-surface2 p-0.5 rounded-full border border-border-default">
-                                            {(['keep', 'change', 'reimagine'] as ShiftMode[]).map((m) => (
-                                                <button
-                                                    key={m}
-                                                    onClick={() => {
-                                                        onShiftsChange(applyShiftMode(shifts, dim.key, m));
-                                                        setExpandedDim(m === 'change' ? dim.key : null);
-                                                    }}
-                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${mode === m
-                                                            ? m === 'reimagine'
-                                                                ? 'bg-accent text-white shadow-sm'
-                                                                : m === 'change'
-                                                                    ? 'bg-yellow-500/90 text-white shadow-sm'
-                                                                    : 'bg-bg-surface1 text-text-primary shadow-sm'
-                                                            : 'text-text-tertiary hover:text-text-secondary'
-                                                        }`}
-                                                >
-                                                    {m === 'keep' ? 'Keep' : m === 'change' ? 'Change' : 'Reimagine'}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <AnimatePresence>
-                                        {mode === 'change' && (isExpanded || shifts[dim.key].value) && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                className="overflow-hidden"
-                                            >
-                                                <input
-                                                    type="text"
-                                                    placeholder={dim.placeholder}
-                                                    value={shifts[dim.key].value}
-                                                    onChange={(e) =>
-                                                        onShiftsChange({
-                                                            ...shifts,
-                                                            [dim.key]: { keep: false, value: e.target.value },
-                                                        })
-                                                    }
-                                                    className="w-full bg-bg-surface2 border border-border-default rounded-lg px-2.5 py-1 text-[11px] text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all mt-1"
-                                                />
-                                                <p className="text-[9px] text-text-tertiary mt-0.5">Give direction, or leave empty for AI surprise</p>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* ── Pattern Picker ── */}
-                <PatternPicker
-                    appliedPattern={appliedPattern}
-                    onApply={onApplyPattern}
-                    onRemove={onRemovePattern}
-                />
-
-                {/* ── Aspect Ratio ── */}
-                <div className="bg-bg-surface1 p-3 rounded-xl border border-border-default">
-                    <div className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider mb-2">
-                        Output Size
-                    </div>
-                    <select
-                        value={aspectRatio}
-                        onChange={(e) => onAspectRatioChange(e.target.value)}
-                        className="w-full bg-bg-surface2 border border-border-default rounded-lg px-2.5 py-1.5 text-[12px] text-text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all cursor-pointer"
-                    >
-                        <option value="1:1">1:1 — Square</option>
-                        <option value="4:5">4:5 — Portrait</option>
-                        <option value="3:4">3:4 — Portrait Tall</option>
-                        <option value="4:3">4:3 — Landscape</option>
-                        <option value="16:9">16:9 — Wide</option>
-                        <option value="9:16">9:16 — Tall</option>
-                    </select>
-                </div>
-
-                {/* ── Create Concepts CTA ── */}
-                <button
-                    onClick={onCreateConcepts}
-                    disabled={isSynthesizing || isGenerating}
-                    className="w-full px-4 py-2.5 ai-gradient text-white rounded-xl font-medium text-[13px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    {isSynthesizing ? (
-                        <><Loader2 className="w-4 h-4 animate-spin" /> Creating...</>
-                    ) : hasConcepts ? (
-                        <><Sparkles className="w-4 h-4" /> Regenerate Concepts</>
-                    ) : (
-                        <><Sparkles className="w-4 h-4" /> Create Concepts</>
-                    )}
-                </button>
-
-                {hasConcepts && (
-                    <button
-                        onClick={onStartOver}
-                        className="w-full px-4 py-1.5 text-[12px] text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-surface2"
-                    >
-                        ← Start Over
-                    </button>
-                )}
-            </div>
-
-            {/* ═══ CENTER CANVAS ═══ */}
-            <div className="flex-1 flex flex-col items-center justify-center p-6 overflow-y-auto relative bg-bg-base">
+        <div className="relative w-full h-full overflow-hidden">
+            {/* ═══ CANVAS — full width ═══ */}
+            <div className="flex flex-col items-center justify-center w-full h-full p-6 overflow-y-auto bg-bg-base">
                 <AnimatePresence mode="wait">
                     {/* Synthesizing state */}
                     {isSynthesizing && (
@@ -294,7 +125,7 @@ export default function VariationStudio({
                         </motion.div>
                     )}
 
-                    {/* Concept cards strip */}
+                    {/* Concept cards */}
                     {!isSynthesizing && !error && hasConcepts && (
                         <motion.div
                             key="concepts"
@@ -313,7 +144,7 @@ export default function VariationStudio({
                                         : 'Click a card to see details and generate artwork'}
                                 </p>
                             </div>
-                            <div className="flex gap-4 justify-center">
+                            <div className="flex gap-4 justify-center flex-wrap">
                                 {concepts.map((concept, i) => (
                                     <ConceptCard
                                         key={i}
@@ -326,10 +157,27 @@ export default function VariationStudio({
                                     />
                                 ))}
                             </div>
+                            {hasConcepts && (
+                                <div className="flex justify-center gap-3 mt-6">
+                                    <button
+                                        onClick={onCreateConcepts}
+                                        disabled={isSynthesizing || isGenerating}
+                                        className="px-5 py-2.5 ai-gradient text-white rounded-xl font-medium text-[13px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                                    >
+                                        <Sparkles className="w-4 h-4" /> Regenerate Concepts
+                                    </button>
+                                    <button
+                                        onClick={onStartOver}
+                                        className="px-4 py-2 text-[12px] text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-surface2"
+                                    >
+                                        ← Start Over
+                                    </button>
+                                </div>
+                            )}
                         </motion.div>
                     )}
 
-                    {/* Empty state */}
+                    {/* Empty state — CTA lives here on canvas */}
                     {!isSynthesizing && !error && !hasConcepts && (
                         <motion.div
                             key="empty"
@@ -346,8 +194,8 @@ export default function VariationStudio({
                             </h2>
                             <p className="text-text-tertiary text-[13px] mb-6 leading-relaxed">
                                 {goal === 'explore'
-                                    ? 'Configure your dimension shifts on the left, then create wildly fresh concepts'
-                                    : 'Adjust what to keep and change on the left, then create concept variations'}
+                                    ? 'Configure your dimension shifts in the panel, then create wildly fresh concepts'
+                                    : 'Adjust what to keep and change in the panel, then create concept variations'}
                             </p>
                             <button
                                 onClick={onCreateConcepts}
@@ -360,6 +208,61 @@ export default function VariationStudio({
                     )}
                 </AnimatePresence>
             </div>
+
+            {/* ═══ FLOATING PANEL — overlays on left ═══ */}
+            <FloatingPanel isVisible={panelVisible} onToggle={() => setPanelVisible(!panelVisible)}>
+                {/* Your Original — thumbnail + tags only (no filename) */}
+                <AccordionSection title="YOUR ORIGINAL" defaultOpen={false}>
+                    <div className="flex gap-2 items-start">
+                        <img
+                            src={uploadedImage.data}
+                            alt="Original design"
+                            className="w-10 h-10 rounded-lg object-cover border border-border-default flex-shrink-0"
+                        />
+                        <div className="flex flex-wrap gap-1">
+                            {style && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{style}</span>}
+                            {harmony && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{harmony}</span>}
+                            {tribe && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{tribe}</span>}
+                            {emotion && <span className="bg-bg-surface2 px-1.5 py-0.5 rounded text-[10px] text-text-secondary">{emotion}</span>}
+                        </div>
+                    </div>
+                </AccordionSection>
+
+                {/* Dimension Shifts — expanded by default */}
+                <AccordionSection title="DIMENSION SHIFTS" defaultOpen={true}>
+                    <DimensionShifts
+                        shifts={shifts}
+                        onShiftsChange={onShiftsChange}
+                        customInputs={{}}
+                        onCustomInputChange={() => { }}
+                    />
+                </AccordionSection>
+
+                {/* Applied Patterns */}
+                <AccordionSection title="APPLIED PATTERNS" defaultOpen={false}>
+                    <PatternPicker
+                        appliedPattern={appliedPattern}
+                        onApply={onApplyPattern}
+                        onRemove={onRemovePattern}
+                    />
+                </AccordionSection>
+
+                {/* Output Size */}
+                <AccordionSection title="OUTPUT SIZE" defaultOpen={false}>
+                    <select
+                        value={aspectRatio}
+                        onChange={(e) => onAspectRatioChange(e.target.value)}
+                        className="w-full bg-bg-surface2 border border-border-default rounded-lg px-2.5 py-1.5 text-[12px] text-text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all cursor-pointer"
+                    >
+                        <option value="1:1">1:1 — Square</option>
+                        <option value="4:5">4:5 — Portrait</option>
+                        <option value="3:4">3:4 — Portrait Tall</option>
+                        <option value="4:3">4:3 — Landscape</option>
+                        <option value="16:9">16:9 — Wide</option>
+                        <option value="9:16">9:16 — Tall</option>
+                    </select>
+                </AccordionSection>
+            </FloatingPanel>
         </div>
     );
 }
