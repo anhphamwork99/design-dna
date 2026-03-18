@@ -7,3 +7,7 @@ export { default as VariationStudio } from './VariationStudio';
 export { default as ConceptCard } from './ConceptCard';
 export { default as ConceptDetailDialog } from './ConceptDetailDialog';
 export { default as PatternPicker } from './PatternPicker';
+export { default as FloatingPanel } from './FloatingPanel';
+export { default as AccordionSection } from './AccordionSection';
+export { default as DimensionShifts } from './DimensionShifts';
+
