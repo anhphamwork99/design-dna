@@ -185,19 +185,13 @@ export default function VariationStudio({
                                 ))}
                             </div>
                             {hasConcepts && (
-                                <div className="flex justify-center gap-3 mt-6">
+                                <div className="flex justify-center mt-6">
                                     <button
                                         onClick={onCreateConcepts}
                                         disabled={isSynthesizing || isAnyGenerating}
-                                        className="px-5 py-2.5 ai-gradient text-white rounded-xl font-medium text-[13px] shadow-lg hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                                        className="px-4 py-2 text-[12px] text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-surface2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
                                     >
-                                        <Sparkles className="w-4 h-4" /> Regenerate Concepts
-                                    </button>
-                                    <button
-                                        onClick={onStartOver}
-                                        className="px-4 py-2 text-[12px] text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-surface2"
-                                    >
-                                        ← Start Over
+                                        <Sparkles className="w-3.5 h-3.5" /> Regenerate All Concepts
                                     </button>
                                 </div>
                             )}
@@ -238,7 +232,7 @@ export default function VariationStudio({
             {/* ═══ FLOATING PANEL — overlays on left ═══ */}
             <FloatingPanel isVisible={panelVisible} onToggle={() => setPanelVisible(!panelVisible)}>
                 {/* Your Original — thumbnail + tags only (no filename) */}
-                <AccordionSection title="YOUR ORIGINAL" defaultOpen={false}>
+                <AccordionSection title="YOUR ORIGINAL" defaultOpen={true}>
                     <div className="flex gap-2 items-start">
                         <img
                             src={uploadedImage.data}
@@ -265,7 +259,7 @@ export default function VariationStudio({
                 </AccordionSection>
 
                 {/* Applied Patterns */}
-                <AccordionSection title="APPLIED PATTERNS" defaultOpen={false}>
+                <AccordionSection title="APPLIED PATTERNS" defaultOpen={true}>
                     <PatternPicker
                         appliedPattern={appliedPattern}
                         onApply={onApplyPattern}
@@ -274,7 +268,7 @@ export default function VariationStudio({
                 </AccordionSection>
 
                 {/* Output Size */}
-                <AccordionSection title="OUTPUT SIZE" defaultOpen={false}>
+                <AccordionSection title="OUTPUT SIZE" defaultOpen={true}>
                     <select
                         value={aspectRatio}
                         onChange={(e) => onAspectRatioChange(e.target.value)}

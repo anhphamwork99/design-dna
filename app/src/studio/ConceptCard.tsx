@@ -69,8 +69,20 @@ export default function ConceptCard({
                     <div className="w-full h-full flex flex-col items-center justify-center relative">
                         <MascotLoader size={60} />
                         <p className="text-[11px] text-text-tertiary mt-2">Generating...</p>
-                        {/* Wave gradient at bottom */}
-                        <div className="absolute bottom-0 left-0 right-0 h-8 wave-gradient" />
+                        {/* Wave pulse bars at bottom — audio visualizer style */}
+                        <div className="absolute bottom-0 left-0 right-0 h-10 wave-gradient">
+                            {Array.from({ length: 24 }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="wave-gradient-bar"
+                                    style={{
+                                        height: `${20 + Math.sin(i * 0.7) * 14 + Math.random() * 6}px`,
+                                        animationDelay: `${i * 0.08}s`,
+                                        animationDuration: `${0.8 + Math.sin(i * 0.5) * 0.4}s`,
+                                    }}
+                                />
+                            ))}
+                        </div>
                     </div>
                 ) : (
                     /* Gradient placeholder with color palette dots */

@@ -56,7 +56,7 @@ export default function ConceptDetailDialog({
                     exit={{ opacity: 0, scale: 0.96 }}
                     transition={{ duration: 0.2 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="bg-bg-surface1 border border-border-default rounded-2xl shadow-2xl w-[90vw] max-w-[1000px] max-h-[90vh] overflow-hidden flex flex-col"
+                    className="bg-bg-surface1 border border-border-default rounded-2xl shadow-2xl w-[90vw] max-w-[1000px] h-[80vh] overflow-hidden flex flex-col"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between px-6 py-4 border-b border-border-default flex-shrink-0">
@@ -146,12 +146,6 @@ export default function ConceptDetailDialog({
                                                 </button>
                                             </>
                                         )}
-                                        <button
-                                            onClick={onStartOver}
-                                            className="px-4 py-2 text-[12px] text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2 rounded-lg hover:bg-bg-surface2/60"
-                                        >
-                                            <Sparkles className="w-3 h-3" /> Start Over
-                                        </button>
                                     </div>
                                 </div>
                             </div>

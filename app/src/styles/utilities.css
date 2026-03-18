@@ -114,21 +114,41 @@
     animation-delay: 0.4s;
 }
 
-/* Wave gradient — bottom of generating concept card */
-@keyframes wave-slide {
-    0% {
-        transform: translateX(-100%);
+/* Wave gradient — pulsating mesh at bottom of generating concept card */
+@keyframes wave-pulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scaleY(0.6);
     }
 
-    100% {
-        transform: translateX(100%);
+    50% {
+        opacity: 1;
+        transform: scaleY(1);
     }
 }
 
 .wave-gradient {
-    background: linear-gradient(90deg,
-            transparent,
-            rgba(99, 102, 241, 0.15),
-            transparent);
-    animation: wave-slide 2s ease-in-out infinite;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    padding: 0 16px;
+    height: 100%;
+}
+
+.wave-gradient::before,
+.wave-gradient::after {
+    content: '';
+    display: block;
+}
+
+/* Generate bars via box-shadows on a pseudo-element grid */
+.wave-gradient-bar {
+    width: 3px;
+    border-radius: 2px;
+    background: var(--gradient-mesh);
+    animation: wave-pulse 1.2s ease-in-out infinite;
+    transform-origin: bottom;
 }
