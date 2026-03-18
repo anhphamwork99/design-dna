@@ -3,9 +3,9 @@
 ## Current
 
 - **Milestone:** v3.0 — UI Redesign
-- **Phase:** 21 — Compare Screen Redesign
-- **Plan:** 02 of 02
-- **Status:** ✅ Complete — Both plans done. Compare screen fully redesigned.
+- **Phase:** 22 — Library & Analyses Screens
+- **Plan:** 01 of 03
+- **Status:** 🔄 In progress — Plan 01 (shared components) complete. Plans 02-03 pending.
 
 ## Milestone History
 
@@ -14,6 +14,14 @@
 | v1.0 Full Feature App | 1–7 | ✅ Complete |
 | v2.0 Backend System | 8–13 | ✅ Complete |
 | v3.0 UI Redesign | 14–24 | 🔄 Active |
+
+## Phase 22 Results
+
+### Plan 22-01: Shared Components ✅
+- `shared/ContextMenu.tsx`: Trigger-based dropdown, click-outside + Escape close, danger variant
+- `shared/DataGrid.tsx`: Generic grid/list toggle with search bar, skeleton loading, empty state
+- `shared/ImageLightbox.tsx`: Fullscreen overlay with download + close, scroll lock
+- Barrel updated with 3 new exports + ContextMenuItem type
 
 ## Phase 21 Results
 
@@ -124,5 +132,5 @@
 
 ## Stopping Point
 
-2026-03-18: Phase 21 complete. Compare screen redesigned from 565 LOC monolith to 4 focused components in `compare/` dir. Results view with readable sections, 2-row action buttons, save-as-pattern modal. Loading screens polished with shimmer-text animation across all flows.
+2026-03-18: Phase 22 Plan 01 complete. 3 shared components created (ContextMenu, DataGrid, ImageLightbox) for PatternLibraryScreen and MyAnalysesScreen. Plans 02-03 pending.
 
