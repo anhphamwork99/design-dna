@@ -140,9 +140,10 @@ export default function VariationStudio({
                     {!isSynthesizing && !error && hasConcepts && (
                         <motion.div
                             key="concepts"
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
+                            exit={{ opacity: 0, y: -16 }}
+                            transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
                             className="w-full max-w-[900px]"
                         >
                             <div className="text-center mb-6">
@@ -193,9 +194,10 @@ export default function VariationStudio({
                     {!isSynthesizing && !error && !hasConcepts && (
                         <motion.div
                             key="empty"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0, scale: 1 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.25 }}
                             className="flex flex-col items-center justify-center text-center max-w-[320px]"
                         >
                             <img src={emptyStudioIllus} alt="" className="w-32 h-32 mb-5 opacity-90" />
