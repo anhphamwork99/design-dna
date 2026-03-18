@@ -3,7 +3,7 @@ import { X, Key, Trash2, Loader2, CheckCircle2, AlertTriangle, ShieldCheck } fro
 import { motion } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API_BASE = import.meta.env.VITE_API_URL ?? '';
 
 type KeyStatus = 'loading' | 'no_key' | 'has_key' | 'updating' | 'saving' | 'deleting' | 'error';
 

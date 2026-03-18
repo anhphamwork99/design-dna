@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useMigratePatterns } from '../hooks/useMigratePatterns';
 import { useAuth } from '../contexts/AuthContext';
+import heroBanner from '../assets/hero-banner.png';
 
 export default function HomeScreen() {
     const { session } = useAuth();
@@ -91,6 +92,16 @@ export default function HomeScreen() {
                     )}
                 </div>
             )}
+
+            {/* Hero Banner */}
+            <div className="w-full max-w-[800px] mb-8 overflow-hidden rounded-2xl">
+                <img
+                    src={heroBanner}
+                    alt="DesignDNA — Discover the DNA of great design"
+                    className="w-full max-h-[440px] object-cover"
+                    draggable={false}
+                />
+            </div>
 
             <h1 className="text-[32px] font-bold tracking-tight text-text-primary mb-3">
                 Welcome to DesignDNA

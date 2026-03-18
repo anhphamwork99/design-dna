@@ -68,8 +68,8 @@ export default function GoalPicker({ onSelectGoal, preloadedImage }: GoalPickerP
                             whileTap={{ scale: 0.98 }}
                             onClick={() => onSelectGoal(card.goal)}
                         >
-                            <div className="w-12 h-12 rounded-xl bg-bg-surface2 flex items-center justify-center mb-4">
-                                <IconComponent className="w-6 h-6 text-text-primary" fill="currentColor" strokeWidth={0} />
+                            <div className="w-12 h-12 rounded-xl ai-gradient flex items-center justify-center mb-4">
+                                <IconComponent className="w-6 h-6 text-white" fill="currentColor" strokeWidth={0} />
                             </div>
                             <h2 className="text-[18px] font-semibold mb-2">{card.title}</h2>
                             <p className="text-[13px] text-text-secondary leading-relaxed mb-6 flex-1">

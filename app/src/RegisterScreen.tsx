@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { useAuth } from './contexts/AuthContext';
+import authBg from './assets/background-update.webp';
 
 interface RegisterScreenProps {
     onSwitchToLogin: () => void;
@@ -40,9 +41,17 @@ export default function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps)
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="min-h-screen flex items-center justify-center p-4"
+            className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
         >
-            <div className="w-full max-w-[400px] flex flex-col items-center">
+            {/* Background Image */}
+            <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${authBg})` }}
+            />
+            {/* Light Overlay */}
+            <div className="absolute inset-0 bg-white/60" />
+
+            <div className="w-full max-w-[400px] flex flex-col items-center relative z-10">
                 {/* Logo */}
                 <div className="flex items-center gap-3 mb-10">
                     <div className="w-8 h-8 rounded ai-gradient"></div>
@@ -50,7 +59,7 @@ export default function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps)
                 </div>
 
                 {/* Card */}
-                <div className="w-full bg-bg-surface1 border border-border-default rounded-xl p-8">
+                <div className="w-full bg-bg-surface1/90 backdrop-blur-xl border border-border-default rounded-xl p-8">
                     <h1 className="text-[20px] font-semibold mb-1">Create your account</h1>
                     <p className="text-[14px] text-text-secondary mb-6">
                         Get started with DesignDNA for free
@@ -61,7 +70,7 @@ export default function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps)
                         type="button"
                         onClick={handleGoogle}
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-medium py-[14px] px-6 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-800 font-medium py-[14px] px-6 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                             <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z" fill="#4285F4" />

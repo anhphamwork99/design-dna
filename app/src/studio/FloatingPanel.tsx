@@ -29,6 +29,24 @@ export default function FloatingPanel({
             flexDirection: 'column',
             gap: 8,
         }}>
+            {/* Toggle button — always visible, always at top */}
+            <button
+                onClick={onToggle}
+                className="flex items-center justify-center w-8 h-8 bg-white rounded-lg shadow-md border border-border-default/50 hover:bg-bg-surface2 transition-colors"
+                style={{
+                    pointerEvents: 'auto',
+                    flexShrink: 0,
+                    alignSelf: 'flex-start',
+                }}
+                aria-label={isVisible ? 'Hide panel' : 'Show panel'}
+            >
+                {isVisible ? (
+                    <PanelLeftClose className="w-4 h-4 text-text-secondary" />
+                ) : (
+                    <PanelLeft className="w-4 h-4 text-text-secondary" />
+                )}
+            </button>
+
             <AnimatePresence>
                 {isVisible && (
                     <motion.div
@@ -51,23 +69,6 @@ export default function FloatingPanel({
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {/* Toggle button — always visible */}
-            <button
-                onClick={onToggle}
-                className="flex items-center justify-center w-8 h-8 bg-white rounded-lg shadow-md border border-border-default/50 hover:bg-bg-surface2 transition-colors"
-                style={{
-                    pointerEvents: 'auto',
-                    flexShrink: 0,
-                }}
-                aria-label={isVisible ? 'Hide panel' : 'Show panel'}
-            >
-                {isVisible ? (
-                    <PanelLeftClose className="w-4 h-4 text-text-secondary" />
-                ) : (
-                    <PanelLeft className="w-4 h-4 text-text-secondary" />
-                )}
-            </button>
         </div>
     );
 }

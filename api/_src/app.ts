@@ -1,6 +1,5 @@
 import 'dotenv/config';
 
-import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { healthRoute } from './routes/health.js';
@@ -11,8 +10,8 @@ import { patternsRoute } from './routes/patterns.js';
 
 const app = new Hono();
 
-// CORS — allow any localhost origin in dev, restrict in production
-const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000';
+// CORS — allow any localhost origin in dev, Vercel domain in production
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 app.use(
     '*',
     cors({
@@ -21,11 +20,15 @@ app.use(
             if (origin && /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
                 return origin;
             }
-            // Allow configured origin
-            if (origin === ALLOWED_ORIGIN) {
+            // Allow configured frontend URL
+            if (origin === FRONTEND_URL) {
                 return origin;
             }
-            return ALLOWED_ORIGIN;
+            // Allow Vercel preview/production domains
+            if (origin && /\.vercel\.app$/.test(origin)) {
+                return origin;
+            }
+            return FRONTEND_URL;
         },
         credentials: true,
         allowHeaders: ['Content-Type', 'Authorization'],
@@ -54,7 +57,4 @@ app.route('/api', aiRoute);
 app.route('/api', analysesRoute);
 app.route('/api', patternsRoute);
 
-// Start server
-const port = Number(process.env.PORT) || 4000;
-console.log(`🚀 API server running on http://localhost:${port}`);
-serve({ fetch: app.fetch, port });
+export default app;

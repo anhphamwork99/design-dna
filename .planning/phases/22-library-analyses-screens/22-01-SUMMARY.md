@@ -66,7 +66,7 @@ Each task was committed atomically:
 
 1. **Task 1: Create ContextMenu, DataGrid, ImageLightbox** - `d362043` (feat)
 
-**Plan metadata:** [pending docs commit]
+**Plan metadata:** `8d739d4` (docs: complete plan)
 
 ## Files Created/Modified
 - `app/src/components/shared/ContextMenu.tsx` - Dropdown context menu with positioned actions, click-outside detection

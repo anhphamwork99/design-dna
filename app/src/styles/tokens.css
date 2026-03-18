@@ -14,6 +14,9 @@
   --shadow-elevated: 0px 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-modal: 0px 25px 50px -12px rgba(0, 0, 0, 0.15);
 
+  /* === GRADIENT (mesh — highlight / accent / CTA) === */
+  --gradient-mesh: linear-gradient(135deg, #fef3c7 0%, #f9a8d4 25%, #c084fc 50%, #818cf8 75%, #60a5fa 100%);
+
   /* === LAYOUT === */
   --sidebar-width: 240px;
   --sidebar-collapsed-width: 64px;

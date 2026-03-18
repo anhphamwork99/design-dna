@@ -19,7 +19,7 @@ export function Button({
     const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variantStyles = {
-        primary: 'bg-text-primary text-text-inverse hover:opacity-90 rounded-lg',
+        primary: 'ai-gradient text-white hover:opacity-90 rounded-lg',
         secondary: 'bg-bg-surface2 text-text-primary border border-border-default hover:bg-bg-surface3 rounded-lg',
         ghost: 'text-text-secondary hover:text-text-primary hover:bg-state-hover rounded-lg',
         icon: 'text-text-secondary hover:text-text-primary hover:bg-state-hover rounded-full',
