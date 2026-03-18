@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, ChevronRight } from 'lucide-react';
 import type { Stage, StudioGoal, Shifts, AppliedPatternData, SynthesizedConcept } from '../studio/types';
-import { getDefaultShifts } from '../studio/types';
+import { getDefaultShifts, goalCards } from '../studio/types';
+import StudioTopBar from '../studio/StudioTopBar';
 import GoalPicker from '../studio/GoalPicker';
 import UploadStage from '../studio/UploadStage';
 import AnalyzingStage from '../studio/AnalyzingStage';
@@ -256,50 +256,22 @@ export default function StudioScreen() {
     );
 
     // ── Render by stage ──
-    return (
-        <div className="flex flex-col h-full min-h-screen bg-bg-base relative">
-            {/* Top bar — exit + dynamic breadcrumb */}
-            {(() => {
-                const isLoadingStage = stage === 'analyzing' || stage === 'cloning' || stage === 'synthesizing' || stage === 'generating';
-                return (
-                    <div className="absolute top-4 left-4 z-50 flex items-center gap-2">
-                        <button
-                            onClick={() => navigate('/')}
-                            className="p-2 rounded-xl bg-bg-surface1 border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-surface2 transition-colors shadow-sm"
-                            aria-label="Exit Studio"
-                            title="Exit Studio"
-                        >
-                            <LogOut className="w-5 h-5" />
-                        </button>
+    const showTopBar = goal !== null && (
+        stage === 'studio' || stage === 'synthesizing' || stage === 'concepts' ||
+        stage === 'generating' || stage === 'result' || stage === 'clone-result'
+    );
+    const goalLabel = goal ? (goalCards.find(c => c.goal === goal)?.title ?? '') : '';
 
-                        {/* Breadcrumb — hidden during loading stages */}
-                        {!isLoadingStage && (
-                            <nav className="flex items-center gap-1 text-[14px]">
-                                {stage === 'goals' ? (
-                                    <span className="font-semibold text-text-primary">Studio</span>
-                                ) : (
-                                    <>
-                                        <button
-                                            onClick={handleStartOver}
-                                            className="text-text-secondary hover:text-text-primary transition-colors"
-                                        >
-                                            Studio
-                                        </button>
-                                        {goal && (
-                                            <>
-                                                <ChevronRight className="w-3.5 h-3.5 text-text-tertiary" />
-                                                <span className="font-medium text-text-primary">
-                                                    {goal === 'clone' ? 'Clone Design' : goal === 'variations' ? 'Make Variations' : 'Explore New Ideas'}
-                                                </span>
-                                            </>
-                                        )}
-                                    </>
-                                )}
-                            </nav>
-                        )}
-                    </div>
-                );
-            })()}
+    return (
+        <div className="flex flex-col h-full min-h-screen bg-bg-base">
+            {/* Top bar — Home icon + breadcrumb */}
+            {showTopBar && (
+                <StudioTopBar
+                    goalLabel={goalLabel}
+                    onExit={() => navigate('/')}
+                    onBackToGoals={handleBackToGoals}
+                />
+            )}
 
             {stage === 'goals' && (
                 <div className="flex-1">
