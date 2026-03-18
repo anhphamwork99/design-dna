@@ -4,8 +4,8 @@
 
 - **Milestone:** v3.0 — UI Redesign
 - **Phase:** 20.1 — Studio Flow Polish (INSERTED)
-- **Plan:** 01 ✅ + 02 ✅ → next: 03 (wave 2)
-- **Status:** 🔄 Wave 1 complete (Plans 01 + 02). Plan 03 (wave 2) pending.
+- **Plan:** 01 ✅ + 02 ✅ + 03 ✅ — Phase 20.1 COMPLETE
+- **Status:** ✅ All 3 plans executed. Phase 20.1 complete.
 
 ## Milestone History
 
@@ -31,6 +31,16 @@
 - StudioScreen: absolute breadcrumb removed, conditional TopBar for studio/concepts/generating/result/clone-result stages
 - Empty state: Sparkles icon → generated illustration (`empty-studio.png`)
 - CTA verified canvas-only: panel is config-only (shifts, patterns, output size)
+
+### Plan 20.1-03: Loading States + Concept Cards + Transitions ✅
+- `ConceptCard.tsx`: Rewritten — unified layout (aspect-4/3 top + text below), responsive sizing
+- Synthesizing: MascotLoader (120px) full canvas takeover + shimmer-text
+- Generating: MascotLoader (60px) inside card + wave-gradient animation
+- Per-card generating state (`Set<number>`) replaces global `stage === 'generating'` — parallel generation
+- CSS grid `repeat(auto-fill, minmax(240px, 1fr))` for responsive concept cards
+- ConceptDetailDialog: MascotLoader replaces Loader2
+- Smooth transitions: scale exit for empty state, eased entrance for concepts
+- Loader2 fully removed from studio, barrel exports updated
 
 ## Phase 22 Results
 
@@ -164,5 +174,5 @@
 
 ## Stopping Point
 
-2026-03-18: Phase 20.1 Plan 01 complete (FloatingPanel + Sidebar Redesign). Plan 02 (Canvas CTA + Empty State + Top Bar) next.
+2026-03-18: Phase 20.1 COMPLETE (all 3 plans). Studio flow polish done — floating panel, top bar, empty state illustration, responsive cards, MascotLoader for all loading, per-card generating, smooth transitions.
 
