@@ -82,7 +82,7 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer-text 2s ease-in-out infinite;
+    animation: shimmer-text 3s ease-in-out infinite;
 }
 
 /* Animated dots — cycling 1→2→3 dots */
