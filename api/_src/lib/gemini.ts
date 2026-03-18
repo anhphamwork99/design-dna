@@ -1,6 +1,17 @@
-import { GoogleGenAI } from '@google/genai';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { decrypt } from './crypto.js';
+
+// Lazy-loaded Gemini SDK — only imported when AI routes are actually called.
+// This prevents cold start delay on simple routes (api-keys, analyses, patterns).
+let _GoogleGenAI: typeof import('@google/genai').GoogleGenAI | null = null;
+
+async function getGoogleGenAI() {
+    if (!_GoogleGenAI) {
+        const mod = await import('@google/genai');
+        _GoogleGenAI = mod.GoogleGenAI;
+    }
+    return _GoogleGenAI;
+}
 
 /**
  * Get a Gemini AI client for a specific user.
@@ -12,7 +23,7 @@ import { decrypt } from './crypto.js';
 export async function getGeminiClient(
     supabase: SupabaseClient,
     userId: string,
-): Promise<GoogleGenAI> {
+) {
     const { data, error } = await supabase
         .from('api_keys')
         .select('encrypted_key')
@@ -29,5 +40,6 @@ export async function getGeminiClient(
     }
 
     const apiKey = decrypt(data.encrypted_key);
+    const GoogleGenAI = await getGoogleGenAI();
     return new GoogleGenAI({ apiKey });
 }
