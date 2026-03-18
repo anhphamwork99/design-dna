@@ -3,9 +3,9 @@
 ## Current
 
 - **Milestone:** v3.0 — UI Redesign
-- **Phase:** 22 — Library & Analyses Screens
-- **Plan:** 03 of 03
-- **Status:** ✅ Phase 22 complete — all 3 plans delivered.
+- **Phase:** 20.1 — Studio Flow Polish (INSERTED)
+- **Plan:** 00 of 00
+- **Status:** 🆕 Phase inserted — not yet planned.
 
 ## Milestone History
 
@@ -141,7 +141,11 @@
 | Back buttons | Removed — sidebar is primary navigation |
 | Buyer fit in Studio | ❌ Removed (no analyzeBuyerFit) |
 
+## Roadmap Evolution
+
+- Phase 20.1 inserted after Phase 20: Studio Flow Polish (URGENT) — IA, layout, visual, interactions polish from code+screenshot review
+
 ## Stopping Point
 
-2026-03-18: Phase 22 complete. All 3 plans delivered: shared components (22-01), library screen (22-02 parallel), analyses screen (22-03). Ready for Phase 23.
+2026-03-18: Phase 22 complete. Phase 20.1 inserted for Studio polish (P1+P2 issues: sidebar hierarchy, shift toggles, duplicate CTA, empty state, concept cards responsive, loading consistency).
 
