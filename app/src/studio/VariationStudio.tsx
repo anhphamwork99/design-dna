@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import MascotLoader from './MascotLoader';
@@ -72,6 +72,20 @@ export default function VariationStudio({
     error,
 }: VariationStudioProps) {
     const [panelVisible, setPanelVisible] = useState(true);
+    const [panelBeforeSynth, setPanelBeforeSynth] = useState(true);
+
+    // Auto-collapse panel when synthesizing begins, restore when done
+    const isSynthesizing = stage === 'synthesizing';
+    useEffect(() => {
+        if (isSynthesizing) {
+            setPanelBeforeSynth(panelVisible);
+            setPanelVisible(false);
+        } else {
+            // Restore prior state after synthesizing completes
+            setPanelVisible(panelBeforeSynth);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isSynthesizing]);
 
     // Derived data from analysis
     const style = analysisResult?.visual_dna?.graphics?.style;
@@ -79,7 +93,7 @@ export default function VariationStudio({
     const tribe = analysisResult?.buyer_dna?.identity_signals?.tribe;
     const emotion = analysisResult?.buyer_dna?.emotional_triggers?.primary_emotion;
 
-    const isSynthesizing = stage === 'synthesizing';
+
     const isAnyGenerating = generatingCardIds.size > 0;
     const hasConcepts = concepts.length > 0;
     const hasAnyArtwork = conceptArtworks.size > 0;
@@ -96,7 +110,7 @@ export default function VariationStudio({
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 z-40"
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 z-20"
                         >
                             <MascotLoader size={120} />
                             <motion.p

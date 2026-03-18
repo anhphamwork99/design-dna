@@ -11,6 +11,7 @@ import VariationStudio from '../studio/VariationStudio';
 import ConceptDetailDialog from '../studio/ConceptDetailDialog';
 import { useAuth } from '../contexts/AuthContext';
 import { analyzeDesign, cloneDesign, synthesizeConcept, generateArtwork } from '../apiClient';
+import { setStudioActive } from '../studio/useStudioActive';
 
 export default function StudioScreen() {
     // ── Auth ──
@@ -42,6 +43,12 @@ export default function StudioScreen() {
     useEffect(() => {
         document.title = 'DesignDNA — Studio';
     }, []);
+
+    // ── Signal AppShell to hide/show sidebar ──
+    useEffect(() => {
+        setStudioActive(stage !== 'goals');
+        return () => setStudioActive(false);
+    }, [stage]);
 
     // ── Handle "entry from Analyze" via route state ──
     const location = useLocation();
@@ -276,10 +283,7 @@ export default function StudioScreen() {
     );
 
     // ── Render by stage ──
-    const showTopBar = goal !== null && (
-        stage === 'studio' || stage === 'synthesizing' || stage === 'concepts' ||
-        stage === 'result' || stage === 'clone-result'
-    );
+    const showTopBar = goal !== null && stage !== 'goals';
     const goalLabel = goal ? (goalCards.find(c => c.goal === goal)?.title ?? '') : '';
 
     return (

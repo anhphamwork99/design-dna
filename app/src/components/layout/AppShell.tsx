@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { useAuth } from '../../contexts/AuthContext';
+import { useStudioActive } from '../../studio/useStudioActive';
 
 interface AppShellProps {
     children: React.ReactNode;
@@ -11,16 +12,19 @@ interface AppShellProps {
 export function AppShell({ children, onSettingsClick }: AppShellProps) {
     const { signOut } = useAuth();
     const location = useLocation();
+    const studioActive = useStudioActive();
 
-    // Studio is a full-canvas experience — hide sidebar
+    // Hide sidebar when studio is actively in use (past goal picker).
+    // Goal picker still shows sidebar for navigation context.
     const isStudioRoute = location.pathname === '/studio';
+    const hideSidebar = isStudioRoute && studioActive;
 
     return (
         <div className="flex min-h-screen bg-bg-base">
-            {!isStudioRoute && (
+            {!hideSidebar && (
                 <Sidebar signOut={signOut} onSettingsClick={onSettingsClick} />
             )}
-            <main className={`flex-1 overflow-auto ${isStudioRoute ? 'p-0' : 'p-8'}`}>
+            <main className={`flex-1 overflow-auto ${hideSidebar ? 'p-0' : 'p-8'}`}>
                 {children}
             </main>
         </div>
