@@ -193,16 +193,18 @@ function UploadStep({
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="pt-8"
-        >
-            <div className="max-w-[640px] mx-auto">
-                <h1 className="text-[32px] font-bold tracking-tight mb-2">Analyze a Design</h1>
-                <p className="text-[14px] text-text-secondary mb-8">Upload a design image to decode its visual DNA and buyer psychology.</p>
+        <div className="pt-8">
+            {/* Header */}
+            <div className="max-w-[800px] mx-auto text-center mb-8">
+                <h1 className="text-[32px] font-bold tracking-tight mb-2">
+                    Analyze a Design
+                </h1>
+                <p className="text-[14px] text-text-secondary">
+                    Upload a design image to decode its visual DNA and buyer psychology.
+                </p>
+            </div>
+
+            <div className="max-w-[800px] mx-auto">
                 {!uploadedImage ? (
                     <div
                         className={`bg-bg-surface1 border-2 border-dashed rounded-xl py-12 px-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${isDragging ? 'border-accent bg-accent/5' : 'border-border-default hover:border-accent'}`}
@@ -225,31 +227,29 @@ function UploadStep({
                     </div>
                 ) : (
                     <div className="flex flex-col">
-                        <div className="bg-bg-surface2 p-2 rounded-xl border border-border-default flex justify-center items-center">
-                            <img src={uploadedImage.data} alt="Uploaded design" className="max-h-[400px] w-full object-contain rounded-lg" />
+                        <div className="bg-bg-surface1 border border-border-default rounded-xl p-6 mb-6">
+                            <div className="flex justify-center">
+                                <img src={uploadedImage.data} alt="Uploaded design" className="max-h-[400px] max-w-full object-contain rounded-lg" />
+                            </div>
                         </div>
-
-                        <div className="h-6"></div>
 
                         <button
                             onClick={onAnalyze}
-                            className="w-full ai-gradient text-white font-medium py-[14px] px-6 rounded-lg hover:opacity-90 transition-opacity"
+                            className="w-full ai-gradient text-white font-medium py-[14px] px-6 rounded-lg hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
                         >
                             Analyze Design
                         </button>
 
-                        <div className="h-2"></div>
-
                         <button
                             onClick={() => setUploadedImage(null)}
-                            className="w-full text-text-secondary text-[14px] py-2 hover:underline"
+                            className="w-full text-text-secondary text-[14px] py-3 hover:underline mt-1"
                         >
                             Change Image
                         </button>
                     </div>
                 )}
             </div>
-        </motion.div>
+        </div>
     );
 }
 
