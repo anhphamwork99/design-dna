@@ -4,8 +4,8 @@
 
 - **Milestone:** v3.0 — UI Redesign
 - **Phase:** 21 — Compare Screen Redesign
-- **Plan:** 01 of 02
-- **Status:** 🔄 In progress — Plan 01 complete (types + upload + analyzing). Plan 02 pending (results + shell wiring).
+- **Plan:** 02 of 02
+- **Status:** ✅ Complete — Both plans done. Compare screen fully redesigned.
 
 ## Milestone History
 
@@ -14,6 +14,25 @@
 | v1.0 Full Feature App | 1–7 | ✅ Complete |
 | v2.0 Backend System | 8–13 | ✅ Complete |
 | v3.0 UI Redesign | 14–24 | 🔄 Active |
+
+## Phase 21 Results
+
+### Plan 21-01: Types + Upload + Analyzing ✅
+- `compare/types.ts`: Step, CompareImage, CompareError types
+- `compare/CompareUpload.tsx`: Multi-image drag & drop (parent-managed state)
+- `compare/CompareAnalyzing.tsx`: MascotLoader GIF + timer + error display
+- Barrel export `compare/index.ts`
+
+### Plan 21-02: CompareResults + Shell Rewrite ✅
+- `compare/CompareResults.tsx`: Redesigned results view — scannable sections, 2-row action buttons
+- `screens/CompareScreen.tsx`: Rewritten as stage-machine shell (~140 LOC)
+- `CompareScreens.tsx` deleted (565 LOC old monolith)
+- Save as Pattern → Modal + toast, Use in Studio → route state nav, New Comparison → no confirm
+- Batch upload race condition fixed (Promise.all)
+- shimmer-text + animated-dots CSS utilities (applied to all 3 loading screens)
+- Emoji icons → lucide-react (CircleCheck, FlaskConical, CircleX)
+- UX copy rewritten: Design DNA, Shared Audience, Why They Sell, Niche Level
+- Net: -85 LOC
 
 ## Phase 20 Results
 
@@ -82,6 +101,7 @@
 **Current:** React + Vite + Supabase + Hono | React Router v7, sidebar nav, screen-per-file
 **App.tsx:** 74 LOC — auth gate + router shell only
 **Studio:** 9 components in `studio/` dir — stage-machine architecture
+**Compare:** 4 components in `compare/` dir — stage-machine architecture
 
 ## Key Models
 
@@ -104,5 +124,5 @@
 
 ## Stopping Point
 
-2026-03-18: Phase 20 complete. Creative Studio redesigned from 1,063 LOC monolith to ~10 focused stage-machine components. All 3 flows (Clone, Variations, Explore) operational. "Go to Studio" wired from Analyze screen.
+2026-03-18: Phase 21 complete. Compare screen redesigned from 565 LOC monolith to 4 focused components in `compare/` dir. Results view with readable sections, 2-row action buttons, save-as-pattern modal. Loading screens polished with shimmer-text animation across all flows.
 
