@@ -35,6 +35,7 @@ export default function StudioScreen() {
     const [concepts, setConcepts] = useState<SynthesizedConcept[]>([]);
     const [conceptArtworks, setConceptArtworks] = useState<Map<number, string>>(new Map());
     const [selectedConceptIndex, setSelectedConceptIndex] = useState<number | null>(null);
+    const [generatingCardIds, setGeneratingCardIds] = useState<Set<number>>(new Set());
     const [generationStep, setGenerationStep] = useState('');
 
     // ── Page title ──
@@ -61,6 +62,7 @@ export default function StudioScreen() {
         setConcepts([]);
         setConceptArtworks(new Map());
         setSelectedConceptIndex(null);
+        setGeneratingCardIds(new Set());
         // Set default shifts for the selected goal
         setShifts(getDefaultShifts(selectedGoal));
         setAppliedPattern(null);
@@ -142,6 +144,7 @@ export default function StudioScreen() {
         setConcepts([]);
         setConceptArtworks(new Map());
         setSelectedConceptIndex(null);
+        setGeneratingCardIds(new Set());
         setStage('synthesizing');
 
         try {
@@ -168,7 +171,12 @@ export default function StudioScreen() {
 
         setSelectedConceptIndex(conceptIndex);
         setGenerationStep('Generating artwork...');
-        setStage('generating');
+        // Per-card generating: add to set instead of global stage
+        setGeneratingCardIds(prev => {
+            const next = new Set(prev);
+            next.add(conceptIndex);
+            return next;
+        });
 
         try {
             const imageBase64 = await generateArtwork(token, {
@@ -185,9 +193,20 @@ export default function StudioScreen() {
                 return next;
             });
             setSelectedConceptIndex(null); // Close dialog
+            // Remove from generating set
+            setGeneratingCardIds(prev => {
+                const next = new Set(prev);
+                next.delete(conceptIndex);
+                return next;
+            });
             setStage('result');
         } catch (err: any) {
             setError(err.message || 'Failed to generate artwork');
+            setGeneratingCardIds(prev => {
+                const next = new Set(prev);
+                next.delete(conceptIndex);
+                return next;
+            });
             setStage('concepts');
         }
     }, [token, session, concepts, uploadedImage, aspectRatio, goal]);
@@ -222,6 +241,7 @@ export default function StudioScreen() {
         setConcepts([]);
         setConceptArtworks(new Map());
         setSelectedConceptIndex(null);
+        setGeneratingCardIds(new Set());
         setStage('goals');
     };
 
@@ -252,13 +272,13 @@ export default function StudioScreen() {
     const isVariationFlow = goal !== null && goal !== 'clone';
     const showVariationStudio = isVariationFlow && (
         stage === 'studio' || stage === 'synthesizing' || stage === 'concepts' ||
-        stage === 'generating' || stage === 'result'
+        stage === 'result'
     );
 
     // ── Render by stage ──
     const showTopBar = goal !== null && (
         stage === 'studio' || stage === 'synthesizing' || stage === 'concepts' ||
-        stage === 'generating' || stage === 'result' || stage === 'clone-result'
+        stage === 'result' || stage === 'clone-result'
     );
     const goalLabel = goal ? (goalCards.find(c => c.goal === goal)?.title ?? '') : '';
 
@@ -362,9 +382,11 @@ export default function StudioScreen() {
                         onAspectRatioChange={setAspectRatio}
                         concepts={concepts}
                         conceptArtworks={conceptArtworks}
+                        generatingCardIds={generatingCardIds}
                         onCreateConcepts={handleCreateConcepts}
                         onSelectConcept={(index) => setSelectedConceptIndex(index)}
                         onQuickAction={handleQuickAction}
+                        onGenerateArtwork={handleGenerateArtwork}
                         onStartOver={handleStartOver}
                         error={error}
                     />
@@ -376,7 +398,7 @@ export default function StudioScreen() {
                 <ConceptDetailDialog
                     concept={concepts[selectedConceptIndex]}
                     artwork={conceptArtworks.get(selectedConceptIndex) || null}
-                    isGenerating={stage === 'generating'}
+                    isGenerating={generatingCardIds.has(selectedConceptIndex)}
                     generationStep={generationStep}
                     onGenerateArtwork={() => handleGenerateArtwork(selectedConceptIndex)}
                     onRegenerateArtwork={() => handleRegenerateArtwork(selectedConceptIndex)}

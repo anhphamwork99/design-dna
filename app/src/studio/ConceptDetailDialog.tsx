@@ -1,7 +1,8 @@
 import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Download, RefreshCw, Sparkles, Loader2, Paintbrush, Lightbulb } from 'lucide-react';
+import { X, Download, RefreshCw, Sparkles, Paintbrush, Lightbulb } from 'lucide-react';
 import type { SynthesizedConcept } from './types';
+import MascotLoader from './MascotLoader';
 
 interface ConceptDetailDialogProps {
     concept: SynthesizedConcept;
@@ -81,13 +82,11 @@ export default function ConceptDetailDialog({
                                 <div className="flex-1 flex items-center justify-center p-6 bg-bg-base min-h-[300px]">
                                     {isGenerating ? (
                                         <div className="flex flex-col items-center text-center">
-                                            <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default flex items-center justify-center mb-5">
-                                                <Loader2 className="w-6 h-6 text-accent animate-spin" />
-                                            </div>
-                                            <h3 className="text-[16px] font-semibold mb-1.5">
+                                            <MascotLoader size={80} />
+                                            <h3 className="text-[15px] font-medium shimmer-text mt-3">
                                                 {generationStep || 'Generating artwork...'}
                                             </h3>
-                                            <p className="text-text-tertiary text-[13px]">
+                                            <p className="text-text-tertiary text-[13px] mt-1">
                                                 This usually takes 20–40 seconds
                                             </p>
                                         </div>
