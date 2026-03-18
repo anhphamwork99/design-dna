@@ -54,7 +54,7 @@ export default function FloatingPanel({
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.2, ease: 'easeOut' }}
-                        className="bg-white rounded-2xl shadow-xl overflow-y-auto"
+                        className="bg-white rounded-2xl shadow-xl overflow-y-auto scrollbar-hide"
                         style={{
                             width: 260,
                             padding: 16,
@@ -63,6 +63,8 @@ export default function FloatingPanel({
                             flexDirection: 'column',
                             gap: 12,
                             maxHeight: '100%',
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
                         }}
                     >
                         {children}
