@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { Sparkles, AlertCircle } from 'lucide-react';
+import MascotLoader from './MascotLoader';
 import type { Stage, StudioGoal, Shifts, AppliedPatternData, SynthesizedConcept } from './types';
 import FloatingPanel from './FloatingPanel';
 import AccordionSection from './AccordionSection';
@@ -88,21 +89,26 @@ export default function VariationStudio({
             {/* ═══ CANVAS — full width ═══ */}
             <div className="flex flex-col items-center justify-center w-full h-full p-6 overflow-y-auto bg-bg-base">
                 <AnimatePresence mode="wait">
-                    {/* Synthesizing state */}
+                    {/* Synthesizing state — full canvas takeover */}
                     {isSynthesizing && (
                         <motion.div
                             key="synthesizing"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="flex flex-col items-center justify-center text-center"
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 z-40"
                         >
-                            <div className="w-14 h-14 rounded-2xl bg-bg-surface1/80 border border-border-default flex items-center justify-center mb-5">
-                                <Loader2 className="w-6 h-6 text-accent animate-spin" />
-                            </div>
-                            <h2 className="text-[16px] font-semibold mb-1.5">Creating concepts...</h2>
-                            <p className="text-text-tertiary text-[13px]">
-                                AI is synthesizing 3 design directions
+                            <MascotLoader size={120} />
+                            <motion.p
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="mt-4 text-[15px] font-medium shimmer-text"
+                            >
+                                Creating your concepts...
+                            </motion.p>
+                            <p className="text-[13px] text-text-tertiary mt-1">
+                                Synthesizing design variations from your shifts
                             </p>
                         </motion.div>
                     )}
