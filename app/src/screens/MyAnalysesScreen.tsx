@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Eye, Palette, Scale, Trash2, MoreVertical } from 'lucide-react';
+import { BookOpen, Eye, Palette, Scale, Trash2 } from 'lucide-react';
 import { listAnalyses, deleteAnalysis } from '../apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { DataGrid, ContextMenu } from '../components/shared';
@@ -91,8 +91,7 @@ export default function MyAnalysesScreen() {
         <div
             key={analysis.id}
             onClick={() => navigate(`/library/analysis/${analysis.id}`)}
-            className={`bg-bg-surface1 border border-border-default rounded-xl overflow-hidden cursor-pointer hover:border-border-hover transition-colors group ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''
-                }`}
+            className={`bg-bg-surface1 border border-border-default rounded-xl overflow-hidden cursor-pointer hover:border-border-hover transition-colors ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
             {/* Thumbnail */}
             <div className="w-full aspect-[4/3] bg-bg-surface2 overflow-hidden flex items-center justify-center">
@@ -100,42 +99,40 @@ export default function MyAnalysesScreen() {
                     <img
                         src={analysis.thumbnail}
                         alt={analysis.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover"
                     />
                 ) : (
-                    <BookOpen className="w-10 h-10 text-text-tertiary" />
+                    <BookOpen className="w-8 h-8 text-text-tertiary" />
                 )}
             </div>
 
             {/* Info */}
-            <div className="p-4 flex flex-col gap-1">
-                <div className="flex items-start justify-between gap-2">
-                    <h3
-                        className="text-[14px] font-semibold text-text-primary truncate"
-                        title={analysis.name}
-                    >
+            <div className="p-4">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                    <h3 className="text-[15px] font-semibold truncate flex-1">
                         {analysis.name}
                     </h3>
                     <ContextMenu
                         items={getMenuItems(analysis.id)}
                         trigger={
                             <button
-                                className="p-1 -mr-1 rounded-md text-text-tertiary hover:text-text-primary hover:bg-state-hover transition-colors"
-                                aria-label="Actions"
+                                className="p-1 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-state-hover transition-colors flex-shrink-0"
+                                aria-label={`Actions for ${analysis.name}`}
                             >
-                                <MoreVertical className="w-4 h-4" />
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <circle cx="8" cy="3" r="1.5" fill="currentColor" />
+                                    <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+                                    <circle cx="8" cy="13" r="1.5" fill="currentColor" />
+                                </svg>
                             </button>
                         }
                     />
                 </div>
-                <p className="text-[12px] text-text-tertiary">
+                <p className="text-[12px] text-text-tertiary mb-1.5">
                     {formatDate(analysis.created_at)}
                 </p>
                 {analysis.result_json?.visual_dna?.summary && (
-                    <p
-                        className="text-[13px] text-text-secondary line-clamp-2 mt-1"
-                        title={analysis.result_json.visual_dna.summary}
-                    >
+                    <p className="text-[13px] text-text-secondary line-clamp-2">
                         {analysis.result_json.visual_dna.summary}
                     </p>
                 )}
@@ -147,17 +144,12 @@ export default function MyAnalysesScreen() {
         <div
             key={analysis.id}
             onClick={() => navigate(`/library/analysis/${analysis.id}`)}
-            className={`flex items-center gap-4 bg-bg-surface1 border border-border-default rounded-xl px-4 py-3 cursor-pointer hover:border-border-hover transition-colors ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''
-                }`}
+            className={`bg-bg-surface1 border border-border-default rounded-xl p-3 hover:border-border-hover cursor-pointer flex items-center gap-4 transition-colors ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
             {/* Thumbnail */}
             <div className="w-12 h-12 rounded-lg bg-bg-surface2 overflow-hidden flex-shrink-0 flex items-center justify-center">
                 {analysis.thumbnail ? (
-                    <img
-                        src={analysis.thumbnail}
-                        alt={analysis.name}
-                        className="w-full h-full object-cover"
-                    />
+                    <img src={analysis.thumbnail} alt="" className="w-full h-full object-cover" />
                 ) : (
                     <BookOpen className="w-5 h-5 text-text-tertiary" />
                 )}
@@ -165,33 +157,25 @@ export default function MyAnalysesScreen() {
 
             {/* Name + summary */}
             <div className="flex-1 min-w-0">
-                <h3
-                    className="text-[14px] font-semibold text-text-primary truncate"
-                    title={analysis.name}
-                >
-                    {analysis.name}
-                </h3>
-                {analysis.result_json?.visual_dna?.summary && (
-                    <p className="text-[13px] text-text-secondary truncate">
-                        {analysis.result_json.visual_dna.summary}
-                    </p>
-                )}
+                <h3 className="text-[14px] font-semibold truncate">{analysis.name}</h3>
+                <p className="text-[12px] text-text-tertiary">
+                    {formatDate(analysis.created_at)}
+                </p>
             </div>
-
-            {/* Date */}
-            <span className="text-[12px] text-text-tertiary whitespace-nowrap flex-shrink-0">
-                {formatDate(analysis.created_at)}
-            </span>
 
             {/* Context menu */}
             <ContextMenu
                 items={getMenuItems(analysis.id)}
                 trigger={
                     <button
-                        className="p-1 rounded-md text-text-tertiary hover:text-text-primary hover:bg-state-hover transition-colors"
-                        aria-label="Actions"
+                        className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-state-hover transition-colors flex-shrink-0"
+                        aria-label={`Actions for ${analysis.name}`}
                     >
-                        <MoreVertical className="w-4 h-4" />
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <circle cx="8" cy="3" r="1.5" fill="currentColor" />
+                            <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+                            <circle cx="8" cy="13" r="1.5" fill="currentColor" />
+                        </svg>
                     </button>
                 }
             />
@@ -199,12 +183,9 @@ export default function MyAnalysesScreen() {
     );
 
     return (
-        <div className="pt-8 mb-24 max-w-[1200px] mx-auto">
-            {/* Page Header */}
+        <div className="pt-8 max-w-[960px] mx-auto">
             <div className="mb-6">
-                <h1 className="text-[28px] font-bold tracking-tight text-text-primary mb-1">
-                    My Analyses
-                </h1>
+                <h1 className="text-[32px] font-bold tracking-tight mb-1">My Analyses</h1>
                 <p className="text-[14px] text-text-secondary">
                     {analyses.length} {analyses.length === 1 ? 'analysis' : 'analyses'}
                 </p>

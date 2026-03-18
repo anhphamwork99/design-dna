@@ -114,9 +114,9 @@ export async function resizeImageIfNeeded(dataUrl: string): Promise<string> {
 }
 
 /**
- * Generate a small thumbnail from a data URL (canvas-based).
+ * Generate a thumbnail from a data URL (canvas-based, 400px max, JPEG 0.85).
  */
-export async function generateThumbnail(dataUrl: string, maxWidth: number = 200): Promise<string> {
+export async function generateThumbnail(dataUrl: string, maxWidth: number = 400): Promise<string> {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
@@ -133,10 +133,11 @@ export async function generateThumbnail(dataUrl: string, maxWidth: number = 200)
       canvas.width = newWidth;
       canvas.height = newHeight;
       const ctx = canvas.getContext('2d')!;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0, newWidth, newHeight);
 
-      // Output as JPEG quality 0.7 for small size
-      const result = canvas.toDataURL('image/jpeg', 0.7);
+      const result = canvas.toDataURL('image/jpeg', 0.85);
       resolve(result);
     };
     img.onerror = () => resolve(dataUrl); // fallback to original if error

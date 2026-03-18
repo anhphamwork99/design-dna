@@ -7,7 +7,7 @@ import type { SynthesizedConcept, SynthesizeInput, GenerateArtworkInput, CloneDe
 
 // ── Config ─────────────────────────────────────────────────────────
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API_BASE = import.meta.env.VITE_API_URL ?? '';
 
 // ── Core Fetch Helper ──────────────────────────────────────────────
 
@@ -114,8 +114,8 @@ export async function checkPatternSaved(token: string, summary: string): Promise
 
 // ── Thumbnail Helpers ──────────────────────────────────────────
 
-/** Resize a data URI to a small thumbnail (default 100x100 max). */
-export function resizeToThumbnail(dataUri: string, maxSize = 100): Promise<string> {
+/** Resize a data URI to a thumbnail (default 400px max, JPEG 0.85 quality). */
+export function resizeToThumbnail(dataUri: string, maxSize = 400): Promise<string> {
     return new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
@@ -132,9 +132,11 @@ export function resizeToThumbnail(dataUri: string, maxSize = 100): Promise<strin
             canvas.width = w;
             canvas.height = h;
             const ctx = canvas.getContext('2d')!;
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, w, h);
 
-            resolve(canvas.toDataURL('image/jpeg', 0.6));
+            resolve(canvas.toDataURL('image/jpeg', 0.85));
         };
         img.onerror = () => resolve(dataUri);
         img.src = dataUri;
