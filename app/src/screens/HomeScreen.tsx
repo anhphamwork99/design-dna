@@ -175,9 +175,8 @@ export default function HomeScreen() {
                         <img
                             src={bgAnalyze}
                             alt="Analyze Graphic"
-                            className="w-full h-full object-contain mix-blend-multiply scale-110 md:scale-125"
+                            className="w-full h-full object-contain scale-110 md:scale-125"
                             draggable={false}
-                            style={{ maskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)' }}
                         />
                     }
                 />
@@ -193,9 +192,8 @@ export default function HomeScreen() {
                         <img
                             src={bgStudio}
                             alt="Studio Graphic"
-                            className="w-full h-full object-contain mix-blend-multiply scale-110 md:scale-125"
+                            className="w-full h-full object-contain scale-110 md:scale-125"
                             draggable={false}
-                            style={{ maskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)' }}
                         />
                     }
                 />
@@ -210,9 +208,8 @@ export default function HomeScreen() {
                         <img
                             src={bgCompare}
                             alt="Compare Graphic"
-                            className="w-full h-full object-contain mix-blend-multiply scale-110 md:scale-125"
+                            className="w-full h-full object-contain scale-110 md:scale-125"
                             draggable={false}
-                            style={{ maskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse at center, black 60%, transparent 100%)' }}
                         />
                     }
                 />
