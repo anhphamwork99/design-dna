@@ -164,12 +164,25 @@ function renderAnalysisSection(title: string, data: unknown): React.ReactNode | 
         <div key={title} className="flex flex-col gap-2">
             <div>
                 <h3 className={isFormula
-                    ? 'text-[22px] font-extrabold text-text-primary tracking-tight mb-1'
+                    ? 'text-[24px] font-extrabold text-text-primary tracking-tight mb-1'
                     : 'text-[13px] font-semibold text-text-primary uppercase tracking-[0.06em] mb-1'
                 }>
                     {isFormula ? 'The Formula' : title}
                 </h3>
-                <div className="w-12 h-1 rounded-full ai-gradient mb-4"></div>
+                {isFormula ? (
+                    <svg width="80" height="10" viewBox="0 0 80 10" fill="none" className="mb-4">
+                        <defs>
+                            <linearGradient id="detail-formula-underline" x1="0" y1="0" x2="80" y2="0" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stopColor="#f472b6" />
+                                <stop offset="50%" stopColor="#a78bfa" />
+                                <stop offset="100%" stopColor="#60a5fa" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M2 7 C12 2, 20 2, 28 6 S44 10, 52 5 S68 1, 78 5" stroke="url(#detail-formula-underline)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                    </svg>
+                ) : (
+                    <div className="w-12 h-1 rounded-full ai-gradient mb-4"></div>
+                )}
             </div>
             <div className="text-[14px] text-text-primary leading-relaxed">
                 {renderValue(data)}
