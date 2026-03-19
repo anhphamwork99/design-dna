@@ -84,38 +84,9 @@ export default function CompareUpload({
             {/* Upload zone + thumbnails */}
             <div className="w-full max-w-[640px] flex flex-col gap-4">
 
-                {/* Thumbnail grid */}
-                {images.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="flex flex-wrap gap-3"
-                    >
-                        {images.map((img, index) => (
-                            <div
-                                key={index}
-                                className="relative w-[120px] h-[120px] rounded-lg overflow-hidden border border-border-default group"
-                            >
-                                <img
-                                    src={img.data}
-                                    alt={img.name}
-                                    className="w-full h-full object-cover"
-                                />
-                                <button
-                                    onClick={() => removeImage(index)}
-                                    className="absolute top-1.5 right-1.5 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
-                                    aria-label={`Remove ${img.name}`}
-                                >
-                                    <X className="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        ))}
-                    </motion.div>
-                )}
-
-                {/* Add image drop zone */}
-                {images.length < 5 && (
+                {/* Thumbnails + add square — all inline */}
+                {images.length === 0 ? (
+                    /* Empty state: full-width drop zone */
                     <div
                         className={`w-full border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-center cursor-pointer transition-colors py-10 gap-3 ${isDragging
                                 ? 'border-accent bg-accent/10'
@@ -128,22 +99,53 @@ export default function CompareUpload({
                     >
                         <UploadCloud className="w-8 h-8 text-text-secondary" />
                         <div>
-                            <p className="text-[14px] font-medium text-text-primary">
-                                {images.length === 0 ? 'Drop images here or click to browse' : 'Add more images'}
-                            </p>
-                            <p className="text-[12px] text-text-tertiary mt-1">
-                                {images.length}/5 selected · PNG, JPG, WEBP
-                            </p>
+                            <p className="text-[14px] font-medium text-text-primary">Drop images here or click to browse</p>
+                            <p className="text-[12px] text-text-tertiary mt-1">0/5 selected · PNG, JPG, WEBP</p>
                         </div>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            className="hidden"
-                            accept="image/*"
-                            multiple
-                            onChange={handleFileChange}
-                        />
+                        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" multiple onChange={handleFileChange} />
                     </div>
+                ) : (
+                    /* Has images: thumbnails + add square inline */
+                    <motion.div
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex flex-wrap gap-3"
+                    >
+                        {images.map((img, index) => (
+                            <div
+                                key={index}
+                                className="relative w-[120px] h-[120px] rounded-lg overflow-hidden border border-border-default group flex-shrink-0"
+                            >
+                                <img src={img.data} alt={img.name} className="w-full h-full object-cover" />
+                                <button
+                                    onClick={() => removeImage(index)}
+                                    className="absolute top-1.5 right-1.5 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
+                                    aria-label={`Remove ${img.name}`}
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+                        ))}
+
+                        {/* Add-image square — inline with thumbnails */}
+                        {images.length < 5 && (
+                            <div
+                                className={`w-[120px] h-[120px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-colors flex-shrink-0 gap-1.5 ${isDragging
+                                        ? 'border-accent bg-accent/10'
+                                        : 'border-border-default hover:border-border-hover bg-bg-surface1'
+                                    }`}
+                                onClick={() => fileInputRef.current?.click()}
+                                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                                onDragLeave={() => setIsDragging(false)}
+                                onDrop={handleDrop}
+                            >
+                                <UploadCloud className="w-6 h-6 text-text-secondary" />
+                                <span className="text-[11px] text-text-tertiary text-center leading-tight px-2">Add image</span>
+                                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" multiple onChange={handleFileChange} />
+                            </div>
+                        )}
+                    </motion.div>
                 )}
 
                 {/* Error */}
