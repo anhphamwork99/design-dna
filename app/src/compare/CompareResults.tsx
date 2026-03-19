@@ -90,32 +90,33 @@ export default function CompareResults({
                 </button>
             </div>
 
-            {/* ── ANALYZING: 2-col layout like AnalyzeScreen ── */}
+            {/* ── ANALYZING: header + thumbnails on top, loading below ── */}
             {isAnalyzing ? (
                 <div className="max-w-[900px] mx-auto">
-                    <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
-                        {/* Left: thumbnail grid */}
-                        <div className="w-full md:w-[40%] md:sticky md:top-[80px] self-start">
-                            <div className="bg-bg-surface2 p-2 rounded-xl border border-border-default">
-                                <div className="flex flex-wrap gap-2 p-2">
-                                    {images.map((img, i) => (
-                                        <div key={i} className="w-[calc(50%-4px)] aspect-square rounded-lg overflow-hidden border border-border-default">
-                                            <img src={img.data} alt={img.name} className="w-full h-full object-cover" />
-                                        </div>
-                                    ))}
+                    {/* Same header as results */}
+                    <div className="mb-8">
+                        <h1 className="text-[32px] font-bold tracking-tight mb-3">
+                            Your Winning Formula
+                        </h1>
+                        <p className="text-[14px] text-text-secondary mb-5">
+                            Here's what your best designs have in common — use these insights to create more winners.
+                        </p>
+                        <div className="flex gap-2 overflow-x-auto pb-2">
+                            {images.map((img, i) => (
+                                <div key={i} className="flex-shrink-0 w-[64px] h-[64px] rounded-lg overflow-hidden border border-border-default">
+                                    <img src={img.data} alt={img.name} className="w-full h-full object-cover" />
                                 </div>
-                            </div>
-                            <p className="mt-3 text-[12px] text-text-secondary">{images.length} designs being compared</p>
+                            ))}
                         </div>
+                    </div>
 
-                        {/* Right: loading */}
-                        <div className="w-full md:w-[60%] flex flex-col items-center justify-center min-h-[400px]">
-                            <CompareAnalyzing
-                                error={error}
-                                onRetry={onRetry}
-                                onCancel={onCancel}
-                            />
-                        </div>
+                    {/* Loading centered in content area */}
+                    <div className="flex flex-col items-center justify-center min-h-[360px]">
+                        <CompareAnalyzing
+                            error={error}
+                            onRetry={onRetry}
+                            onCancel={onCancel}
+                        />
                     </div>
                 </div>
             ) : (
