@@ -53,6 +53,21 @@ export function UploadZone({
         if (file) processFile(file);
     };
 
+    const handlePaste = useCallback((e: React.ClipboardEvent) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+        for (const item of items) {
+            if (item.type.startsWith('image/')) {
+                const file = item.getAsFile();
+                if (file) {
+                    e.preventDefault();
+                    processFile(file);
+                    break;
+                }
+            }
+        }
+    }, [processFile]);
+
     if (preview) {
         return (
             <div className={`relative bg-bg-surface2 rounded-[16px] border border-border-default overflow-hidden ${className}`}>
@@ -79,16 +94,18 @@ export function UploadZone({
                         ? 'border-accent bg-accent-subtle'
                         : 'border-border-default hover:border-accent bg-bg-surface1'
                     }`}
+                tabIndex={0}
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleDrop}
+                onPaste={handlePaste}
             >
                 <UploadCloud className={`text-text-tertiary mb-3 ${compact ? 'w-8 h-8' : 'w-12 h-12'}`} />
                 <p className={`font-medium text-text-primary mb-1 ${compact ? 'text-[14px]' : 'text-[16px]'}`}>
-                    Drop your design here
+                    Drop or paste your design here
                 </p>
-                <p className="text-[14px] text-text-secondary mb-1">or click to browse</p>
+                <p className="text-[14px] text-text-secondary mb-1">or click to browse · Ctrl+V to paste</p>
                 <p className="text-[12px] text-text-tertiary">PNG, JPG, WEBP · Max {maxSizeMB}MB</p>
                 <input
                     type="file"
