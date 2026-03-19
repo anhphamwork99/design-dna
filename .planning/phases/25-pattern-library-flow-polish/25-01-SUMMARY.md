@@ -2,77 +2,95 @@
 phase: 25-pattern-library-flow-polish
 plan: 01
 status: complete
-completed_at: 2026-03-19T21:43:00+07:00
+completed_at: 2026-03-19T22:37:00+07:00
 commits:
   - 5a3eea9 feat(25-01): PatternDetailScreen — top breadcrumb, flat sections, no bottom Back button
   - 33951b8 feat(25-01): LibraryScreen — Add Compare Designs CTA button to header
+  - aca76e0 feat: Pattern — merge Library+Compare into nested /pattern/* route (Layers icon, accent CTA)
+  - 86110f1 copy: rename headings — 'Deep Analyses' + 'Winning Patterns'
+  - cf3eda7 copy: rename buttons — 'Find Pattern' on /pattern CTA + empty state
+  - 727245e feat(compare): apply New Analysis layout — breadcrumb, centered upload, AnimatePresence, CTA on ≥2 images
+  - c5ba807 feat(sidebar): single flat nav, rename Pattern→Winning Patterns, Analyze→Deep Analyze, remove sections
+  - 3112624 feat(sidebar): reorder nav — Home > Studio > Deep Analyze > Winning Patterns
+  - 0116873 feat(compare): inline add-image square with thumbnails in flex-wrap row
+  - c16355b feat(compare): loading screen matches Deep Analyze — energy bar, step labels, error Modal, cancel confirm
+  - 2ec006b feat(compare-results): back breadcrumb, gradient h2, shadow card, gradient h3 icons, neutral list dots
+  - 11b1546 feat(compare): loading embedded in results layout
+  - 8c9a193 feat(compare): loading layout — header+thumbnails on top, energy bar centered below
+  - 3d9ca60 feat(formula-heading): neutral extrabold + AI gradient underline decor
+  - fd9b59b style(formula): 24px heading + SVG wavy gradient underline
+  - 77a58a0 feat(pattern-detail): rewrite to match CompareResults — full card layout sync
 ---
 
 ## Summary
 
-Applied Analyze screen navigation patterns to Pattern Library flow for UX consistency across both features.
+Phase 25 — Pattern Library Flow Polish. Merged Library + Compare into unified `/pattern/*` route. Synced all UI patterns across Compare flow, Pattern Detail, Sidebar, and nav structure. Applied premium visual treatments (gradient icons, SVG underlines, energy bar loading).
 
-## Tasks Completed
+## Changes by Area
 
-### Task 1: PatternDetailScreen — Breadcrumb + Flat Sections ✅
+### 1. Route & Navigation Restructure
 
-**Changes to `app/src/screens/PatternDetailScreen.tsx`:**
+- **Merged Library + Compare** into nested `/pattern/*` route with `Layers` icon
+- **Sidebar** consolidated to single flat list (removed WORKSPACE/TOOLS sections)
+- **Nav reordered**: Home → Studio → Deep Analyze → Winning Patterns
+- **Renamed**: "Pattern" → "Winning Patterns", "Analyze" → "Deep Analyze"
+- **Button copy**: "Compare Designs" → "Find Pattern" for consistency
 
-1. **Top breadcrumb added** — Inline `← Back to Library` text button placed BEFORE the main content flex row:
-   ```tsx
-   <button onClick={() => navigate('/library')}
-     className="flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-text-primary transition-colors mb-6">
-     <ArrowLeft className="w-4 h-4" />
-     <span>Back to Library</span>
-   </button>
-   ```
+### 2. CompareUpload (`/pattern/compare`)
 
-2. **Bottom "Back to Library" button removed** — Action bar now contains only:
-   - `Use in Studio` (primary)
-   - `Delete Pattern` (secondary)
+- Applied New Analysis layout: breadcrumb at top, centered upload zone, AnimatePresence transitions
+- Inline add-image square with thumbnails in flex-wrap row (120×120 add button)
+- CTA shown only when ≥2 images selected
 
-3. **Analysis sections flattened** — `renderAnalysisSection` updated from card-style (`bg-bg-surface2 p-4 rounded-lg`) to flat heading + content style:
-   ```tsx
-   <div className="flex flex-col gap-2">
-     <h3 className="text-[13px] font-semibold text-text-primary uppercase tracking-[0.06em]">{title}</h3>
-     <div className="text-[14px] text-text-primary leading-relaxed">{renderValue(data)}</div>
-   </div>
-   ```
+### 3. CompareAnalyzing (Loading State)
 
-4. **Gap increased** — Analysis sections container changed from `gap-4` → `gap-6` for breathing room.
+- Refactored to match AnalyzeLoadingStep: MascotLoader (120px), energy bar progress, 4 step labels
+- Error Modal overlay + cancel confirmation dialog
+- **Embedded inside CompareResults** — header+thumbnails remain on top, energy bar centered below (not separate full-screen step)
 
-### Task 2: LibraryScreen — Compare Designs CTA ✅
+### 4. CompareResults (`/pattern/compare` results)
 
-**Changes to `app/src/screens/LibraryScreen.tsx`:**
+- "← Back to Patterns" breadcrumb at top
+- "The Formula" heading: **24px extrabold neutral** + **SVG wavy gradient underline** (cubic bezier curves)
+- Main card: accent border replaced with `box-shadow: 0 4px 24px rgba(0,0,0,0.07)`
+- H3 sections (Design DNA, Shared Audience, Why They Sell): **filled gradient icon badges** (ai-gradient 6×6 rounded-md + white icon)
+- List items: neutral dot icon (`bg-text-tertiary`) instead of accent
+- "Your Sweet Spot" niche row: **AI gradient background** + Trophy icon
+- `ai-gradient-text` utility class added to `utilities.css`
 
-1. **Button import added** — `Button` added to shared components import.
+### 5. PatternDetailScreen (`/pattern/:id`)
 
-2. **Header updated to flex row** — `mb-6` div → `mb-6 flex items-start justify-between gap-4`:
-   - Left: title + subtitle text
-   - Right: `Compare Designs` primary button navigating to `/compare`
+- **Full rewrite** to match CompareResults layout 1:1:
+  - Single-column max-w-900px (was 2-col 40/60)
+  - Breadcrumb → H1 + metadata → Thumbnail row → The Formula card
+  - Keep/Try Changing/Stop Doing 3-column colored grid
+  - Design DNA 2×2 grid, Shared Audience 2×2 grid
+  - Why They Sell styled list + Niche Level ladder (Broad → Focused → Sweet Spot gradient)
+  - Actions: Use in Studio + New Comparison + Delete
+  - SVG wavy gradient underline on "The Formula"
+
+## Files Modified
+
+| File | Changes |
+|------|---------|
+| `app/src/screens/PatternScreen.tsx` | New — merged Library+Compare with nested routes |
+| `app/src/screens/LibraryScreen.tsx` | "Find Pattern" CTA in header |
+| `app/src/screens/PatternDetailScreen.tsx` | Full rewrite — cards, gradient icons, niche ladder |
+| `app/src/screens/CompareScreen.tsx` | Loading embedded in results, breadcrumb, AnimatePresence |
+| `app/src/compare/CompareUpload.tsx` | Inline thumbnails + add-square, centered layout |
+| `app/src/compare/CompareAnalyzing.tsx` | MascotLoader, energy bar, error modal, cancel dialog |
+| `app/src/compare/CompareResults.tsx` | Full visual polish — gradient heading, shadow card, icons |
+| `app/src/components/layout/Sidebar.tsx` | Flat nav, reorder, rename labels |
+| `app/src/styles/utilities.css` | Added `.ai-gradient-text` utility |
 
 ## Verification
 
-All success criteria met:
-
 | Criterion | Result |
 |-----------|--------|
-| PatternDetailScreen: top breadcrumb "← Back to Library" | ✅ |
-| PatternDetailScreen: bottom Back button removed | ✅ |
-| PatternDetailScreen: analysis sections flat (no card wrappers) | ✅ |
-| LibraryScreen: "Compare Designs" CTA in header | ✅ |
-| Navigation consistent with Analyze flow | ✅ |
+| `/pattern` route renders Library with "Find Pattern" CTA | ✅ |
+| `/pattern/compare` renders Compare flow (upload → analyzing → results) | ✅ |
+| `/pattern/:id` renders detail matching CompareResults layout | ✅ |
+| Sidebar: flat list, correct order and labels | ✅ |
+| Loading state embedded in results page (not separate screen) | ✅ |
+| "The Formula" — 24px extrabold + SVG wavy gradient underline | ✅ |
 | Build passes (0 errors) | ✅ |
-
-## Build Output
-
-```
-✓ 2185 modules transformed.
-✓ built in 1.30s
-```
-
-## Notes
-
-- `ArrowLeft` import retained in PatternDetailScreen — used by the top breadcrumb button.
-- Pattern matches AnalyzeScreen's `← Back to Analyses` breadcrumb exactly (same className, same icon).
-- `Button` component was already available in `../components/shared` barrel export.
