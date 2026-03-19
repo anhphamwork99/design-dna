@@ -1,7 +1,7 @@
 import React from 'react';
 
 type ButtonProps = React.ComponentProps<'button'> & {
-    variant?: 'primary' | 'secondary' | 'ghost' | 'icon';
+    variant?: 'primary' | 'secondary' | 'ghost' | 'icon' | 'accent';
     size?: 'sm' | 'md' | 'lg';
     loading?: boolean;
     children: React.ReactNode;
@@ -20,6 +20,7 @@ export function Button({
 
     const variantStyles = {
         primary: 'ai-gradient text-white hover:opacity-90 rounded-lg',
+        accent: 'bg-accent text-white hover:bg-accent-hover rounded-lg',
         secondary: 'bg-bg-surface2 text-text-primary border border-border-default hover:bg-bg-surface3 rounded-lg',
         ghost: 'text-text-secondary hover:text-text-primary hover:bg-state-hover rounded-lg',
         icon: 'text-text-secondary hover:text-text-primary hover:bg-state-hover rounded-full',

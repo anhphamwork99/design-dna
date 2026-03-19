@@ -24,7 +24,7 @@ export function AppShell({ children, onSettingsClick }: AppShellProps) {
             {!hideSidebar && (
                 <Sidebar signOut={signOut} onSettingsClick={onSettingsClick} />
             )}
-            <main className={`flex-1 overflow-auto ${hideSidebar ? 'p-0' : 'p-8'}`}>
+            <main className={`flex-1 overflow-x-clip ${hideSidebar ? 'p-0' : 'p-8'}`}>
                 {children}
             </main>
         </div>

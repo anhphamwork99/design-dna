@@ -11,3 +11,4 @@ export { ContextMenu } from './ContextMenu';
 export type { ContextMenuItem } from './ContextMenu';
 export { DataGrid } from './DataGrid';
 export { ImageLightbox } from './ImageLightbox';
+export { DataPairRow, DataPointCard, TagChip } from './DataDisplay';

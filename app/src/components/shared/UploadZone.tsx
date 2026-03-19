@@ -75,7 +75,7 @@ export function UploadZone({
                 {onClear && (
                     <button
                         onClick={onClear}
-                        className="absolute top-3 right-3 bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70 transition-colors"
+                        className="absolute top-3 right-3 bg-bg-surface1/90 backdrop-blur-sm text-text-secondary border border-border-default p-1.5 rounded-full hover:text-text-primary hover:bg-bg-surface1 transition-colors shadow-sm"
                         aria-label="Remove image"
                     >
                         <X className="w-4 h-4" />

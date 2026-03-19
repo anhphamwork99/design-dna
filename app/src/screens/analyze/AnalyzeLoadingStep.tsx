@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Modal, Button } from '../../components/shared';
+import MascotLoader from '../../studio/MascotLoader';
 import type { AnalyzeError } from './types';
 
 interface AnalyzeLoadingStepProps {
@@ -77,16 +78,11 @@ export function AnalyzeLoadingStep({
     const canChangeApiKey = error?.type === 'api' && error.message.includes('API key');
 
     return (
-        <div className="flex-1 flex items-center justify-center min-h-[500px]">
+        <div className="flex flex-col items-center w-full">
             {/* Loading Content */}
             <div className="flex flex-col items-center gap-6 w-full max-w-[400px] px-6">
                 {/* MascotLoader GIF */}
-                <img
-                    src="/mascot-loader.gif"
-                    alt="Analyzing..."
-                    style={{ height: '120px', width: 'auto' }}
-                    className="object-contain"
-                />
+                <MascotLoader size={120} />
 
                 {/* Step text */}
                 <p className="text-[14px] text-text-secondary text-center shimmer-text">

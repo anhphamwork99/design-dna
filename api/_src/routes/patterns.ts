@@ -1,8 +1,11 @@
 import { Hono } from 'hono';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { authMiddleware } from '../middleware/auth.js';
+import { uploadThumbnails } from '../lib/storage.js';
+import type { CloudflareBindings } from '../app.js';
 
 type Env = {
+    Bindings: CloudflareBindings;
     Variables: {
         user: User;
         supabase: SupabaseClient;
@@ -45,6 +48,18 @@ patternsRoute.post('/patterns', async (c) => {
             );
         }
 
+        // Upload thumbnails to Storage (base64 → CDN URLs)
+        let thumbnailUrls = body.thumbnails || [];
+        if (thumbnailUrls.length > 0) {
+            const patternFileId = crypto.randomUUID();
+            thumbnailUrls = await uploadThumbnails(
+                c.env.SUPABASE_URL,
+                c.env.SUPABASE_SERVICE_ROLE_KEY,
+                thumbnailUrls,
+                `patterns/${user.id}/${patternFileId}`,
+            );
+        }
+
         const { data, error } = await supabase
             .from('patterns')
             .insert({
@@ -52,7 +67,7 @@ patternsRoute.post('/patterns', async (c) => {
                 name: body.name.trim(),
                 summary: body.summary || null,
                 source_image_count: body.sourceImageCount || null,
-                thumbnails: body.thumbnails || null,
+                thumbnails: thumbnailUrls,
                 batch_analysis: body.batchAnalysis,
             })
             .select('id, name, created_at')

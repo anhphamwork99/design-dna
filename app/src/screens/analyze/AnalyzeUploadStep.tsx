@@ -24,10 +24,10 @@ export function AnalyzeUploadStep({
             {/* Header */}
             <div className="text-center mb-10 max-w-[520px]">
                 <h1 className="text-[28px] font-bold tracking-tight mb-3">
-                    Analyze a Design
+                    Understand what makes any design work
                 </h1>
                 <p className="text-[14px] text-text-secondary leading-relaxed">
-                    Upload a design image to decode its visual DNA and uncover the buyer psychology behind it.
+                    Upload any product or marketing design — we'll break down its style, color strategy, and the audience it's built to attract.
                 </p>
             </div>
 

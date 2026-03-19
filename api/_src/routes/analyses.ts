@@ -1,8 +1,11 @@
 import { Hono } from 'hono';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import { authMiddleware } from '../middleware/auth.js';
+import { uploadThumbnail, isBase64DataUrl } from '../lib/storage.js';
+import type { CloudflareBindings } from '../app.js';
 
 type Env = {
+    Bindings: CloudflareBindings;
     Variables: {
         user: User;
         supabase: SupabaseClient;
@@ -36,12 +39,24 @@ analysesRoute.post('/analyses', async (c) => {
             );
         }
 
+        // Upload thumbnail to Storage if it's a base64 data URL
+        let thumbnailValue = body.thumbnail || null;
+        if (thumbnailValue && isBase64DataUrl(thumbnailValue)) {
+            const fileId = crypto.randomUUID();
+            thumbnailValue = await uploadThumbnail(
+                c.env.SUPABASE_URL,
+                c.env.SUPABASE_SERVICE_ROLE_KEY,
+                thumbnailValue,
+                `analyses/${user.id}/${fileId}.jpg`,
+            );
+        }
+
         const { data, error } = await supabase
             .from('analyses')
             .insert({
                 user_id: user.id,
                 name: body.name || null,
-                thumbnail: body.thumbnail || null,
+                thumbnail: thumbnailValue,
                 result_json: body.resultJson,
             })
             .select('id, name, created_at')

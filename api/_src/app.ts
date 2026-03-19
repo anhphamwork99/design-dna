@@ -5,6 +5,7 @@ import { apiKeysRoute } from './routes/api-keys.js';
 import { aiRoute } from './routes/ai.js';
 import { analysesRoute } from './routes/analyses.js';
 import { patternsRoute } from './routes/patterns.js';
+import { migrateThumbnailsRoute } from './routes/migrate-thumbnails.js';
 
 /**
  * Cloudflare Worker Bindings — set via `wrangler secret put`.
@@ -79,5 +80,6 @@ app.route('/api', apiKeysRoute);
 app.route('/api', aiRoute);
 app.route('/api', analysesRoute);
 app.route('/api', patternsRoute);
+app.route('/api', migrateThumbnailsRoute);
 
 export default app;
