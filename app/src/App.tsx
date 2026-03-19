@@ -12,9 +12,7 @@ import {
   CompareScreen,
   StudioScreen,
   LibraryScreen,
-  ViewAnalysisScreen,
   PatternDetailScreen,
-  MyAnalysesScreen,
 } from './screens';
 
 export default function App() {
@@ -57,13 +55,11 @@ export default function App() {
     <AppShell onSettingsClick={() => setIsSettingsOpen(true)}>
       <Routes>
         <Route path="/" element={<HomeScreen />} />
-        <Route path="/analyze" element={<AnalyzeScreen />} />
+        <Route path="/analyze/*" element={<AnalyzeScreen />} />
         <Route path="/studio" element={<StudioScreen />} />
         <Route path="/compare" element={<CompareScreen />} />
         <Route path="/library" element={<LibraryScreen />} />
         <Route path="/library/pattern/:id" element={<PatternDetailScreen />} />
-        <Route path="/library/analysis/:id" element={<ViewAnalysisScreen />} />
-        <Route path="/analyses" element={<MyAnalysesScreen />} />
       </Routes>
 
       <AnimatePresence>

@@ -67,7 +67,7 @@ export default function MyAnalysesScreen() {
         {
             label: 'View',
             icon: Eye,
-            onClick: () => navigate(`/library/analysis/${id}`),
+            onClick: () => navigate(`/analyze/${id}`),
         },
         {
             label: 'Use in Studio',
@@ -90,10 +90,9 @@ export default function MyAnalysesScreen() {
     const renderGridItem = (analysis: any) => (
         <div
             key={analysis.id}
-            onClick={() => navigate(`/library/analysis/${analysis.id}`)}
+            onClick={() => navigate(`/analyze/${analysis.id}`)}
             className={`bg-bg-surface1 border border-border-default rounded-xl cursor-pointer hover:border-border-hover transition-colors ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
-            {/* Thumbnail */}
             <div
                 className="w-full aspect-[4/3] overflow-hidden flex items-center justify-center rounded-t-xl"
                 style={{ backgroundColor: analysis.thumbnail ? '#e8e8e8' : undefined }}
@@ -111,7 +110,6 @@ export default function MyAnalysesScreen() {
                 )}
             </div>
 
-            {/* Info */}
             <div className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-1">
                     <h3 className="text-[15px] font-semibold truncate flex-1">
@@ -148,10 +146,9 @@ export default function MyAnalysesScreen() {
     const renderListItem = (analysis: any) => (
         <div
             key={analysis.id}
-            onClick={() => navigate(`/library/analysis/${analysis.id}`)}
+            onClick={() => navigate(`/analyze/${analysis.id}`)}
             className={`bg-bg-surface1 border border-border-default rounded-xl p-3 hover:border-border-hover cursor-pointer flex items-center gap-4 transition-colors ${deletingId === analysis.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
-            {/* Thumbnail */}
             <div
                 className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
                 style={{ backgroundColor: analysis.thumbnail ? '#e8e8e8' : undefined }}
@@ -163,7 +160,6 @@ export default function MyAnalysesScreen() {
                 )}
             </div>
 
-            {/* Name + summary */}
             <div className="flex-1 min-w-0">
                 <h3 className="text-[14px] font-semibold truncate">{analysis.name}</h3>
                 <p className="text-[12px] text-text-tertiary">
@@ -171,7 +167,6 @@ export default function MyAnalysesScreen() {
                 </p>
             </div>
 
-            {/* Context menu */}
             <ContextMenu
                 items={getMenuItems(analysis.id)}
                 trigger={

@@ -1,26 +1,77 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { UploadCloud, AlertTriangle, ImageOff, Copy, Check, Sparkles } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { ImageOff, Copy, Check, ArrowLeft, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
-import { analyzeDesign, saveAnalysis, getAnalysis } from '../apiClient';
+import { analyzeDesign, saveAnalysis } from '../apiClient';
 import { generateThumbnail } from '../api';
 import { useAuth } from '../contexts/AuthContext';
+import { Button } from '../components/shared';
+import { AnalyzeUploadStep } from './analyze/AnalyzeUploadStep';
+import { AnalyzeLoadingStep } from './analyze/AnalyzeLoadingStep';
+import { AnalyzeGoToStudioButton } from './analyze/AnalyzeGoToStudioButton';
+import { AnalyzeBuyerTab } from './analyze/AnalyzeBuyerTab';
+import { AnalyzeVisualTab } from './analyze/AnalyzeVisualTab';
+import MyAnalysesScreen from './MyAnalysesScreen';
+import ViewAnalysisScreen from './ViewAnalysisScreen';
+import type { AnalyzeImage, AnalyzeError } from './analyze/types';
+
+// ── Nested Route Shell ─────────────────────────────────────────────
+
+export default function AnalyzeScreen() {
+    return (
+        <Routes>
+            <Route index element={<AnalyzeListView />} />
+            <Route path="new" element={<AnalyzeNewFlow />} />
+            <Route path=":id" element={<ViewAnalysisScreen />} />
+        </Routes>
+    );
+}
+
+// ── Analyze List View ──────────────────────────────────────────────
+// Wraps MyAnalysesScreen + "New Analysis" CTA header
+
+function AnalyzeListView() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        document.title = 'DesignDNA — Analyze';
+    }, []);
+
+    return (
+        <div>
+            {/* Header bar with CTA */}
+            <div className="flex items-center justify-between pt-8 pb-2 max-w-[960px] mx-auto">
+                <div /> {/* spacer — title is rendered inside MyAnalysesScreen */}
+                <Button
+                    onClick={() => navigate('/analyze/new')}
+                    className="flex items-center gap-2"
+                >
+                    <Plus className="w-4 h-4" />
+                    New Analysis
+                </Button>
+            </div>
+            <MyAnalysesScreen />
+        </div>
+    );
+}
+
+// ── Analyze New Flow ───────────────────────────────────────────────
+// The existing 3-step upload → analyzing → results state machine
 
 type Step = 'upload' | 'analyzing' | 'results';
 
-export default function AnalyzeScreen() {
+function AnalyzeNewFlow() {
+    const navigate = useNavigate();
     const { session } = useAuth();
     const [currentStep, setCurrentStep] = useState<Step>('upload');
-    const [uploadedImage, setUploadedImage] = useState<{ data: string; name: string; type: string } | null>(null);
+    const [uploadedImage, setUploadedImage] = useState<AnalyzeImage | null>(null);
     const [analysisResult, setAnalysisResult] = useState<any>(null);
-    const [error, setError] = useState<{ type: string; message: string } | null>(null);
-    const [initialGenMode, setInitialGenMode] = useState<string | undefined>(undefined);
-    const [savedAnalysisId, setSavedAnalysisId] = useState<string | null>(null);
+    const [error, setError] = useState<AnalyzeError | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
         const titles: Record<Step, string> = {
-            upload: 'DesignDNA — Analyze',
+            upload: 'DesignDNA — New Analysis',
             analyzing: 'DesignDNA — Analyzing…',
             results: 'DesignDNA — Results',
         };
@@ -60,11 +111,6 @@ export default function AnalyzeScreen() {
                         thumbnail,
                         resultJson: result
                     })
-                        .then(saved => {
-                            if (saved && saved.id) {
-                                setSavedAnalysisId(saved.id);
-                            }
-                        })
                         .catch(err => console.warn('Failed to auto-save analysis:', err));
                 })
                 .catch(err => console.warn('Failed to generate thumbnail for auto-save:', err));
@@ -122,248 +168,43 @@ export default function AnalyzeScreen() {
     };
 
     return (
-        <AnimatePresence mode="wait">
-            {currentStep === 'analyzing' ? (
-                <AnalyzingStep
-                    key="analyzing"
-                    uploadedImage={uploadedImage}
-                    error={error}
-                    onRetry={() => handleAnalyze()}
-                    onCancel={handleCancelAnalysis}
-                />
-            ) : currentStep === 'results' ? (
-                <ResultsStep
-                    key="results"
-                    uploadedImage={uploadedImage}
-                    analysisResult={analysisResult}
-                    onNavigate={setCurrentStep}
-                    setInitialGenMode={setInitialGenMode}
-                />
-            ) : (
-                <UploadStep
-                    key="upload"
-                    uploadedImage={uploadedImage}
-                    setUploadedImage={setUploadedImage}
-                    onAnalyze={() => handleAnalyze()}
-                />
-            )}
-        </AnimatePresence>
-    );
-}
-
-
-// ── Upload Step ────────────────────────────────────────────────────
-
-function UploadStep({
-    uploadedImage,
-    setUploadedImage,
-    onAnalyze
-}: {
-    key?: string;
-    uploadedImage: { data: string; name: string; type: string } | null;
-    setUploadedImage: (img: { data: string; name: string; type: string } | null) => void;
-    onAnalyze: () => void;
-}) {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                setUploadedImage({ data: event.target?.result as string, name: file.name, type: file.type });
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-        const file = e.dataTransfer.files?.[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                setUploadedImage({ data: event.target?.result as string, name: file.name, type: file.type });
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    return (
-        <div className="pt-8">
-            {/* Header */}
-            <div className="max-w-[800px] mx-auto text-center mb-8">
-                <h1 className="text-[32px] font-bold tracking-tight mb-2">
-                    Analyze a Design
-                </h1>
-                <p className="text-[14px] text-text-secondary">
-                    Upload a design image to decode its visual DNA and buyer psychology.
-                </p>
+        <div>
+            {/* Back link */}
+            <div className="pt-6 pb-2 max-w-[960px] mx-auto">
+                <button
+                    onClick={() => navigate('/analyze')}
+                    className="flex items-center gap-1.5 text-[13px] text-text-secondary hover:text-text-primary transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Analyses
+                </button>
             </div>
 
-            <div className="max-w-[800px] mx-auto">
-                {!uploadedImage ? (
-                    <div
-                        className={`bg-bg-surface1 border-2 border-dashed rounded-xl py-12 px-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${isDragging ? 'border-accent bg-accent/5' : 'border-border-default hover:border-accent'}`}
-                        onClick={() => fileInputRef.current?.click()}
-                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                        onDragLeave={() => setIsDragging(false)}
-                        onDrop={handleDrop}
-                    >
-                        <UploadCloud className="w-12 h-12 text-text-secondary mb-4" />
-                        <h3 className="text-[16px] font-medium text-text-primary mb-1">Drop your design here</h3>
-                        <p className="text-[14px] text-text-secondary mb-2">or click to browse</p>
-                        <p className="text-[12px] text-text-tertiary">PNG, JPG, WEBP</p>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            className="hidden"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                        />
-                    </div>
+            <AnimatePresence mode="wait">
+                {currentStep === 'analyzing' ? (
+                    <AnalyzeLoadingStep
+                        key="analyzing"
+                        error={error}
+                        onRetry={() => handleAnalyze()}
+                        onCancel={handleCancelAnalysis}
+                    />
+                ) : currentStep === 'results' ? (
+                    <ResultsStep
+                        key="results"
+                        uploadedImage={uploadedImage}
+                        analysisResult={analysisResult}
+                        onNavigate={setCurrentStep}
+                    />
                 ) : (
-                    <div className="flex flex-col">
-                        <div className="bg-bg-surface1 border border-border-default rounded-xl p-6 mb-6">
-                            <div className="flex justify-center">
-                                <img src={uploadedImage.data} alt="Uploaded design" className="max-h-[400px] max-w-full object-contain rounded-lg" />
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={onAnalyze}
-                            className="w-full ai-gradient text-white font-medium py-[14px] px-6 rounded-lg hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-                        >
-                            Analyze Design
-                        </button>
-
-                        <button
-                            onClick={() => setUploadedImage(null)}
-                            className="w-full text-text-secondary text-[14px] py-3 hover:underline mt-1"
-                        >
-                            Change Image
-                        </button>
-                    </div>
+                    <AnalyzeUploadStep
+                        key="upload"
+                        uploadedImage={uploadedImage}
+                        setUploadedImage={setUploadedImage}
+                        onAnalyze={() => handleAnalyze()}
+                    />
                 )}
-            </div>
+            </AnimatePresence>
         </div>
-    );
-}
-
-
-// ── Analyzing Step ─────────────────────────────────────────────────
-
-function AnalyzingStep({
-    uploadedImage,
-    error,
-    onRetry,
-    onCancel
-}: {
-    key?: string;
-    uploadedImage: { data: string; name: string; type: string } | null;
-    error: { type: string; message: string } | null;
-    onRetry: () => void;
-    onCancel: () => void;
-}) {
-    const [elapsed, setElapsed] = useState(0);
-
-    useEffect(() => {
-        if (error) return;
-        const interval = setInterval(() => {
-            setElapsed(prev => prev + 1);
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [error]);
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="pt-8"
-        >
-            <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
-                <div className="w-full md:w-[40%] md:sticky md:top-[80px] self-start">
-                    {uploadedImage ? (
-                        <div className="relative overflow-hidden bg-bg-surface2 p-2 rounded-xl border border-border-default">
-                            <img src={uploadedImage.data} alt="Analyzing design" className="w-full max-h-[300px] md:max-h-none object-contain rounded-lg" />
-                            <div className="animate-scan-line"></div>
-                        </div>
-                    ) : (
-                        <div className="w-full aspect-square bg-bg-surface2 rounded-xl animate-shimmer border border-border-default"></div>
-                    )}
-                </div>
-
-                <div className="w-full md:w-[60%] flex flex-col gap-6">
-                    {error ? (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-bg-surface1 border-l-4 border-l-error rounded-xl p-4 flex flex-col gap-3"
-                        >
-                            <div className="flex items-center gap-2 text-error">
-                                <AlertTriangle className="w-5 h-5" />
-                                <h3 className="text-[14px] font-semibold">Connection Failed</h3>
-                            </div>
-                            <p className="text-[14px] text-text-secondary">{error.message}</p>
-                            <div className="flex flex-wrap gap-3 mt-2">
-                                <button onClick={onRetry} className="bg-accent text-white px-4 py-2 rounded-lg text-[14px] font-medium hover:bg-accent-hover">
-                                    Retry
-                                </button>
-                                {error.type === 'api' && error.message.includes('API key') && (
-                                    <button onClick={() => { document.dispatchEvent(new CustomEvent('open-settings')); onCancel(); }} className="text-text-secondary hover:text-text-primary px-4 py-2 rounded-lg text-[14px] font-medium border border-border-default hover:bg-bg-surface2">
-                                        Change API Key
-                                    </button>
-                                )}
-                                <button onClick={onCancel} className="text-text-secondary hover:text-text-primary px-4 py-2 rounded-lg text-[14px] font-medium">
-                                    Cancel
-                                </button>
-                            </div>
-                        </motion.div>
-                    ) : (
-                        <>
-                            <div>
-                                <h1 className="text-[32px] font-bold tracking-tight mb-2">Analysis Results</h1>
-                                <p className="text-[14px] text-text-secondary">Here is the detailed breakdown of the original design and its target buyers.</p>
-                            </div>
-
-                            <div className="flex border-b border-border-default">
-                                <button className="py-3 px-5 text-[13px] font-medium uppercase tracking-[0.05em] relative text-text-primary">
-                                    Design Breakdown
-                                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
-                                </button>
-                                <button className="py-3 px-5 text-[13px] font-medium uppercase tracking-[0.05em] text-text-secondary">
-                                    Target Audience
-                                </button>
-                            </div>
-
-                            {[1, 2, 3, 4, 5].map(i => (
-                                <div key={i} className="flex flex-col gap-3">
-                                    <div className="h-5 w-[200px] bg-bg-surface2 rounded animate-shimmer"></div>
-                                    <div className="h-4 w-full bg-bg-surface2 rounded animate-shimmer"></div>
-                                    <div className="h-4 w-[80%] bg-bg-surface2 rounded animate-shimmer"></div>
-                                    <div className="h-4 w-[60%] bg-bg-surface2 rounded animate-shimmer"></div>
-                                </div>
-                            ))}
-                        </>
-                    )}
-                </div>
-            </div>
-
-            {!error && (
-                <div className="mt-8 text-center flex flex-col items-center gap-2">
-                    <p className="text-[14px] text-text-secondary">
-                        Analyzing... {elapsed}s
-                    </p>
-                    <button onClick={onCancel} className="text-[14px] text-text-tertiary hover:text-text-secondary hover:underline">
-                        Cancel
-                    </button>
-                </div>
-            )}
-        </motion.div>
     );
 }
 
@@ -374,14 +215,12 @@ function ResultsStep({
     uploadedImage,
     analysisResult,
     onNavigate,
-    setInitialGenMode,
     readMode = false
 }: {
     key?: string;
     uploadedImage: { data: string; name: string } | null;
     analysisResult: any;
     onNavigate: (s: Step) => void;
-    setInitialGenMode: (mode: string | undefined) => void;
     readMode?: boolean;
 }) {
     const [activeTab, setActiveTab] = useState<'visual' | 'buyer'>('visual');
@@ -419,12 +258,12 @@ function ResultsStep({
             <ImageOff className="w-12 h-12 text-text-tertiary" />
             <h2 className="text-[20px] font-semibold">No Analysis Data</h2>
             <p className="text-[14px] text-text-secondary max-w-[400px]">It looks like there's no analysis to show. Upload a design to get started.</p>
-            <button
+            <Button
                 onClick={() => onNavigate('upload')}
-                className="mt-2 px-5 py-3 rounded-lg ai-gradient text-white text-[14px] font-medium hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+                className="mt-2"
             >
                 Upload a Design
-            </button>
+            </Button>
         </motion.div>
     );
 
@@ -489,394 +328,42 @@ function ResultsStep({
                         role="tabpanel"
                     >
                         {activeTab === 'visual' && visualDNA && (
-                            <>
-                                {visualDNA.summary && (
-                                    <motion.div variants={itemVariants} className="bg-bg-surface2 p-4 rounded-lg text-[14px] leading-relaxed italic text-text-secondary border border-border-default">
-                                        {visualDNA.summary}
-                                    </motion.div>
-                                )}
-
-                                <motion.div variants={itemVariants}>
-                                    <h3 className="text-[16px] font-semibold mb-3">Composition</h3>
-                                    <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-[14px]">
-                                        <div className="flex justify-between items-center border-b border-border-default pb-2">
-                                            <span className="text-text-secondary">Grid Type</span>
-                                            <span className="text-text-primary font-medium text-right">{visualDNA.composition?.grid_type}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center border-b border-border-default pb-2">
-                                            <span className="text-text-secondary">Symmetry</span>
-                                            <span className="text-text-primary font-medium text-right">{visualDNA.composition?.symmetry}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center border-b border-border-default pb-2">
-                                            <span className="text-text-secondary">Focal Point</span>
-                                            <span className="text-text-primary font-medium text-right">{visualDNA.composition?.focal_point}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center border-b border-border-default pb-2">
-                                            <span className="text-text-secondary">Visual Flow</span>
-                                            <span className="text-text-primary font-medium text-right">{visualDNA.composition?.visual_flow}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center border-b border-border-default pb-2">
-                                            <span className="text-text-secondary">Density</span>
-                                            <span className="text-text-primary font-medium text-right">{visualDNA.composition?.density}</span>
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                <motion.div variants={itemVariants}>
-                                    <h3 className="text-[16px] font-semibold mb-3">Color</h3>
-                                    <div className="flex h-10 w-full rounded-lg overflow-hidden mb-3">
-                                        {visualDNA.color?.palette?.map((c: any, i: number) => (
-                                            <div key={i} style={{ width: `${c.proportion || (100 / (visualDNA.color.palette.length || 1))}%`, backgroundColor: c.hex }} title={`${c.name} (${c.proportion}%)`} />
-                                        ))}
-                                    </div>
-                                    <div className="flex flex-wrap gap-4 mb-5">
-                                        {visualDNA.color?.palette?.map((c: any, i: number) => (
-                                            <div key={i} className="flex items-center gap-2 bg-bg-surface2 px-3 py-2 rounded-lg">
-                                                <div className="w-5 h-5 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: c.hex }}></div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[12px] font-medium text-text-primary leading-tight">{c.name}</span>
-                                                    <span className="text-[11px] text-text-tertiary uppercase tracking-wider">{c.role}</span>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[14px]">
-                                        <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default text-center">
-                                            <span className="block text-text-secondary text-[12px] mb-1">Harmony</span>
-                                            <span className="font-medium text-text-primary">{visualDNA.color?.harmony}</span>
-                                        </div>
-                                        <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default text-center">
-                                            <span className="block text-text-secondary text-[12px] mb-1">Contrast</span>
-                                            <span className="font-medium text-text-primary">{visualDNA.color?.contrast}</span>
-                                        </div>
-                                        <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default text-center">
-                                            <span className="block text-text-secondary text-[12px] mb-1">Temperature</span>
-                                            <span className="font-medium text-text-primary">{visualDNA.color?.temperature}</span>
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                <motion.div variants={itemVariants}>
-                                    <h3 className="text-[16px] font-semibold mb-3">Typography</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                                        {visualDNA.typography?.fonts?.map((f: any, i: number) => (
-                                            <div key={i} className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <div className="text-[12px] text-accent font-medium mb-1 uppercase tracking-wider">{f.role}</div>
-                                                <div className="text-[14px] font-semibold text-text-primary truncate">{f.classification}</div>
-                                                <div className="text-[12px] text-text-secondary mt-1">{f.weight} · {f.case}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row items-baseline justify-between py-3 border-t border-border-default">
-                                        <span className="text-[14px] text-text-secondary">Hierarchy Levels</span>
-                                        <span className="text-[14px] font-medium text-text-primary bg-bg-surface2 px-3 py-1 rounded-full">{visualDNA.typography?.hierarchy_levels}</span>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 py-3 border-t border-border-default">
-                                        <span className="text-[14px] text-text-secondary min-w-[150px]">Suggested Google Fonts</span>
-                                        <div className="flex flex-wrap gap-2">
-                                            {visualDNA.typography?.suggested_google_fonts?.map((f: string, i: number) => (
-                                                <span key={i} className="bg-bg-surface2 text-text-primary px-2 py-1 rounded-md text-[13px] border border-border-hover">{f}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                <motion.div variants={itemVariants}>
-                                    <h3 className="text-[16px] font-semibold mb-3">Graphics</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[14px] mb-4">
-                                        <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default flex flex-col justify-between">
-                                            <span className="text-text-secondary text-[12px] block mb-1">Style</span>
-                                            <span className="font-medium text-text-primary leading-tight">{visualDNA.graphics?.style}</span>
-                                        </div>
-                                        <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default flex flex-col justify-between">
-                                            <span className="text-text-secondary text-[12px] block mb-1">Primary Element</span>
-                                            <span className="font-medium text-text-primary leading-tight">{visualDNA.graphics?.primary_element}</span>
-                                        </div>
-                                        <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default flex flex-col justify-between">
-                                            <span className="text-text-secondary text-[12px] block mb-1">Detail Level</span>
-                                            <span className="font-medium text-text-primary leading-tight">{visualDNA.graphics?.detail_level}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex sm:items-baseline flex-col sm:flex-row gap-2 border-t border-border-default pt-3">
-                                            <span className="text-[14px] text-text-secondary min-w-[150px]">Secondary Elements</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {visualDNA.graphics?.secondary_elements?.map((e: string, i: number) => (
-                                                    <span key={i} className="bg-bg-surface2 text-text-primary px-2 py-1 rounded-md text-[13px] border border-border-hover">{e}</span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="flex sm:items-baseline flex-col sm:flex-row gap-2 border-t border-border-default pt-3">
-                                            <span className="text-[14px] text-text-secondary min-w-[150px]">Effects</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {visualDNA.graphics?.effects?.map((e: string, i: number) => (
-                                                    <span key={i} className="bg-bg-surface2 text-text-primary px-2 py-1 rounded-md text-[13px] border border-border-hover">{e}</span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                <motion.div variants={itemVariants} className="pb-8">
-                                    <h3 className="text-[16px] font-semibold mb-3">Print Recommendations</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-[14px] mb-4">
-                                        <div className="flex justify-between items-center border-b border-border-default pb-2">
-                                            <span className="text-text-secondary">Best Print Method</span>
-                                            <span className="text-text-primary font-medium text-right">{visualDNA.pod_technical?.best_print_method}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center border-b border-border-default pb-2">
-                                            <span className="text-text-secondary">Scalability</span>
-                                            <span className="text-text-primary font-medium text-right">{visualDNA.pod_technical?.scalability}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex flex-col gap-4">
-                                        <div>
-                                            <span className="text-[14px] text-text-secondary block mb-2">Suitable Products</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {visualDNA.pod_technical?.suitable_products?.map((p: string, i: number) => (
-                                                    <span key={i} className="bg-bg-surface2 text-text-primary px-3 py-1.5 rounded-full text-[13px] shadow-sm border border-border-default">{p}</span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span className="text-[14px] text-text-secondary block mb-2">Recommended Garment Colors</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {visualDNA.pod_technical?.recommended_garment_colors?.map((c: any, i: number) => (
-                                                    <div key={i} className="flex items-center gap-2 bg-bg-surface2 px-3 py-1.5 rounded-full shadow-sm border border-border-default">
-                                                        <div className="w-3.5 h-3.5 rounded-full border border-black/10" style={{ backgroundColor: c.hex || c }}></div>
-                                                        <span className="text-[13px] text-text-primary font-medium">{c.name || c}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </>
+                            <AnalyzeVisualTab visualDNA={visualDNA} itemVariants={itemVariants} />
                         )}
 
                         {activeTab === 'buyer' && buyerDNA && (
-                            <>
-                                {/* ─── HERO TIER: The key insight ─── */}
-                                <motion.div variants={itemVariants} className="border-l-2 border-l-accent pl-5">
-                                    <h3 className="text-[18px] font-bold mb-1">Why It Feels Personal</h3>
-                                    <p className="text-[13px] text-text-tertiary mb-4">The specific design decisions that create "this was made for me" resonance</p>
-                                    <div className="flex flex-col gap-3">
-                                        {buyerDNA.made_for_me_decisions?.map((d: any, i: number) => (
-                                            <div key={i} className="bg-bg-surface2 p-4 rounded-lg">
-                                                <h4 className="text-[14px] font-semibold mb-1">{d.decision}</h4>
-                                                <p className="text-[14px] text-text-secondary italic">{d.why_it_works}</p>
-                                                {d.what_would_break && (
-                                                    <p className="text-[12px] text-text-tertiary mt-2">
-                                                        ⚠️ What breaks if you change it: {d.what_would_break}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </motion.div>
-
-                                {/* ─── PRIMARY TIER: Core buyer understanding ─── */}
-                                <motion.div variants={itemVariants}>
-                                    <h3 className="text-[16px] font-semibold mb-3">Who Buys This</h3>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[14px]">
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Age</span>
-                                                <span className="font-medium text-text-primary">{buyerDNA.persona?.age_range}</span>
-                                            </div>
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Gender</span>
-                                                <span className="font-medium text-text-primary">{buyerDNA.persona?.gender_lean}</span>
-                                            </div>
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Lifestyle</span>
-                                                <span className="font-medium text-text-primary leading-tight">{buyerDNA.persona?.lifestyle}</span>
-                                            </div>
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Spending</span>
-                                                <span className="font-medium text-text-primary leading-tight">{buyerDNA.persona?.spending_mindset}</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col gap-3 pt-3">
-                                            <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 pb-3 border-b border-border-default">
-                                                <span className="text-[14px] text-text-secondary min-w-[120px]">Interests</span>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {buyerDNA.persona?.interests?.map((t: string, i: number) => <span key={i} className="bg-bg-surface2 px-2 py-1 rounded-md text-[13px] border border-border-hover">{t}</span>)}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 pb-3 border-b border-border-default">
-                                                <span className="text-[14px] text-text-secondary min-w-[120px]">Values</span>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {buyerDNA.persona?.values?.map((t: string, i: number) => <span key={i} className="bg-bg-surface2 px-2 py-1 rounded-md text-[13px] border border-border-hover">{t}</span>)}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 pb-1">
-                                                <span className="text-[14px] text-text-secondary min-w-[120px]">Communities</span>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {buyerDNA.persona?.online_communities?.map((t: string, i: number) => <span key={i} className="bg-bg-surface2 px-2 py-1 rounded-md text-[13px] border border-border-hover">{t}</span>)}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                <motion.div variants={itemVariants}>
-                                    <h3 className="text-[16px] font-semibold mb-3">Why People Buy This</h3>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[14px]">
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Primary Emotion</span>
-                                                <span className="font-medium text-text-primary">{buyerDNA.emotional_triggers?.primary_emotion}</span>
-                                            </div>
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Trigger</span>
-                                                <span className="font-medium text-text-primary leading-tight">{buyerDNA.emotional_triggers?.trigger_description}</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 pt-2 pb-3 border-b border-border-default">
-                                            <span className="text-[14px] text-text-secondary min-w-[150px]">Secondary Emotions</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {buyerDNA.emotional_triggers?.secondary_emotions?.map((t: string, i: number) => <span key={i} className="bg-bg-surface2 text-text-primary px-2 py-1 rounded-md text-[13px] border border-border-hover">{t}</span>)}
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between py-1">
-                                            <span className="text-[14px] text-text-secondary">Emotional Arc</span>
-                                            <span className="text-[14px] font-medium text-text-primary">{buyerDNA.emotional_triggers?.emotional_arc}</span>
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                {/* ─── SUPPORTING TIER: Context & details ─── */}
-                                <motion.div variants={itemVariants} className="border-t border-border-default pt-8">
-                                    <h3 className="text-[16px] font-semibold mb-3">What This Design Communicates</h3>
-                                    <div className="flex flex-col gap-3 text-[14px]">
-                                        <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                            <span className="text-text-secondary text-[12px] block mb-1">Primary Signal</span>
-                                            <span className="font-medium text-text-primary leading-tight">{buyerDNA.identity_signals?.primary}</span>
-                                        </div>
-                                        <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                            <span className="text-text-secondary text-[12px] block mb-1">Message to World</span>
-                                            <span className="font-medium text-text-primary italic leading-tight">"{buyerDNA.identity_signals?.message_to_world}"</span>
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Tribe</span>
-                                                <span className="font-medium text-text-primary">{buyerDNA.identity_signals?.tribe}</span>
-                                            </div>
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Aesthetic Identity</span>
-                                                <span className="font-medium text-text-primary">{buyerDNA.identity_signals?.aesthetic_identity}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                <motion.div variants={itemVariants} className="pb-8">
-                                    <h3 className="text-[16px] font-semibold mb-3">When & Where It Sells</h3>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 pb-3 border-b border-border-default">
-                                            <span className="text-[14px] text-text-secondary min-w-[120px]">Best Seasons</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {buyerDNA.occasion_timing?.best_seasons?.map((t: string, i: number) => <span key={i} className="bg-bg-surface2 text-text-primary px-2 py-1 rounded-md text-[13px] border border-border-hover">{t}</span>)}
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 pb-3 border-b border-border-default">
-                                            <span className="text-[14px] text-text-secondary min-w-[120px]">Events</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {buyerDNA.occasion_timing?.events?.map((t: string, i: number) => <span key={i} className="bg-bg-surface2 text-text-primary px-2 py-1 rounded-md text-[13px] border border-border-hover">{t}</span>)}
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[14px] pt-2">
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Wear Context</span>
-                                                <span className="font-medium text-text-primary">{buyerDNA.occasion_timing?.wear_context}</span>
-                                            </div>
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Mood Triggers</span>
-                                                <span className="font-medium text-text-primary">{buyerDNA.occasion_timing?.mood_triggers}</span>
-                                            </div>
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Gift Score</span>
-                                                <span className="font-medium text-text-primary">{buyerDNA.occasion_timing?.gift_potential?.score}/10</span>
-                                            </div>
-                                            <div className="bg-bg-surface2 p-3 rounded-lg border border-border-default">
-                                                <span className="text-text-secondary text-[12px] block mb-1">Longevity</span>
-                                                <span className="font-medium text-text-primary">{buyerDNA.occasion_timing?.evergreen_vs_viral}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </>
+                            <AnalyzeBuyerTab buyerDNA={buyerDNA} itemVariants={itemVariants} />
                         )}
 
                         <motion.div variants={itemVariants} className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-border-default">
                             {!readMode && (
                                 <>
-                                    <GoToStudioButton
+                                    <AnalyzeGoToStudioButton
                                         uploadedImage={uploadedImage}
                                         analysisResult={analysisResult}
                                     />
-                                    <button
+                                    <Button
+                                        variant="ghost"
                                         onClick={() => onNavigate('upload')}
-                                        className="px-5 py-2 rounded-lg text-text-secondary hover:text-text-primary text-[14px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
                                     >
                                         Analyze Another Design
-                                    </button>
+                                    </Button>
                                 </>
                             )}
-                            <button
+                            <Button
+                                variant="secondary"
                                 onClick={handleCopyDNA}
-                                className="px-5 py-2 rounded-lg text-text-secondary hover:text-text-primary text-[14px] font-medium transition-colors flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
                             >
                                 {copied ? (
                                     <><Check className="w-4 h-4 text-success" /> Copied!</>
                                 ) : (
                                     <><Copy className="w-4 h-4" /> Copy DNA JSON</>
                                 )}
-                            </button>
+                            </Button>
                         </motion.div>
                     </motion.div>
                 </div>
             </div>
         </motion.div>
-    );
-}
-
-
-// ── Go to Studio Button ────────────────────────────────────────────
-
-function GoToStudioButton({
-    uploadedImage,
-    analysisResult,
-}: {
-    uploadedImage: { data: string; name: string } | null;
-    analysisResult: any;
-}) {
-    const navigate = useNavigate();
-
-    return (
-        <button
-            onClick={() => navigate('/studio', {
-                state: {
-                    analysisResult,
-                    uploadedImage: uploadedImage ? {
-                        data: uploadedImage.data,
-                        name: uploadedImage.name,
-                        type: 'image/png',  // default; actual type not preserved in ResultsStep props
-                    } : null,
-                }
-            })}
-            className="px-5 py-3 rounded-lg ai-gradient text-white text-[14px] font-medium hover:opacity-90 transition-opacity text-left focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base flex items-center gap-2"
-        >
-            <Sparkles className="w-4 h-4" />
-            <div>
-                Go to Studio
-                <p className="text-[12px] text-white/70 font-normal mt-0.5">Clone, remix, or explore new ideas</p>
-            </div>
-        </button>
     );
 }
