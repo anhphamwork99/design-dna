@@ -158,11 +158,19 @@ export default function PatternDetailScreen() {
 function renderAnalysisSection(title: string, data: unknown): React.ReactNode | null {
     if (!data) return null;
 
+    const isFormula = title === 'Winning Formula';
+
     return (
         <div key={title} className="flex flex-col gap-2">
-            <h3 className="text-[13px] font-semibold text-text-primary uppercase tracking-[0.06em]">
-                {title}
-            </h3>
+            <div>
+                <h3 className={isFormula
+                    ? 'text-[22px] font-extrabold text-text-primary tracking-tight mb-1'
+                    : 'text-[13px] font-semibold text-text-primary uppercase tracking-[0.06em] mb-1'
+                }>
+                    {isFormula ? 'The Formula' : title}
+                </h3>
+                <div className="w-12 h-1 rounded-full ai-gradient mb-4"></div>
+            </div>
             <div className="text-[14px] text-text-primary leading-relaxed">
                 {renderValue(data)}
             </div>

@@ -146,9 +146,10 @@ export default function CompareResults({
                     <div className="max-w-[900px] mx-auto flex flex-col gap-6">
                         {/* The Formula card */}
                         <div className="bg-bg-surface1 rounded-xl p-6" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
-                            <h2 className="text-[18px] font-bold mb-3 ai-gradient-text">
+                            <h2 className="text-[22px] font-extrabold text-text-primary tracking-tight mb-1">
                                 The Formula
                             </h2>
+                            <div className="w-16 h-1 rounded-full ai-gradient mb-5"></div>
                             <p className="text-[15px] text-text-primary leading-relaxed mb-6">
                                 {analysis?.winning_formula?.summary || 'No summary available.'}
                             </p>
