@@ -46,13 +46,8 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                 </button>
             </div>
 
-            {/* WORKSPACE section */}
+            {/* Main nav — single flat list */}
             <div className="px-3 mt-4">
-                {!collapsed && (
-                    <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-3 mb-1">
-                        Workspace
-                    </p>
-                )}
                 <nav className="flex flex-col gap-1">
                     <SidebarNavItem
                         icon={<Home className="w-5 h-5" />}
@@ -62,30 +57,16 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                     />
                     <SidebarNavItem
                         icon={<Layers className="w-5 h-5" />}
-                        label="Pattern"
+                        label="Winning Patterns"
                         to="/pattern"
                         collapsed={collapsed}
                     />
                     <SidebarNavItem
                         icon={<Microscope className="w-5 h-5" />}
-                        label="Analyze"
+                        label="Deep Analyze"
                         to="/analyze"
                         collapsed={collapsed}
                     />
-                </nav>
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-border-default mx-3 my-4" />
-
-            {/* TOOLS section */}
-            <div className="px-3">
-                {!collapsed && (
-                    <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider px-3 mb-1">
-                        Tools
-                    </p>
-                )}
-                <nav className="flex flex-col gap-1">
                     <SidebarNavItem
                         icon={<Palette className="w-5 h-5" />}
                         label="Studio"
