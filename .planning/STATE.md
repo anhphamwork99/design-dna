@@ -3,8 +3,8 @@
 ## Current
 
 - **Milestone:** v3.0 — UI Redesign
-- **Phase:** 19 ✅ COMPLETE — Next: Phase 25 (Pattern Library Flow Polish)
-- **Status:** Phase 19 fully complete. Phase 25 added per user request — apply Analyze patterns to Pattern Library flow.
+- **Phase:** 25 ✅ COMPLETE — Pattern Library Flow Polish
+- **Status:** Plan 25-01 complete. PatternDetailScreen (top breadcrumb, flat sections, no bottom Back button) + LibraryScreen (Compare Designs CTA). Build passes.
 
 ## Phase 19 Results
 
@@ -22,7 +22,14 @@
 - `AnalyzeScreen.tsx`: ResultsStep — "Analyze Another" ghost → /analyze, "Copy Analysis" (was "Copy DNA JSON"), auto-save toast (3s fixed bottom-right), mobile thumbnail pin (IntersectionObserver + fixed bar)
 - `AnalyzeUploadStep.tsx`: Vertically centered, max-w-[640px], 28px heading, spacious spacing, full-width Analyze button
 
+## Phase 25 Results
 
+### Plan 25-01: Pattern Library Flow Polish ✅
+- `PatternDetailScreen.tsx`: Inline "← Back to Library" breadcrumb at top (ArrowLeft + text link, matches AnalyzeScreen pattern exactly)
+- `PatternDetailScreen.tsx`: Bottom "Back to Library" Button removed — action bar now: Use in Studio + Delete Pattern only
+- `PatternDetailScreen.tsx`: Analysis sections flattened — removed `bg-bg-surface2 p-4 rounded-lg` card wrappers, replaced with flat `text-[13px] font-semibold uppercase tracking-[0.06em]` headings + `leading-relaxed` content. Container gap `gap-4` → `gap-6`
+- `LibraryScreen.tsx`: "Compare Designs" primary Button added to header (top-right flex row), navigates to /compare
+- Build: 0 errors ✅
 
 ## Milestone History
 
