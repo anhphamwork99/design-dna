@@ -167,29 +167,16 @@ export default function CompareScreen() {
                     />
                 )}
 
-                {step === 'analyzing' && (
-                    <motion.div
-                        key="analyzing"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.2, ease: 'easeOut' }}
-                        className="min-h-[calc(100vh-160px)] flex flex-col items-center justify-center py-16"
-                    >
-                        <CompareAnalyzing
-                            error={error}
-                            onRetry={handleCompareAnalyze}
-                            onCancel={handleCancelAnalysis}
-                        />
-                    </motion.div>
-                )}
-
-                {step === 'results' && (
+                {(step === 'analyzing' || step === 'results') && (
                     <CompareResults
                         key="results"
                         images={compareImages}
                         compareResult={compareResult}
                         onNewComparison={handleNewComparison}
+                        isAnalyzing={step === 'analyzing'}
+                        error={error}
+                        onRetry={handleCompareAnalyze}
+                        onCancel={handleCancelAnalysis}
                     />
                 )}
             </AnimatePresence>
