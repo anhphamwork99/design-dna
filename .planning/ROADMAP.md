@@ -256,6 +256,27 @@ Plans:
 
 ---
 
+### Phase 25: Pattern Library Flow Polish
+**Requirements:** SCREEN-06 (analyze polish)
+**Risk:** 🟢 LOW
+
+**Goal:** Apply Analysis screen patterns (Phase 19) to the Pattern Library flow — nested routes, breadcrumb navigation, consistent list/detail UX, clipboard paste on relevant upload zones.
+
+**Scope:**
+- Restructure `/library` as nested routes: `/library` (pattern list), `/library/pattern/:id` (detail), keep `/library/analysis/:id` or migrate to `/analyze/:id`
+- Sidebar: consolidate Library item to single entry (if applicable)
+- PatternDetailScreen: add inline breadcrumb "← Back to Library"
+- Apply same result layout conventions: side-by-side image + DNA breakdown
+- Verify context menu actions navigate to correct nested routes
+- Ensure consistent empty state, loading, and error patterns
+
+**Depends on:** Phase 19, Phase 22
+**Plans:** 0 plans — run `/gsd:plan-phase 25`
+
+**Verification:** Pattern list → detail → back flow works. Navigation consistent with Analyze flow.
+
+---
+
 ## Dependency Chain
 
 ```
@@ -281,5 +302,5 @@ Phases 18–23 can be done in any order after Phase 17.
 
 ---
 
-*Total: 11 phases (Phase 14–24)*
+*Total: 12 phases (Phase 14–25)*
 *Estimated: Medium-to-large effort*
