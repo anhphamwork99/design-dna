@@ -183,11 +183,11 @@ export default function HomeScreen() {
 
                 <FeatureHeroBlock
                     reversed
-                    title={<>Generate variants from your <em className="font-logo font-normal italic text-text-tertiary pr-1">library</em></>}
+                    title={<>Generate variants from your <em className="font-logo font-normal italic text-accent opacity-90 pr-1 px-1">library</em></>}
                     description="Enter the Studio to blend multiple successful patterns together. Give the AI an original graphic to get customized, print-ready variations maintaining the core visual DNA."
                     ctaText="Open Studio"
                     ctaRoute="/studio"
-                    ctaVariant="secondary"
+                    ctaVariant="primary"
                     illustration={
                         <img
                             src={bgStudio}
@@ -199,11 +199,11 @@ export default function HomeScreen() {
                 />
 
                 <FeatureHeroBlock
-                    title={<>Find the common <em className="font-logo font-normal italic text-text-tertiary pr-1">patterns</em></>}
+                    title={<>Find the common <em className="font-logo font-normal italic text-accent opacity-90 pr-1 px-1">patterns</em></>}
                     description="Perform batch analysis on multiple winning designs to find their shared structural features. Extract and save these high-converting patterns to your personal library."
                     ctaText="Compare Designs"
                     ctaRoute="/compare"
-                    ctaVariant="secondary"
+                    ctaVariant="primary"
                     illustration={
                         <img
                             src={bgCompare}
@@ -214,6 +214,18 @@ export default function HomeScreen() {
                     }
                 />
             </div>
+
+            {/* Simple Elegant Footer */}
+            <footer className="mt-8 pt-8 border-t border-border-default flex flex-col md:flex-row items-center justify-between gap-4">
+                <p className="text-[14px] text-text-tertiary">
+                    &copy; 2026 DesignDNA. Empowered by AI.
+                </p>
+                <div className="flex items-center gap-6">
+                    <a href="#" className="text-[14px] font-medium text-text-tertiary hover:text-text-primary transition-colors">Documentation</a>
+                    <a href="#" className="text-[14px] font-medium text-text-tertiary hover:text-text-primary transition-colors">Support</a>
+                    <a href="#" className="text-[14px] font-medium text-text-tertiary hover:text-text-primary transition-colors">Terms</a>
+                </div>
+            </footer>
         </div>
     );
 }
