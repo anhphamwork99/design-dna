@@ -175,7 +175,7 @@ export default function HomeScreen() {
                         <img
                             src={bgAnalyze}
                             alt="Analyze Graphic"
-                            className="w-full h-full object-cover mix-blend-darken scale-[1.05]"
+                            className="w-full h-full object-contain mix-blend-darken scale-110 md:scale-125"
                             draggable={false}
                         />
                     }
@@ -192,7 +192,7 @@ export default function HomeScreen() {
                         <img
                             src={bgStudio}
                             alt="Studio Graphic"
-                            className="w-full h-full object-cover mix-blend-darken scale-[1.05]"
+                            className="w-full h-full object-contain mix-blend-darken scale-110 md:scale-125"
                             draggable={false}
                         />
                     }
@@ -208,7 +208,7 @@ export default function HomeScreen() {
                         <img
                             src={bgCompare}
                             alt="Compare Graphic"
-                            className="w-full h-full object-cover mix-blend-darken scale-[1.05]"
+                            className="w-full h-full object-contain mix-blend-darken scale-110 md:scale-125"
                             draggable={false}
                         />
                     }

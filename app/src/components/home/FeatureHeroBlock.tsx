@@ -63,8 +63,8 @@ export function FeatureHeroBlock({
                     <Link
                         to={ctaRoute}
                         className={`inline-flex items-center justify-center px-6 py-3.5 rounded-xl text-[15px] font-semibold transition-all duration-250 ease-out shadow-sm ${isPrimary
-                                ? 'ai-gradient text-white hover:opacity-90 shadow-accent/20 hover:scale-[1.02]'
-                                : 'bg-bg-surface1 border border-border-default text-text-primary hover:bg-bg-surface2 hover:border-border-hover'
+                            ? 'ai-gradient text-white hover:opacity-90 shadow-accent/20 hover:scale-[1.02]'
+                            : 'bg-bg-surface1 border border-border-default text-text-primary hover:bg-bg-surface2 hover:border-border-hover'
                             }`}
                     >
                         {ctaText}
@@ -81,13 +81,10 @@ export function FeatureHeroBlock({
                 style={{ perspective: '1000px' }}
             >
                 <div
-                    className="absolute inset-0 bg-bg-surface1 rounded-[2rem] border border-border-default overflow-hidden shadow-sm"
+                    className="absolute inset-0 w-full h-full flex items-center justify-center transition-transform"
                     style={tiltStyles}
                 >
-                    <div className="absolute inset-0 bg-gradient-to-br from-bg-surface1 to-bg-surface2 opacity-50 pointer-events-none" />
-                    <div className="relative z-10 w-full h-full flex items-center justify-center">
-                        {illustration}
-                    </div>
+                    {illustration}
                 </div>
             </div>
         </div>
