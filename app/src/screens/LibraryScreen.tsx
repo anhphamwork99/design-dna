@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layers, Eye, Palette, Trash2 } from 'lucide-react';
 import { listPatterns, deletePatternById, SavedPattern } from '../apiClient';
 import { useAuth } from '../contexts/AuthContext';
-import { DataGrid, ContextMenu } from '../components/shared';
+import { DataGrid, ContextMenu, Button } from '../components/shared';
 import type { ContextMenuItem } from '../components/shared';
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -49,12 +49,10 @@ export default function LibraryScreen() {
             .finally(() => setLoading(false));
     }, [session]);
 
-    // ── Search filter (local) ──────────────────────────────────────
     const filteredPatterns = patterns.filter((p) =>
         p.name.toLowerCase().includes(searchValue.toLowerCase()),
     );
 
-    // ── Context menu actions ───────────────────────────────────────
     const handleDelete = async (id: string, name: string) => {
         if (!session) return;
         if (!window.confirm(`Delete pattern "${name}"?`)) return;
@@ -88,14 +86,12 @@ export default function LibraryScreen() {
         },
     ];
 
-    // ── Render: grid card ──────────────────────────────────────────
     const renderGridItem = (pattern: SavedPattern) => (
         <div
             key={pattern.id}
             onClick={() => navigate(`/library/pattern/${pattern.id}`)}
             className={`bg-bg-surface1 border border-border-default rounded-xl cursor-pointer hover:border-border-hover transition-colors ${deletingId === pattern.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
-            {/* Thumbnail area */}
             <div
                 className="w-full aspect-[4/3] overflow-hidden flex items-center justify-center rounded-t-xl"
                 style={{ backgroundColor: pattern.thumbnails.length > 0 ? '#e8e8e8' : undefined }}
@@ -113,7 +109,6 @@ export default function LibraryScreen() {
                 )}
             </div>
 
-            {/* Info area */}
             <div className="p-4">
                 <div className="flex items-start justify-between gap-2 mb-1">
                     <h3 className="text-[15px] font-semibold truncate flex-1">
@@ -145,14 +140,12 @@ export default function LibraryScreen() {
         </div>
     );
 
-    // ── Render: list row ───────────────────────────────────────────
     const renderListItem = (pattern: SavedPattern) => (
         <div
             key={pattern.id}
             onClick={() => navigate(`/library/pattern/${pattern.id}`)}
             className={`bg-bg-surface1 border border-border-default rounded-xl p-3 hover:border-border-hover cursor-pointer flex items-center gap-4 transition-colors ${deletingId === pattern.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
-            {/* Thumbnail */}
             <div
                 className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
                 style={{ backgroundColor: pattern.thumbnails.length > 0 ? '#e8e8e8' : undefined }}
@@ -170,7 +163,6 @@ export default function LibraryScreen() {
                 )}
             </div>
 
-            {/* Name + meta */}
             <div className="flex-1 min-w-0">
                 <h3 className="text-[14px] font-semibold truncate">{pattern.name}</h3>
                 <p className="text-[12px] text-text-tertiary">
@@ -178,7 +170,6 @@ export default function LibraryScreen() {
                 </p>
             </div>
 
-            {/* Context menu */}
             <ContextMenu
                 items={menuItems(pattern)}
                 trigger={
@@ -197,7 +188,6 @@ export default function LibraryScreen() {
         </div>
     );
 
-    // ── Error state ────────────────────────────────────────────────
     if (error && !loading) {
         return (
             <div className="pt-8 text-center">
@@ -206,14 +196,21 @@ export default function LibraryScreen() {
         );
     }
 
-    // ── Main render ────────────────────────────────────────────────
     return (
         <div className="pt-8 max-w-[960px] mx-auto">
-            <div className="mb-6">
-                <h1 className="text-[32px] font-bold tracking-tight mb-1">Pattern Library</h1>
-                <p className="text-[14px] text-text-secondary">
-                    {patterns.length} pattern{patterns.length !== 1 ? 's' : ''}
-                </p>
+            <div className="mb-6 flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="text-[32px] font-bold tracking-tight mb-1">Pattern Library</h1>
+                    <p className="text-[14px] text-text-secondary">
+                        {patterns.length} pattern{patterns.length !== 1 ? 's' : ''}
+                    </p>
+                </div>
+                <Button
+                    variant="primary"
+                    onClick={() => navigate('/compare')}
+                >
+                    Compare Designs
+                </Button>
             </div>
 
             <DataGrid<SavedPattern>
