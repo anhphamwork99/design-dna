@@ -67,6 +67,7 @@ function AnalyzeNewFlow() {
     const [uploadedImage, setUploadedImage] = useState<AnalyzeImage | null>(null);
     const [analysisResult, setAnalysisResult] = useState<any>(null);
     const [error, setError] = useState<AnalyzeError | null>(null);
+    const [showSavedToast, setShowSavedToast] = useState(false);
     const abortControllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
@@ -103,7 +104,7 @@ function AnalyzeNewFlow() {
 
             if (abortController.signal.aborted) return;
 
-            // Auto-save fire-and-forget
+            // Auto-save fire-and-forget + show toast on success
             generateThumbnail(uploadedImage.data, 200)
                 .then(thumbnail => {
                     saveAnalysis(token, {
@@ -111,6 +112,11 @@ function AnalyzeNewFlow() {
                         thumbnail,
                         resultJson: result
                     })
+                        .then(() => {
+                            // Show "Analysis saved ✓" toast for 3s
+                            setShowSavedToast(true);
+                            setTimeout(() => setShowSavedToast(false), 3000);
+                        })
                         .catch(err => console.warn('Failed to auto-save analysis:', err));
                 })
                 .catch(err => console.warn('Failed to generate thumbnail for auto-save:', err));
@@ -204,6 +210,22 @@ function AnalyzeNewFlow() {
                     />
                 )}
             </AnimatePresence>
+
+            {/* Auto-save toast — fixed bottom-right */}
+            <AnimatePresence>
+                {showSavedToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className="fixed bottom-6 right-6 bg-bg-surface1 border border-border-default rounded-lg px-4 py-3 shadow-lg flex items-center gap-2 text-[13px] z-50"
+                    >
+                        <Check className="w-4 h-4 text-success" />
+                        <span>Analysis saved</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
@@ -223,8 +245,28 @@ function ResultsStep({
     onNavigate: (s: Step) => void;
     readMode?: boolean;
 }) {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'visual' | 'buyer'>('visual');
     const [copied, setCopied] = useState(false);
+    const [imagePinned, setImagePinned] = useState(false);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+
+    // Mobile thumbnail pin: observe sentinel above the image
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // When sentinel leaves viewport (scrolled past) → pin the image
+                setImagePinned(!entry.isIntersecting);
+            },
+            { threshold: 0, rootMargin: '0px 0px 0px 0px' }
+        );
+
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, []);
 
     const handleCopyDNA = async () => {
         try {
@@ -278,6 +320,29 @@ function ResultsStep({
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="pt-8 mb-24"
         >
+            {/* Mobile pinned thumbnail — only visible on mobile when scrolled past image */}
+            <AnimatePresence>
+                {imagePinned && uploadedImage && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.15 }}
+                        className="md:hidden fixed top-0 left-0 right-0 z-40 bg-bg-base/95 backdrop-blur-sm border-b border-border-default px-4 py-2 flex items-center gap-3"
+                    >
+                        <img
+                            src={uploadedImage.data}
+                            alt="Design thumbnail"
+                            className="h-10 w-10 object-cover rounded-md flex-shrink-0 border border-border-default"
+                        />
+                        <span className="text-[13px] text-text-secondary truncate">{uploadedImage.name}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Sentinel: observe this to know when user scrolled past the image area */}
+            <div ref={sentinelRef} className="md:hidden h-px" aria-hidden="true" />
+
             <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
                 <div className="w-full md:w-[40%] md:sticky md:top-[80px] self-start">
                     <div className="bg-bg-surface2 p-2 rounded-xl border border-border-default">
@@ -344,9 +409,9 @@ function ResultsStep({
                                     />
                                     <Button
                                         variant="ghost"
-                                        onClick={() => onNavigate('upload')}
+                                        onClick={() => navigate('/analyze')}
                                     >
-                                        Analyze Another Design
+                                        Analyze Another
                                     </Button>
                                 </>
                             )}
@@ -357,7 +422,7 @@ function ResultsStep({
                                 {copied ? (
                                     <><Check className="w-4 h-4 text-success" /> Copied!</>
                                 ) : (
-                                    <><Copy className="w-4 h-4" /> Copy DNA JSON</>
+                                    <><Copy className="w-4 h-4" /> Copy Analysis</>
                                 )}
                             </Button>
                         </motion.div>
