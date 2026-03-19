@@ -34,30 +34,30 @@ export function OnboardingChecklist({ hasPatterns }: OnboardingChecklistProps) {
                 Welcome to DesignDNA
             </h2>
             <p className="text-[15px] text-text-secondary mb-10 max-w-lg">
-                Your journey starts here. Complete these three key steps to master the creative AI workflow and start generating high-converting designs.
+                Turn any design into high-converting POD assets. Complete these key steps to master the creative AI workflow.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
                 {steps.map((step, idx) => (
                     <div
                         key={idx}
-                        className={`relative p-6 rounded-2xl border transition-all duration-300 ${step.isComplete
-                                ? 'bg-bg-surface2/50 border-border-default/50 opacity-70'
+                        className={`relative p-6 rounded-2xl border transition-all duration-300 ease-in-out ${step.isComplete
+                                ? 'bg-bg-surface2/50 border-border-default/50 opacity-60 scale-[0.98]'
                                 : 'bg-bg-base border-accent/20 shadow-sm ring-1 ring-accent/5'
                             }`}
                     >
                         <div className="flex items-start justify-between mb-5">
-                            <div className={`p-3 rounded-xl ${step.isComplete ? 'bg-bg-surface1 text-text-tertiary shadow-sm' : 'bg-accent/10 text-accent shadow-sm'}`}>
+                            <div className={`p-3 rounded-xl transition-colors duration-300 ${step.isComplete ? 'bg-bg-surface1 text-text-tertiary shadow-none' : 'bg-accent/10 text-accent shadow-sm'}`}>
                                 {step.icon}
                             </div>
                             {step.isComplete && (
                                 <CheckCircle2 className="w-6 h-6 text-accent animate-in zoom-in duration-300" />
                             )}
                         </div>
-                        <h3 className={`font-semibold text-[16px] mb-2 ${step.isComplete ? 'text-text-secondary' : 'text-text-primary'}`}>
+                        <h3 className={`font-semibold text-[16px] mb-2 transition-colors duration-300 ${step.isComplete ? 'text-text-secondary' : 'text-text-primary'}`}>
                             {step.title}
                         </h3>
-                        <p className={`text-[14px] leading-relaxed ${step.isComplete ? 'text-text-tertiary' : 'text-text-secondary'}`}>
+                        <p className={`text-[14px] leading-relaxed transition-colors duration-300 ${step.isComplete ? 'text-text-tertiary' : 'text-text-secondary'}`}>
                             {step.description}
                         </p>
                     </div>

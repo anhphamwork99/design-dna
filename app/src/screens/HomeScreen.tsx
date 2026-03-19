@@ -12,12 +12,10 @@ export default function HomeScreen() {
     const [patterns, setPatterns] = useState<SavedPattern[]>([]);
     const [loadingPatterns, setLoadingPatterns] = useState(true);
 
-    // localStorage → Supabase migration
     const { state: migrationState, startMigration, dismiss: dismissMigration } = useMigratePatterns(
         session?.access_token ?? null
     );
 
-    // Auto-dismiss migration banner after success
     useEffect(() => {
         if (migrationState.status === 'done') {
             const timer = setTimeout(() => dismissMigration(), 3000);
@@ -29,7 +27,6 @@ export default function HomeScreen() {
         document.title = 'DesignDNA — Home';
     }, []);
 
-    // Fetch user's patterns
     useEffect(() => {
         if (!session) {
             setLoadingPatterns(false);
@@ -44,7 +41,7 @@ export default function HomeScreen() {
     }, [session]);
 
     return (
-        <div className="flex flex-col w-full max-w-[1200px] mx-auto pb-24 pt-4 md:pt-10 min-h-[80vh]">
+        <div className="flex flex-col w-full max-w-[1240px] px-6 mx-auto pb-24 pt-4 md:pt-10 min-h-[80vh]">
             {/* Migration banner */}
             {migrationState.status !== 'idle' && (
                 <div className="mb-10 w-full relative z-20">
@@ -113,42 +110,56 @@ export default function HomeScreen() {
                 </div>
             )}
 
-            {/* Top Section: Onboarding or Carousel */}
-            {!loadingPatterns && (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out mb-24">
-                    {patterns.length === 0 ? (
-                        <OnboardingChecklist hasPatterns={patterns.length > 0} />
-                    ) : (
-                        <RecentAnalysesCarousel patterns={patterns} />
-                    )}
-                </div>
-            )}
+            {/* Top Section: Loading Skeleton or Content */}
+            <div className="min-h-[360px] mb-24">
+                {loadingPatterns ? (
+                    <div className="animate-pulse">
+                        <div className="h-8 w-48 bg-bg-surface1 rounded-md mb-8" />
+                        <div className="flex gap-6 overflow-hidden">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="h-[300px] w-[320px] shrink-0 bg-bg-surface1/60 rounded-2xl border border-border-default/50" />
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="animate-in fade-in duration-500 ease-out fill-mode-forwards">
+                        {patterns.length === 0 ? (
+                            <OnboardingChecklist hasPatterns={false} />
+                        ) : (
+                            <RecentAnalysesCarousel patterns={patterns} />
+                        )}
+                    </div>
+                )}
+            </div>
 
             {/* Main Section: Feature Hero Blocks */}
             <div className="flex flex-col gap-24 lg:gap-32 pb-20">
                 <FeatureHeroBlock
-                    title="Decode the DNA of any interface"
-                    description="Upload any top-selling design—from graphic tees to typography art—and let our AI analyze the core visual layout, styling, and buyer psychological triggers that make it work."
+                    title={<>Decode the DNA of any <em className="font-logo font-normal italic text-accent opacity-90 pr-1">interface</em></>}
+                    description="Upload any design—from t-shirts to landing pages—and let our AI analyze the core visual layout, styling, and buyer psychological triggers that make it work."
                     ctaText="Analyze Design"
                     ctaRoute="/analyze/new"
+                    ctaVariant="primary"
                     illustration={<MousePointerClick className="w-32 h-32 text-accent/80 drop-shadow-lg" strokeWidth={1} />}
                 />
 
                 <FeatureHeroBlock
                     reversed
-                    title="Generate variants from your library"
+                    title={<>Generate variants from your <em className="font-logo font-normal italic text-text-tertiary pr-1">library</em></>}
                     description="Enter the Studio to blend multiple successful patterns together. Give the AI an original graphic to get customized, print-ready variations maintaining the core visual DNA."
                     ctaText="Open Studio"
                     ctaRoute="/studio"
-                    illustration={<Sparkles className="w-32 h-32 text-accent/80 drop-shadow-lg" strokeWidth={1} />}
+                    ctaVariant="secondary"
+                    illustration={<Sparkles className="w-32 h-32 text-text-tertiary drop-shadow-lg" strokeWidth={1} />}
                 />
 
                 <FeatureHeroBlock
-                    title="Find the common patterns"
+                    title={<>Find the common <em className="font-logo font-normal italic text-text-tertiary pr-1">patterns</em></>}
                     description="Perform batch analysis on multiple winning designs to find their shared structural features. Extract and save these high-converting patterns to your personal library."
                     ctaText="Compare Designs"
                     ctaRoute="/compare"
-                    illustration={<Layers className="w-32 h-32 text-accent/80 drop-shadow-lg" strokeWidth={1} />}
+                    ctaVariant="secondary"
+                    illustration={<Layers className="w-32 h-32 text-text-tertiary drop-shadow-lg" strokeWidth={1} />}
                 />
             </div>
         </div>
