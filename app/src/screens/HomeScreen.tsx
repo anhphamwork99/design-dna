@@ -6,6 +6,7 @@ import { FeatureHeroBlock } from '../components/home/FeatureHeroBlock';
 import { OnboardingChecklist } from '../components/home/OnboardingChecklist';
 import { RecentAnalysesCarousel } from '../components/home/RecentAnalysesCarousel';
 import { MousePointerClick, Sparkles, Layers } from 'lucide-react';
+import heroBanner from '../assets/hero-banner.png';
 
 export default function HomeScreen() {
     const { session } = useAuth();
@@ -45,6 +46,7 @@ export default function HomeScreen() {
             {/* Migration banner */}
             {migrationState.status !== 'idle' && (
                 <div className="mb-10 w-full relative z-20">
+                    {/* Migration states... */}
                     {migrationState.status === 'detected' && (
                         <div className="bg-bg-surface1 border border-accent/30 rounded-xl px-5 py-3 flex items-center justify-between gap-4 shadow-lg shadow-accent/5">
                             <p className="text-[14px] text-text-secondary">
@@ -110,14 +112,35 @@ export default function HomeScreen() {
                 </div>
             )}
 
-            {/* Top Section: Loading Skeleton or Content */}
-            <div className="min-h-[360px] mb-24">
+            {/* Header / Hero Banner */}
+            <div className="w-full flex justify-center mb-8 lg:mb-12">
+                <div className="w-full max-w-[880px] rounded-2xl md:rounded-3xl overflow-hidden shadow-sm border border-border-default bg-bg-surface1">
+                    <img
+                        src={heroBanner}
+                        alt="DesignDNA — Discover the DNA of great design"
+                        className="w-full h-auto object-cover max-h-[300px] md:max-h-[440px]"
+                        draggable={false}
+                    />
+                </div>
+            </div>
+
+            <div className="text-center mb-16 lg:mb-20">
+                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-text-primary mb-4 lg:mb-6">
+                    Welcome to DesignDNA
+                </h1>
+                <p className="text-[16px] md:text-[18px] text-text-secondary max-w-2xl mx-auto leading-relaxed">
+                    Decode the visual formulas of winning designs, discover successful patterns, and generate fresh print-ready assets tailored to any niche.
+                </p>
+            </div>
+
+            {/* Content Switcher: Onboarding or Recent Analyses */}
+            <div className="mb-20 lg:mb-28 min-h-[140px]">
                 {loadingPatterns ? (
                     <div className="animate-pulse">
-                        <div className="h-8 w-48 bg-bg-surface1 rounded-md mb-8" />
-                        <div className="flex gap-6 overflow-hidden">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="h-[300px] w-[320px] shrink-0 bg-bg-surface1/60 rounded-2xl border border-border-default/50" />
+                        <div className="h-6 w-32 bg-bg-surface1 rounded-md mb-4" />
+                        <div className="flex gap-4 overflow-hidden">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className="h-[140px] w-[200px] shrink-0 bg-bg-surface1/60 rounded-xl border border-border-default/50" />
                             ))}
                         </div>
                     </div>
@@ -133,7 +156,7 @@ export default function HomeScreen() {
             </div>
 
             {/* Main Section: Feature Hero Blocks */}
-            <div className="flex flex-col gap-24 lg:gap-32 pb-20">
+            <div className="flex flex-col gap-24 lg:gap-40 pb-20">
                 <FeatureHeroBlock
                     title={<>Decode the DNA of any <em className="font-logo font-normal italic text-accent opacity-90 pr-1">interface</em></>}
                     description="Upload any design—from t-shirts to landing pages—and let our AI analyze the core visual layout, styling, and buyer psychological triggers that make it work."

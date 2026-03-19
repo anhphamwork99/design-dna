@@ -27,7 +27,7 @@ export function RecentAnalysesCarousel({ patterns }: RecentAnalysesCarouselProps
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
-            const scrollAmount = window.innerWidth < 768 ? 300 : 400;
+            const scrollAmount = window.innerWidth < 768 ? 200 : 300;
             scrollRef.current.scrollBy({
                 left: direction === 'left' ? -scrollAmount : scrollAmount,
                 behavior: 'smooth',
@@ -36,31 +36,28 @@ export function RecentAnalysesCarousel({ patterns }: RecentAnalysesCarouselProps
     };
 
     return (
-        <div className="relative group">
-            <div className="flex items-center justify-between mb-8 px-2">
+        <div className="relative group/carousel max-w-full">
+            <div className="flex items-center justify-between mb-4 px-1">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-text-primary mb-1">
+                    <h2 className="text-[17px] font-semibold tracking-tight text-text-primary">
                         Recent Analyses
                     </h2>
-                    <p className="text-[14px] text-text-secondary">
-                        Jump back into your saved DNA patterns.
-                    </p>
                 </div>
-                {patterns.length > 3 && (
-                    <div className="flex items-center gap-3">
+                {patterns.length > 4 && (
+                    <div className="flex items-center gap-1.5 opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-200">
                         <button
                             onClick={() => scroll('left')}
-                            className="p-2.5 rounded-full border border-border-default bg-bg-surface1 text-text-secondary hover:text-text-primary hover:bg-state-hover hover:border-border-hover transition-all shadow-sm focus:outline-none"
+                            className="p-1.5 rounded-full border border-border-default bg-bg-surface1 text-text-secondary hover:text-text-primary hover:bg-state-hover hover:border-border-hover transition-all focus:outline-none shadow-sm"
                             aria-label="Scroll left"
                         >
-                            <ChevronLeft className="w-5 h-5" />
+                            <ChevronLeft className="w-4 h-4" />
                         </button>
                         <button
                             onClick={() => scroll('right')}
-                            className="p-2.5 rounded-full border border-border-default bg-bg-surface1 text-text-secondary hover:text-text-primary hover:bg-state-hover hover:border-border-hover transition-all shadow-sm focus:outline-none"
+                            className="p-1.5 rounded-full border border-border-default bg-bg-surface1 text-text-secondary hover:text-text-primary hover:bg-state-hover hover:border-border-hover transition-all focus:outline-none shadow-sm"
                             aria-label="Scroll right"
                         >
-                            <ChevronRight className="w-5 h-5" />
+                            <ChevronRight className="w-4 h-4" />
                         </button>
                     </div>
                 )}
@@ -68,44 +65,45 @@ export function RecentAnalysesCarousel({ patterns }: RecentAnalysesCarouselProps
 
             <div
                 ref={scrollRef}
-                className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-6 px-2 -mx-2 hide-scrollbar"
+                className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 px-1 -mx-1 hide-scrollbar"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
                 {patterns.map((pattern) => (
                     <div
                         key={pattern.id}
                         onClick={() => navigate(`/pattern/${pattern.id}`)}
-                        className="snap-start shrink-0 w-[280px] sm:w-[340px] bg-bg-surface1 border border-border-default rounded-2xl cursor-pointer hover:border-border-hover transition-all shadow-sm hover:shadow-md flex flex-col overflow-hidden group/card"
+                        className="snap-start shrink-0 w-[160px] sm:w-[220px] aspect-[4/3] bg-bg-surface1 border border-border-default rounded-xl cursor-pointer hover:border-border-hover hover:shadow-md transition-all flex flex-col overflow-hidden group/card relative"
                     >
                         <div
-                            className="w-full aspect-[4/3] flex flex-col items-center justify-center bg-[#f5f5f5] overflow-hidden"
+                            className="absolute inset-0 w-full h-full bg-[#f8f9fa] flex items-center justify-center overflow-hidden"
                         >
                             {pattern.thumbnails.length > 0 ? (
                                 <img
                                     src={pattern.thumbnails[0]}
                                     alt={pattern.name}
-                                    className="w-full h-full object-contain group-hover/card:scale-105 transition-transform duration-700 ease-out"
+                                    className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500 ease-out"
                                 />
                             ) : (
-                                <Layers className="w-10 h-10 text-text-tertiary" />
+                                <Layers className="w-8 h-8 text-text-tertiary" />
                             )}
                         </div>
-                        <div className="p-5 flex-1 bg-bg-base border-t border-border-default/50">
-                            <h3 className="text-[16px] font-semibold truncate mb-1.5 text-text-primary">
+
+                        {/* Overlay gradient for text */}
+                        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
+
+                        {/* Text overlay */}
+                        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 flex flex-col justify-end">
+                            <h3 className="text-[13px] sm:text-[14px] font-semibold truncate text-white drop-shadow-sm mb-0.5">
                                 {pattern.name}
                             </h3>
-                            <p className="text-[13px] text-text-tertiary mb-3">
+                            <p className="text-[11px] sm:text-[12px] text-white/80 truncate">
                                 {pattern.source_image_count} design{pattern.source_image_count !== 1 ? 's' : ''} · {timeAgo(pattern.created_at)}
-                            </p>
-                            <p className="text-[14px] leading-relaxed text-text-secondary line-clamp-2">
-                                {pattern.summary}
                             </p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Need to inject hide-scrollbar utility inline since index.css may not have it */}
             <style>{`
                 .hide-scrollbar::-webkit-scrollbar {
                     display: none;
