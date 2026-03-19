@@ -166,8 +166,8 @@ export default function HomeScreen() {
             {/* Main Section: Feature Hero Blocks */}
             <div className="flex flex-col gap-24 lg:gap-32 pb-20">
                 <FeatureHeroBlock
-                    title={<>Decode the DNA of any <em className="font-logo font-normal italic text-accent opacity-90 pr-1">interface</em></>}
-                    description="Upload any design—from t-shirts to landing pages—and let our AI analyze the core visual layout, styling, and buyer psychological triggers that make it work."
+                    title={<>Decode the DNA of any <em className="font-logo font-normal italic text-accent opacity-90 pr-1 px-1">graphic</em></>}
+                    description="Upload any print-on-demand artwork or illustration and let our AI analyze the core visual composition, typography, and color palettes that make it successful."
                     ctaText="Analyze Design"
                     ctaRoute="/analyze/new"
                     ctaVariant="primary"
