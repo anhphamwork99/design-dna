@@ -71,7 +71,7 @@
 |----|-------------|-------|
 | SCREEN-01 | Extract 6 inline components from `App.tsx` into `screens/` folder | Decompose god component |
 | SCREEN-02 | **Home** — hero upload CTA + quick action cards (3) + recent analyses grid | Dashboard |
-| SCREEN-03 | **AnalyzeScreen** — upload zone → analyzing progress → side-by-side results (image + DNA accordion) | 3-state flow |
+| ~~SCREEN-03~~ | ~~**AnalyzeScreen** — upload zone → analyzing progress → side-by-side results (image + DNA accordion)~~ | ✅ Complete — nested routes + MascotLoader + energy bar |
 | SCREEN-04 | **CreativeStudioScreen** — 3-panel (Source + Workspace + Output) | Most complex |
 | ~~SCREEN-05~~ | ~~**CompareScreen** — 4-slot selector + comparison matrix + winning formula card~~ | ✅ Complete |
 | ~~SCREEN-06~~ | ~~**PatternLibraryScreen** — grid/list toggle, search, cards with context menu [⋮]~~ | ✅ Complete |
@@ -93,8 +93,8 @@
 | ~~UX-02~~ | ~~Fullscreen image lightbox — click image → overlay with download + close~~ | ✅ Complete |
 | ~~UX-03~~ | ~~Cross-feature quick actions — 12 links mapped (Analyze→Studio, Compare→Save Pattern, etc.)~~ | ✅ Complete |
 | ~~UX-04~~ | ~~All empty states designed per screen with icon + message + CTA~~ | ✅ Complete |
-| UX-05 | Loading states — progress bars (determinate), skeleton cards, inline button spinners | Consistent loading |
-| UX-06 | Error states — banner (API key), toast (API failure), overlay (offline) | Error handling |
+| ~~UX-05~~ | ~~Loading states — progress bars (determinate), skeleton cards, inline button spinners~~ | ✅ Complete — MascotLoader + energy bar + step text |
+| ~~UX-06~~ | ~~Error states — banner (API key), toast (API failure), overlay (offline)~~ | ✅ Complete — error modal overlay + type-specific handling |
 
 ### POLISH — Final Quality
 
