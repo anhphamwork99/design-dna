@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { CompareUpload, CompareAnalyzing, CompareResults } from '../compare';
 import type { Step, CompareImage, CompareError } from '../compare';
 import { analyzeBatch } from '../apiClient';
@@ -168,12 +168,20 @@ export default function CompareScreen() {
                 )}
 
                 {step === 'analyzing' && (
-                    <CompareAnalyzing
+                    <motion.div
                         key="analyzing"
-                        error={error}
-                        onRetry={handleCompareAnalyze}
-                        onCancel={handleCancelAnalysis}
-                    />
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className="min-h-[calc(100vh-160px)] flex flex-col items-center justify-center py-16"
+                    >
+                        <CompareAnalyzing
+                            error={error}
+                            onRetry={handleCompareAnalyze}
+                            onCancel={handleCancelAnalysis}
+                        />
+                    </motion.div>
                 )}
 
                 {step === 'results' && (

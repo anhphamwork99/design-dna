@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { Modal, Button } from '../components/shared';
 import MascotLoader from '../studio/MascotLoader';
 import type { CompareError } from './types';
 
@@ -9,91 +10,163 @@ interface CompareAnalyzingProps {
     onCancel: () => void;
 }
 
-export default function CompareAnalyzing({
-    error,
-    onRetry,
-    onCancel,
-}: CompareAnalyzingProps) {
+const STEPS = [
+    { threshold: 0, label: 'Reading your designs...' },
+    { threshold: 25, label: 'Comparing compositions...' },
+    { threshold: 50, label: 'Finding shared patterns...' },
+    { threshold: 75, label: 'Finalizing insights...' },
+];
+
+function getProgress(elapsed: number): number {
+    if (elapsed <= 4) {
+        return Math.floor((elapsed / 4) * 25);
+    } else if (elapsed <= 10) {
+        return Math.floor(25 + ((elapsed - 4) / 6) * 25);
+    } else if (elapsed <= 18) {
+        return Math.floor(50 + ((elapsed - 10) / 8) * 25);
+    } else if (elapsed <= 30) {
+        return Math.floor(75 + ((elapsed - 18) / 12) * 20);
+    }
+    return 95;
+}
+
+function getStepLabel(percentage: number): string {
+    let label = STEPS[0].label;
+    for (const step of STEPS) {
+        if (percentage >= step.threshold) label = step.label;
+    }
+    return label;
+}
+
+function getErrorTitle(error: CompareError): string {
+    switch (error.type) {
+        case 'api': return 'API Error';
+        case 'timeout': return 'Request Timed Out';
+        case 'network': return 'Connection Failed';
+        default: return 'Analysis Failed';
+    }
+}
+
+export default function CompareAnalyzing({ error, onRetry, onCancel }: CompareAnalyzingProps) {
     const [elapsed, setElapsed] = useState(0);
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
     useEffect(() => {
         if (error) return;
-        const interval = setInterval(() => {
-            setElapsed((prev) => prev + 1);
-        }, 1000);
+        const interval = setInterval(() => setElapsed((prev) => prev + 1), 1000);
         return () => clearInterval(interval);
     }, [error]);
 
-    // ── Error state ──
-    if (error) {
-        return (
-            <div className="pt-8">
-                <div className="max-w-[480px] mx-auto flex flex-col items-center text-center gap-6">
-                    <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center">
-                        <AlertTriangle className="w-8 h-8 text-error" />
-                    </div>
+    const percentage = getProgress(elapsed);
+    const stepLabel = getStepLabel(percentage);
+    const canChangeApiKey = error?.type === 'api' && error.message.includes('API key');
 
-                    <div>
-                        <h2 className="text-[20px] font-bold text-text-primary mb-2">
-                            Analysis Failed
-                        </h2>
-                        <p className="text-[14px] text-text-secondary leading-relaxed">
-                            {error.message}
+    return (
+        <div className="flex flex-col items-center w-full">
+            {/* Loading Content */}
+            <div className="flex flex-col items-center gap-6 w-full max-w-[400px] px-6">
+                {/* MascotLoader GIF */}
+                <MascotLoader size={120} />
+
+                {/* Step text */}
+                <p className="text-[14px] text-text-secondary text-center shimmer-text">
+                    {stepLabel}
+                </p>
+
+                {/* Energy bar */}
+                <div className="w-full flex flex-col gap-2">
+                    <div className="flex justify-end">
+                        <span className="text-[12px] font-medium text-text-primary">{percentage}%</span>
+                    </div>
+                    <div
+                        className="w-full rounded-full border border-border-default overflow-hidden"
+                        style={{ height: '16px', backgroundColor: 'var(--color-bg-surface2)' }}
+                    >
+                        <div
+                            className="energy-bar-fill h-full rounded-full transition-all duration-500 ease-out"
+                            style={{ width: `${percentage}%` }}
+                        />
+                    </div>
+                </div>
+
+                {/* Cancel button */}
+                <Button variant="ghost" size="sm" onClick={() => setShowCancelConfirm(true)}>
+                    Cancel
+                </Button>
+            </div>
+
+            {/* Error Modal Overlay */}
+            <Modal
+                open={!!error}
+                onClose={() => { }}
+                title={error ? getErrorTitle(error) : ''}
+                width="max-w-[440px]"
+            >
+                <div className="flex flex-col gap-5">
+                    <div className="flex items-start gap-4">
+                        <div
+                            className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}
+                        >
+                            <AlertTriangle className="w-5 h-5 text-red-500" />
+                        </div>
+                        <p className="text-[14px] text-text-secondary pt-2 leading-relaxed">
+                            {error?.message}
                         </p>
                     </div>
-
-                    <div className="flex flex-wrap items-center justify-center gap-3">
-                        <button
-                            onClick={onRetry}
-                            className="ai-gradient text-white px-6 py-2.5 rounded-lg text-[14px] font-medium hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-                        >
-                            Retry
-                        </button>
-                        {error.type === 'api' && error.message.includes('API key') && (
-                            <button
+                    <div className="flex flex-col gap-2">
+                        <Button variant="primary" size="md" onClick={onRetry} className="w-full">
+                            Try Again
+                        </Button>
+                        {canChangeApiKey && (
+                            <Button
+                                variant="secondary"
+                                size="md"
+                                className="w-full"
                                 onClick={() => {
-                                    onCancel();
                                     document.dispatchEvent(new CustomEvent('open-settings'));
+                                    onCancel();
                                 }}
-                                className="text-text-secondary hover:text-text-primary px-5 py-2.5 rounded-lg text-[14px] font-medium border border-border-default hover:bg-bg-surface2 transition-colors focus-visible:ring-2 focus-visible:ring-accent"
                             >
                                 Change API Key
-                            </button>
+                            </Button>
                         )}
-                        <button
-                            onClick={onCancel}
-                            className="text-text-secondary hover:text-text-primary px-5 py-2.5 rounded-lg text-[14px] font-medium focus-visible:ring-2 focus-visible:ring-accent"
-                        >
+                        <Button variant="ghost" size="md" onClick={onCancel} className="w-full">
                             Cancel
-                        </button>
+                        </Button>
                     </div>
                 </div>
-            </div>
-        );
-    }
+            </Modal>
 
-    // ── Analyzing state (mascot GIF) ──
-    return (
-        <div className="pt-8">
-            <div className="max-w-[480px] mx-auto flex flex-col items-center text-center gap-6">
-                <MascotLoader size={160} />
-
-                <div>
-                    <h2 className="text-[20px] font-semibold shimmer-text mb-2 tracking-tight">
-                        Discovering what makes your designs special<span className="animated-dots"><span>.</span><span>.</span><span>.</span></span>
-                    </h2>
-                    <p className="text-[13px] text-text-tertiary">
-                        {elapsed}s elapsed
+            {/* Cancel Confirmation Dialog */}
+            <Modal
+                open={showCancelConfirm}
+                onClose={() => setShowCancelConfirm(false)}
+                title="Cancel Analysis?"
+                width="max-w-[400px]"
+            >
+                <div className="flex flex-col gap-5">
+                    <p className="text-[14px] text-text-secondary leading-relaxed">
+                        The analysis is still in progress. Are you sure you want to cancel?
                     </p>
+                    <div className="flex flex-col gap-2">
+                        <Button variant="primary" size="md" onClick={() => setShowCancelConfirm(false)} className="w-full">
+                            Continue Analysis
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="md"
+                            className="w-full text-red-500 hover:text-red-600"
+                            onClick={() => {
+                                setShowCancelConfirm(false);
+                                onCancel();
+                            }}
+                        >
+                            Yes, Cancel
+                        </Button>
+                    </div>
                 </div>
-
-                <button
-                    onClick={onCancel}
-                    className="text-[14px] text-text-tertiary hover:text-text-secondary hover:underline transition-colors"
-                >
-                    Cancel
-                </button>
-            </div>
+            </Modal>
         </div>
     );
 }
