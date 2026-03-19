@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
+import { motion } from 'motion/react';
 import { UploadCloud, X } from 'lucide-react';
+import { Button } from '../components/shared';
 import { ErrorBanner } from '../components/shared/ErrorBanner';
 import type { CompareImage, CompareError } from './types';
 
@@ -26,7 +28,6 @@ export default function CompareUpload({
         const remainingSlots = 5 - images.length;
         const filesToAdd = validFiles.slice(0, remainingSlots);
 
-        // Read all files in parallel, then update state once to avoid race condition
         Promise.all(
             filesToAdd.map(
                 (file) =>
@@ -49,7 +50,6 @@ export default function CompareUpload({
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         addFiles(Array.from(e.target.files || []));
-        // Reset so re-selecting the same file triggers onChange
         if (e.target) e.target.value = '';
     };
 
@@ -64,26 +64,38 @@ export default function CompareUpload({
     };
 
     return (
-        <div className="pt-8">
+        <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="min-h-[calc(100vh-160px)] flex flex-col items-center justify-center py-16 px-4"
+        >
             {/* Header */}
-            <div className="max-w-[800px] mx-auto text-center mb-8">
-                <h1 className="text-[32px] font-bold tracking-tight mb-2">
-                    Compare Your Designs
+            <div className="text-center mb-10 max-w-[520px]">
+                <h1 className="text-[28px] font-bold tracking-tight mb-3">
+                    Find patterns across your best designs
                 </h1>
-                <p className="text-[14px] text-text-secondary">
+                <p className="text-[14px] text-text-secondary leading-relaxed">
                     Upload 2–5 of your best-selling designs and we'll find the patterns they share — so you can repeat what works.
                 </p>
             </div>
 
-            {/* Upload area */}
-            <div className="max-w-[800px] mx-auto">
-                <div className="bg-bg-surface1 border border-border-default rounded-xl p-6 mb-6">
-                    {/* Image grid */}
-                    <div className="flex flex-wrap gap-4 mb-4">
+            {/* Upload zone + thumbnails */}
+            <div className="w-full max-w-[640px] flex flex-col gap-4">
+
+                {/* Thumbnail grid */}
+                {images.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex flex-wrap gap-3"
+                    >
                         {images.map((img, index) => (
                             <div
                                 key={index}
-                                className="relative w-[150px] h-[150px] rounded-lg overflow-hidden border border-border-default group"
+                                className="relative w-[120px] h-[120px] rounded-lg overflow-hidden border border-border-default group"
                             >
                                 <img
                                     src={img.data}
@@ -92,70 +104,76 @@ export default function CompareUpload({
                                 />
                                 <button
                                     onClick={() => removeImage(index)}
-                                    className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80 focus-visible:ring-2 focus-visible:ring-accent focus-visible:opacity-100"
+                                    className="absolute top-1.5 right-1.5 bg-black/60 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
                                     aria-label={`Remove ${img.name}`}
                                 >
-                                    <X className="w-4 h-4" />
+                                    <X className="w-3.5 h-3.5" />
                                 </button>
                             </div>
                         ))}
+                    </motion.div>
+                )}
 
-                        {/* Add-image zone */}
-                        {images.length < 5 && (
-                            <div
-                                className={`w-[150px] h-[150px] bg-bg-surface2 border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${isDragging
-                                    ? 'border-accent bg-accent/10'
-                                    : 'border-border-default hover:border-border-hover'
-                                    }`}
-                                onClick={() => fileInputRef.current?.click()}
-                                onDragOver={(e) => {
-                                    e.preventDefault();
-                                    setIsDragging(true);
-                                }}
-                                onDragLeave={() => setIsDragging(false)}
-                                onDrop={handleDrop}
-                            >
-                                <UploadCloud className="w-8 h-8 text-text-secondary mb-2" />
-                                <span className="text-[12px] text-text-secondary">
-                                    Add Image
-                                </span>
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    className="hidden"
-                                    accept="image/*"
-                                    multiple
-                                    onChange={handleFileChange}
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    <p className="text-[14px] text-text-secondary text-center">
-                        {images.length}/5 images selected
-                    </p>
-                </div>
-
-                {/* Error banner */}
-                {error && (
-                    <div className="mb-6">
-                        <ErrorBanner
-                            title="Analysis failed"
-                            message={error.message}
-                            onDismiss={onDismissError}
+                {/* Add image drop zone */}
+                {images.length < 5 && (
+                    <div
+                        className={`w-full border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-center cursor-pointer transition-colors py-10 gap-3 ${isDragging
+                                ? 'border-accent bg-accent/10'
+                                : 'border-border-default hover:border-border-hover bg-bg-surface1'
+                            }`}
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={handleDrop}
+                    >
+                        <UploadCloud className="w-8 h-8 text-text-secondary" />
+                        <div>
+                            <p className="text-[14px] font-medium text-text-primary">
+                                {images.length === 0 ? 'Drop images here or click to browse' : 'Add more images'}
+                            </p>
+                            <p className="text-[12px] text-text-tertiary mt-1">
+                                {images.length}/5 selected · PNG, JPG, WEBP
+                            </p>
+                        </div>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/*"
+                            multiple
+                            onChange={handleFileChange}
                         />
                     </div>
                 )}
 
-                {/* CTA */}
-                <button
-                    onClick={onAnalyze}
-                    disabled={images.length < 2}
-                    className="w-full ai-gradient text-white font-medium py-[14px] px-6 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-                >
-                    Find Shared Patterns
-                </button>
+                {/* Error */}
+                {error && (
+                    <ErrorBanner
+                        title="Analysis failed"
+                        message={error.message}
+                        onDismiss={onDismissError}
+                    />
+                )}
+
+                {/* CTA — only show when ≥2 images */}
+                {images.length >= 2 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex flex-col gap-2"
+                    >
+                        <Button onClick={onAnalyze} size="lg" className="w-full">
+                            Find Shared Patterns
+                        </Button>
+                        {images.length < 5 && (
+                            <p className="text-[12px] text-text-tertiary text-center">
+                                Add up to {5 - images.length} more image{5 - images.length !== 1 ? 's' : ''} for better results
+                            </p>
+                        )}
+                    </motion.div>
+                )}
             </div>
-        </div>
+        </motion.div>
     );
 }

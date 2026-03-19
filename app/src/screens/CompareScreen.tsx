@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
 import { CompareUpload, CompareAnalyzing, CompareResults } from '../compare';
 import type { Step, CompareImage, CompareError } from '../compare';
 import { analyzeBatch } from '../apiClient';
@@ -6,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function CompareScreen() {
     const { session } = useAuth();
+    const navigate = useNavigate();
 
     // ── State machine ──
     const [step, setStep] = useState<Step>('upload');
@@ -135,34 +139,52 @@ export default function CompareScreen() {
         setStep('upload');
     };
 
-    // ── Render by step ──
+    // ── Render ──
     return (
-        <>
+        <div>
+            {/* Back breadcrumb — shown on upload step only */}
             {step === 'upload' && (
-                <CompareUpload
-                    images={compareImages}
-                    onImagesChange={setCompareImages}
-                    onAnalyze={handleCompareAnalyze}
-                    error={error}
-                    onDismissError={() => setError(null)}
-                />
+                <div className="pt-6 pb-2 max-w-[960px] mx-auto">
+                    <button
+                        onClick={() => navigate('/pattern')}
+                        className="flex items-center gap-1.5 text-[13px] text-text-secondary hover:text-text-primary transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Patterns
+                    </button>
+                </div>
             )}
 
-            {step === 'analyzing' && (
-                <CompareAnalyzing
-                    error={error}
-                    onRetry={handleCompareAnalyze}
-                    onCancel={handleCancelAnalysis}
-                />
-            )}
+            <AnimatePresence mode="wait">
+                {step === 'upload' && (
+                    <CompareUpload
+                        key="upload"
+                        images={compareImages}
+                        onImagesChange={setCompareImages}
+                        onAnalyze={handleCompareAnalyze}
+                        error={error}
+                        onDismissError={() => setError(null)}
+                    />
+                )}
 
-            {step === 'results' && (
-                <CompareResults
-                    images={compareImages}
-                    compareResult={compareResult}
-                    onNewComparison={handleNewComparison}
-                />
-            )}
-        </>
+                {step === 'analyzing' && (
+                    <CompareAnalyzing
+                        key="analyzing"
+                        error={error}
+                        onRetry={handleCompareAnalyze}
+                        onCancel={handleCancelAnalysis}
+                    />
+                )}
+
+                {step === 'results' && (
+                    <CompareResults
+                        key="results"
+                        images={compareImages}
+                        compareResult={compareResult}
+                        onNewComparison={handleNewComparison}
+                    />
+                )}
+            </AnimatePresence>
+        </div>
     );
 }
