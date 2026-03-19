@@ -33,7 +33,7 @@ function PatternListView() {
             {/* Title + CTA — same row */}
             <div className="flex items-center justify-between pt-8 mb-6">
                 <div>
-                    <h1 className="text-[32px] font-bold tracking-tight mb-1">Patterns</h1>
+                    <h1 className="text-[32px] font-bold tracking-tight mb-1">Winning Patterns</h1>
                 </div>
                 <Button
                     variant="accent"

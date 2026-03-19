@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { ImageOff, Copy, Check, ArrowLeft, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { analyzeDesign, saveAnalysis } from '../apiClient';
@@ -12,6 +12,7 @@ import { AnalyzeGoToStudioButton } from './analyze/AnalyzeGoToStudioButton';
 import { AnalyzeBuyerTab } from './analyze/AnalyzeBuyerTab';
 import { AnalyzeVisualTab } from './analyze/AnalyzeVisualTab';
 import MyAnalysesScreen from './MyAnalysesScreen';
+import { invalidateAnalysesCache } from './MyAnalysesScreen';
 import ViewAnalysisScreen from './ViewAnalysisScreen';
 import type { AnalyzeImage, AnalyzeError } from './analyze/types';
 
@@ -32,28 +33,61 @@ export default function AnalyzeScreen() {
 
 function AnalyzeListView() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [showSavedToast, setShowSavedToast] = useState(false);
 
     useEffect(() => {
         document.title = 'DesignDNA — Analyze';
     }, []);
 
+    // Show toast if navigated back after saving
+    useEffect(() => {
+        if ((location.state as any)?.saved) {
+            setShowSavedToast(true);
+            const timer = setTimeout(() => setShowSavedToast(false), 3000);
+            // Clear state so refreshing doesn't re-trigger
+            window.history.replaceState({}, '');
+            return () => clearTimeout(timer);
+        }
+    }, [location.state]);
+
     return (
-        <div>
-            {/* Header bar with CTA */}
-            <div className="flex items-center justify-between pt-8 pb-2 max-w-[960px] mx-auto">
-                <div /> {/* spacer — title is rendered inside MyAnalysesScreen */}
+        <div className="max-w-[960px] mx-auto">
+            {/* Title + CTA — same row */}
+            <div className="flex items-center justify-between pt-8 mb-6">
+                <div>
+                    <h1 className="text-[32px] font-bold tracking-tight mb-1">Deep Analyses</h1>
+                </div>
                 <Button
+                    variant="accent"
                     onClick={() => navigate('/analyze/new')}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 flex-shrink-0"
                 >
                     <Plus className="w-4 h-4" />
                     New Analysis
                 </Button>
             </div>
-            <MyAnalysesScreen />
+            <MyAnalysesScreen hideTitle />
+
+            {/* Saved toast */}
+            <AnimatePresence>
+                {showSavedToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className="fixed bottom-6 right-6 bg-bg-surface1 border border-border-default rounded-lg px-4 py-3 shadow-lg flex items-center gap-2 text-[13px] z-50"
+                    >
+                        <Check className="w-4 h-4 text-success" />
+                        <span>Analysis saved</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
+
 
 // ── Analyze New Flow ───────────────────────────────────────────────
 // The existing 3-step upload → analyzing → results state machine
@@ -113,6 +147,8 @@ function AnalyzeNewFlow() {
                         resultJson: result
                     })
                         .then(() => {
+                            // Invalidate list cache so /analyze shows new analysis immediately
+                            invalidateAnalysesCache();
                             // Show "Analysis saved ✓" toast for 3s
                             setShowSavedToast(true);
                             setTimeout(() => setShowSavedToast(false), 3000);
@@ -178,7 +214,7 @@ function AnalyzeNewFlow() {
             {/* Back link */}
             <div className="pt-6 pb-2 max-w-[960px] mx-auto">
                 <button
-                    onClick={() => navigate('/analyze')}
+                    onClick={() => navigate('/analyze', { state: analysisResult ? { saved: true } : undefined })}
                     className="flex items-center gap-1.5 text-[13px] text-text-secondary hover:text-text-primary transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
@@ -188,12 +224,35 @@ function AnalyzeNewFlow() {
 
             <AnimatePresence mode="wait">
                 {currentStep === 'analyzing' ? (
-                    <AnalyzeLoadingStep
+                    <motion.div
                         key="analyzing"
-                        error={error}
-                        onRetry={() => handleAnalyze()}
-                        onCancel={handleCancelAnalysis}
-                    />
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="pt-8 mb-24 max-w-[960px] mx-auto"
+                    >
+                        <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
+                            {/* Left: Image preview */}
+                            <div className="w-full md:w-[40%] md:sticky md:top-[80px] self-start">
+                                <div className="bg-bg-surface2 p-2 rounded-xl border border-border-default">
+                                    {uploadedImage && (
+                                        <img src={uploadedImage.data} alt="Analyzing..." className="w-full max-h-[300px] md:max-h-none object-contain rounded-lg" />
+                                    )}
+                                </div>
+                                <p className="mt-4 text-[12px] text-text-secondary truncate" title={uploadedImage?.name}>{uploadedImage?.name}</p>
+                            </div>
+
+                            {/* Right: Loading content */}
+                            <div className="w-full md:w-[60%] flex flex-col items-center justify-center min-h-[400px]">
+                                <AnalyzeLoadingStep
+                                    error={error}
+                                    onRetry={() => handleAnalyze()}
+                                    onCancel={handleCancelAnalysis}
+                                />
+                            </div>
+                        </div>
+                    </motion.div>
                 ) : currentStep === 'results' ? (
                     <ResultsStep
                         key="results"
@@ -318,7 +377,7 @@ function ResultsStep({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="pt-8 mb-24"
+            className="pt-8 mb-24 max-w-[960px] mx-auto"
         >
             {/* Mobile pinned thumbnail — only visible on mobile when scrolled past image */}
             <AnimatePresence>
@@ -344,7 +403,7 @@ function ResultsStep({
             <div ref={sentinelRef} className="md:hidden h-px" aria-hidden="true" />
 
             <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
-                <div className="w-full md:w-[40%] md:sticky md:top-[80px] self-start">
+                <div className="w-full md:w-[40%] md:sticky md:top-8 self-start">
                     <div className="bg-bg-surface2 p-2 rounded-xl border border-border-default">
                         {uploadedImage && (
                             <img src={uploadedImage.data} alt="Analyzed design" className="w-full max-h-[300px] md:max-h-none object-contain rounded-lg" />
@@ -354,32 +413,47 @@ function ResultsStep({
                 </div>
 
                 <div className="w-full md:w-[60%] flex flex-col gap-6">
-                    <div>
-                        <h1 className="text-[32px] font-bold tracking-tight mb-2">Analysis Results</h1>
-                        <p className="text-[14px] text-text-secondary">Here is the detailed breakdown of the original design and its target buyers.</p>
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <h1 className="text-[32px] font-bold tracking-tight mb-2">Analysis Results</h1>
+                            <p className="text-[14px] text-text-secondary">Here is the detailed breakdown of the original design and its target buyers.</p>
+                        </div>
+                        {/* Copy Analysis — top-right of content column */}
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={handleCopyDNA}
+                            className="flex-shrink-0 mt-1"
+                        >
+                            {copied ? (
+                                <><Check className="w-4 h-4 text-success" /> Copied!</>
+                            ) : (
+                                <><Copy className="w-4 h-4" /> Copy Analysis</>
+                            )}
+                        </Button>
                     </div>
 
                     <div className="flex border-b border-border-default" role="tablist">
                         <button
                             onClick={() => setActiveTab('visual')}
-                            className={`py-3 px-5 text-[13px] font-medium uppercase tracking-[0.05em] relative transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-t ${activeTab === 'visual' ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}
+                            className={`py-3 px-5 text-[13px] font-medium uppercase tracking-[0.05em] relative transition-colors duration-150 focus-visible:outline-none rounded-t ${activeTab === 'visual' ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}
                             role="tab"
                             aria-selected={activeTab === 'visual'}
                         >
                             Design Breakdown
                             {activeTab === 'visual' && (
-                                <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
+                                <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-[2px] bg-text-primary" />
                             )}
                         </button>
                         <button
                             onClick={() => setActiveTab('buyer')}
-                            className={`py-3 px-5 text-[13px] font-medium uppercase tracking-[0.05em] relative transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-t ${activeTab === 'buyer' ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}
+                            className={`py-3 px-5 text-[13px] font-medium uppercase tracking-[0.05em] relative transition-colors duration-150 focus-visible:outline-none rounded-t ${activeTab === 'buyer' ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}
                             role="tab"
                             aria-selected={activeTab === 'buyer'}
                         >
                             Target Audience
                             {activeTab === 'buyer' && (
-                                <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" />
+                                <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-[2px] bg-text-primary" />
                             )}
                         </button>
                     </div>
@@ -400,7 +474,7 @@ function ResultsStep({
                             <AnalyzeBuyerTab buyerDNA={buyerDNA} itemVariants={itemVariants} />
                         )}
 
-                        <motion.div variants={itemVariants} className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-border-default">
+                        <motion.div variants={itemVariants} className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-border-default justify-end">
                             {!readMode && (
                                 <>
                                     <AnalyzeGoToStudioButton
@@ -409,22 +483,12 @@ function ResultsStep({
                                     />
                                     <Button
                                         variant="ghost"
-                                        onClick={() => navigate('/analyze')}
+                                        onClick={() => navigate('/analyze', { state: { saved: true } })}
                                     >
-                                        Analyze Another
+                                        <Plus className="w-4 h-4" /> Analyze Another
                                     </Button>
                                 </>
                             )}
-                            <Button
-                                variant="secondary"
-                                onClick={handleCopyDNA}
-                            >
-                                {copied ? (
-                                    <><Check className="w-4 h-4 text-success" /> Copied!</>
-                                ) : (
-                                    <><Copy className="w-4 h-4" /> Copy Analysis</>
-                                )}
-                            </Button>
                         </motion.div>
                     </motion.div>
                 </div>
