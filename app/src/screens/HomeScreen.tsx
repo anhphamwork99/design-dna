@@ -1,10 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMigratePatterns } from '../hooks/useMigratePatterns';
 import { useAuth } from '../contexts/AuthContext';
-import heroBanner from '../assets/hero-banner.png';
+import { listPatterns, SavedPattern } from '../apiClient';
+import { FeatureHeroBlock } from '../components/home/FeatureHeroBlock';
+import { OnboardingChecklist } from '../components/home/OnboardingChecklist';
+import { RecentAnalysesCarousel } from '../components/home/RecentAnalysesCarousel';
+import { MousePointerClick, Sparkles, Layers } from 'lucide-react';
 
 export default function HomeScreen() {
     const { session } = useAuth();
+    const [patterns, setPatterns] = useState<SavedPattern[]>([]);
+    const [loadingPatterns, setLoadingPatterns] = useState(true);
 
     // localStorage → Supabase migration
     const { state: migrationState, startMigration, dismiss: dismissMigration } = useMigratePatterns(
@@ -23,27 +29,41 @@ export default function HomeScreen() {
         document.title = 'DesignDNA — Home';
     }, []);
 
+    // Fetch user's patterns
+    useEffect(() => {
+        if (!session) {
+            setLoadingPatterns(false);
+            return;
+        }
+        listPatterns(session.access_token)
+            .then(setPatterns)
+            .catch((err) => {
+                console.error('Failed to load patterns for home screen:', err);
+            })
+            .finally(() => setLoadingPatterns(false));
+    }, [session]);
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <div className="flex flex-col w-full max-w-[1200px] mx-auto pb-24 pt-4 md:pt-10 min-h-[80vh]">
             {/* Migration banner */}
             {migrationState.status !== 'idle' && (
-                <div className="mb-6 w-full max-w-[640px]">
+                <div className="mb-10 w-full relative z-20">
                     {migrationState.status === 'detected' && (
-                        <div className="bg-bg-surface1 border border-accent/30 rounded-lg px-5 py-3 flex items-center justify-between gap-4 shadow-lg">
-                            <p className="text-[13px] text-text-secondary">
-                                <span className="mr-2">📦</span>
+                        <div className="bg-bg-surface1 border border-accent/30 rounded-xl px-5 py-3 flex items-center justify-between gap-4 shadow-lg shadow-accent/5">
+                            <p className="text-[14px] text-text-secondary">
+                                <span className="mr-3">📦</span>
                                 Found <span className="text-text-primary font-medium">{migrationState.localPatternCount}</span> pattern{migrationState.localPatternCount !== 1 ? 's' : ''} in local storage. Migrate to your account?
                             </p>
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex items-center gap-3 shrink-0">
                                 <button
                                     onClick={startMigration}
-                                    className="px-4 py-1.5 rounded-md ai-gradient text-white text-[12px] font-medium hover:opacity-90 transition-opacity"
+                                    className="px-5 py-2 rounded-lg ai-gradient text-white text-[13px] font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
                                 >
                                     Migrate Now
                                 </button>
                                 <button
                                     onClick={dismissMigration}
-                                    className="px-3 py-1.5 rounded-md text-[12px] text-text-tertiary hover:text-text-secondary transition-colors"
+                                    className="px-4 py-2 rounded-lg text-[13px] font-medium text-text-tertiary hover:text-text-secondary hover:bg-state-hover transition-colors whitespace-nowrap"
                                 >
                                     Not Now
                                 </button>
@@ -52,38 +72,38 @@ export default function HomeScreen() {
                     )}
 
                     {migrationState.status === 'migrating' && (
-                        <div className="bg-bg-surface1 border border-accent/30 rounded-lg px-5 py-3 flex items-center gap-3 shadow-lg">
-                            <div className="w-4 h-4 rounded-full border-2 border-accent border-t-transparent animate-spin shrink-0" />
-                            <p className="text-[13px] text-text-secondary">
+                        <div className="bg-bg-surface1 border border-accent/30 rounded-xl px-5 py-4 flex items-center gap-4 shadow-lg shadow-accent/5">
+                            <div className="w-5 h-5 rounded-full border-2 border-accent border-t-transparent animate-spin shrink-0" />
+                            <p className="text-[14px] text-text-secondary">
                                 Migrating patterns… <span className="text-text-primary font-medium">{migrationState.migratedCount}/{migrationState.localPatternCount}</span>
                             </p>
                         </div>
                     )}
 
                     {migrationState.status === 'done' && (
-                        <div className="bg-bg-surface1 border border-[#34d399]/30 rounded-lg px-5 py-3 flex items-center gap-3 shadow-lg">
-                            <span className="text-[#34d399]">✓</span>
-                            <p className="text-[13px] text-text-secondary">
-                                <span className="text-text-primary font-medium">{migrationState.migratedCount}</span> pattern{migrationState.migratedCount !== 1 ? 's' : ''} migrated successfully{migrationState.skippedCount > 0 ? `, ${migrationState.skippedCount} already existed` : ''}
+                        <div className="bg-bg-surface1 border border-[#34d399]/30 rounded-xl px-5 py-4 flex items-center gap-4 shadow-lg shadow-[#34d399]/5">
+                            <span className="text-[#34d399] font-bold text-lg">✓</span>
+                            <p className="text-[14px] text-text-secondary">
+                                <span className="text-text-primary font-medium border-b border-text-primary/20 pb-0.5">{migrationState.migratedCount}</span> pattern{migrationState.migratedCount !== 1 ? 's' : ''} migrated successfully{migrationState.skippedCount > 0 ? `, ${migrationState.skippedCount} already existed` : ''}
                             </p>
                         </div>
                     )}
 
                     {migrationState.status === 'error' && (
-                        <div className="bg-bg-surface1 border border-error/30 rounded-lg px-5 py-3 flex items-center justify-between gap-4 shadow-lg">
-                            <p className="text-[13px] text-text-secondary">
-                                Migration failed: {migrationState.error}. Your local patterns are safe — try again later.
+                        <div className="bg-bg-surface1 border border-error/30 rounded-xl px-5 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg shadow-error/5">
+                            <p className="text-[14px] text-text-secondary">
+                                <span className="text-error font-medium mr-2">Migration failed:</span> {migrationState.error}. Your local patterns are safe.
                             </p>
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex items-center gap-3 shrink-0">
                                 <button
                                     onClick={startMigration}
-                                    className="px-4 py-1.5 rounded-md bg-accent text-white text-[12px] font-medium hover:bg-accent-hover transition-colors"
+                                    className="px-5 py-2 rounded-lg bg-accent text-white text-[13px] font-semibold hover:bg-accent-hover transition-colors shadow-sm whitespace-nowrap"
                                 >
                                     Retry
                                 </button>
                                 <button
                                     onClick={dismissMigration}
-                                    className="px-3 py-1.5 rounded-md text-[12px] text-text-tertiary hover:text-text-secondary transition-colors"
+                                    className="px-4 py-2 rounded-lg text-[13px] font-medium text-text-tertiary hover:text-text-secondary hover:bg-state-hover transition-colors whitespace-nowrap"
                                 >
                                     Dismiss
                                 </button>
@@ -93,22 +113,44 @@ export default function HomeScreen() {
                 </div>
             )}
 
-            {/* Hero Banner */}
-            <div className="w-full max-w-[800px] mb-8 overflow-hidden rounded-2xl">
-                <img
-                    src={heroBanner}
-                    alt="DesignDNA — Discover the DNA of great design"
-                    className="w-full max-h-[440px] object-cover"
-                    draggable={false}
+            {/* Top Section: Onboarding or Carousel */}
+            {!loadingPatterns && (
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out mb-24">
+                    {patterns.length === 0 ? (
+                        <OnboardingChecklist hasPatterns={patterns.length > 0} />
+                    ) : (
+                        <RecentAnalysesCarousel patterns={patterns} />
+                    )}
+                </div>
+            )}
+
+            {/* Main Section: Feature Hero Blocks */}
+            <div className="flex flex-col gap-24 lg:gap-32 pb-20">
+                <FeatureHeroBlock
+                    title="Decode the DNA of any interface"
+                    description="Upload any top-selling design—from graphic tees to typography art—and let our AI analyze the core visual layout, styling, and buyer psychological triggers that make it work."
+                    ctaText="Analyze Design"
+                    ctaRoute="/analyze/new"
+                    illustration={<MousePointerClick className="w-32 h-32 text-accent/80 drop-shadow-lg" strokeWidth={1} />}
+                />
+
+                <FeatureHeroBlock
+                    reversed
+                    title="Generate variants from your library"
+                    description="Enter the Studio to blend multiple successful patterns together. Give the AI an original graphic to get customized, print-ready variations maintaining the core visual DNA."
+                    ctaText="Open Studio"
+                    ctaRoute="/studio"
+                    illustration={<Sparkles className="w-32 h-32 text-accent/80 drop-shadow-lg" strokeWidth={1} />}
+                />
+
+                <FeatureHeroBlock
+                    title="Find the common patterns"
+                    description="Perform batch analysis on multiple winning designs to find their shared structural features. Extract and save these high-converting patterns to your personal library."
+                    ctaText="Compare Designs"
+                    ctaRoute="/compare"
+                    illustration={<Layers className="w-32 h-32 text-accent/80 drop-shadow-lg" strokeWidth={1} />}
                 />
             </div>
-
-            <h1 className="text-[32px] font-bold tracking-tight text-text-primary mb-3">
-                Welcome to DesignDNA
-            </h1>
-            <p className="text-[14px] text-text-secondary max-w-[400px]">
-                Home dashboard coming soon. Use the sidebar to navigate to your tools.
-            </p>
         </div>
     );
 }
