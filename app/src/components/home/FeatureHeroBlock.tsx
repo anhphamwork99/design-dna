@@ -1,4 +1,4 @@
-import React, { type ReactNode, useRef, useState } from 'react';
+import React, { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 export interface FeatureHeroBlockProps {
@@ -20,34 +20,6 @@ export function FeatureHeroBlock({
     ctaVariant = 'primary',
     reversed = false,
 }: FeatureHeroBlockProps) {
-    const cardRef = useRef<HTMLDivElement>(null);
-    const [tiltStyles, setTiltStyles] = useState({});
-
-    // Lightweight 3D Tilt effect
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!cardRef.current) return;
-        const rect = cardRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left; // x position within the element.
-        const y = e.clientY - rect.top; // y position within the element.
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        // Calculate rotation degrees (max 4 degrees)
-        const rotateX = ((y - centerY) / centerY) * -4;
-        const rotateY = ((x - centerX) / centerX) * 4;
-
-        setTiltStyles({
-            transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`,
-            transition: 'transform 0.1s ease-out',
-        });
-    };
-
-    const handleMouseLeave = () => {
-        setTiltStyles({
-            transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
-            transition: 'transform 0.6s ease-out',
-        });
-    };
-
     const isPrimary = ctaVariant === 'primary';
 
     return (
@@ -72,18 +44,8 @@ export function FeatureHeroBlock({
                 </div>
             </div>
 
-            <div
-                ref={cardRef}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                onMouseEnter={() => setTiltStyles({ transition: 'transform 0.1s ease-out' })}
-                className="flex-1 w-full flex items-center justify-center min-h-[360px] lg:min-h-[480px] relative group cursor-default"
-                style={{ perspective: '1000px' }}
-            >
-                <div
-                    className="absolute inset-0 w-full h-full flex items-center justify-center transition-transform"
-                    style={tiltStyles}
-                >
+            <div className="flex-1 w-full flex items-center justify-center min-h-[360px] lg:min-h-[480px]">
+                <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
                     {illustration}
                 </div>
             </div>
