@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layers, Eye, Palette, Trash2 } from 'lucide-react';
 import { listPatterns, deletePatternById, SavedPattern } from '../apiClient';
 import { useAuth } from '../contexts/AuthContext';
-import { DataGrid, ContextMenu, Button } from '../components/shared';
+import { DataGrid, ContextMenu } from '../components/shared';
 import type { ContextMenuItem } from '../components/shared';
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ function timeAgo(dateStr: string): string {
 
 // ── LibraryScreen ──────────────────────────────────────────────────
 
-export default function LibraryScreen() {
+export default function LibraryScreen({ hideTitle }: { hideTitle?: boolean } = {}) {
     const { session } = useAuth();
     const navigate = useNavigate();
 
@@ -71,7 +71,7 @@ export default function LibraryScreen() {
         {
             label: 'View',
             icon: Eye,
-            onClick: () => navigate(`/library/pattern/${pattern.id}`),
+            onClick: () => navigate(`/pattern/${pattern.id}`),
         },
         {
             label: 'Use in Studio',
@@ -89,7 +89,7 @@ export default function LibraryScreen() {
     const renderGridItem = (pattern: SavedPattern) => (
         <div
             key={pattern.id}
-            onClick={() => navigate(`/library/pattern/${pattern.id}`)}
+            onClick={() => navigate(`/pattern/${pattern.id}`)}
             className={`bg-bg-surface1 border border-border-default rounded-xl cursor-pointer hover:border-border-hover transition-colors ${deletingId === pattern.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
             <div
@@ -143,7 +143,7 @@ export default function LibraryScreen() {
     const renderListItem = (pattern: SavedPattern) => (
         <div
             key={pattern.id}
-            onClick={() => navigate(`/library/pattern/${pattern.id}`)}
+            onClick={() => navigate(`/pattern/${pattern.id}`)}
             className={`bg-bg-surface1 border border-border-default rounded-xl p-3 hover:border-border-hover cursor-pointer flex items-center gap-4 transition-colors ${deletingId === pattern.id ? 'opacity-50 pointer-events-none' : ''}`}
         >
             <div
@@ -197,21 +197,15 @@ export default function LibraryScreen() {
     }
 
     return (
-        <div className="pt-8 max-w-[960px] mx-auto">
-            <div className="mb-6 flex items-start justify-between gap-4">
-                <div>
-                    <h1 className="text-[32px] font-bold tracking-tight mb-1">Pattern Library</h1>
+        <div className={hideTitle ? '' : 'pt-8 max-w-[960px] mx-auto'}>
+            {!hideTitle && (
+                <div className="mb-6">
+                    <h1 className="text-[32px] font-bold tracking-tight mb-1">Patterns</h1>
                     <p className="text-[14px] text-text-secondary">
                         {patterns.length} pattern{patterns.length !== 1 ? 's' : ''}
                     </p>
                 </div>
-                <Button
-                    variant="primary"
-                    onClick={() => navigate('/compare')}
-                >
-                    Compare Designs
-                </Button>
-            </div>
+            )}
 
             <DataGrid<SavedPattern>
                 items={filteredPatterns}
@@ -226,7 +220,7 @@ export default function LibraryScreen() {
                 emptyTitle="No patterns yet"
                 emptyDescription="Compare multiple designs to discover shared patterns you can reuse."
                 emptyActionLabel="Go to Compare"
-                emptyOnAction={() => navigate('/compare')}
+                emptyOnAction={() => navigate('/pattern/compare')}
                 searchPlaceholder="Search patterns..."
             />
         </div>

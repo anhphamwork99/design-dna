@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import {
     Home,
-    Library,
+    Layers,
     Palette,
     Microscope,
-    Scale,
     Settings,
     LogOut,
     ChevronLeft,
@@ -62,9 +61,9 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                         collapsed={collapsed}
                     />
                     <SidebarNavItem
-                        icon={<Library className="w-5 h-5" />}
-                        label="Library"
-                        to="/library"
+                        icon={<Layers className="w-5 h-5" />}
+                        label="Pattern"
+                        to="/pattern"
                         collapsed={collapsed}
                     />
                     <SidebarNavItem
@@ -91,12 +90,6 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                         icon={<Palette className="w-5 h-5" />}
                         label="Studio"
                         to="/studio"
-                        collapsed={collapsed}
-                    />
-                    <SidebarNavItem
-                        icon={<Scale className="w-5 h-5" />}
-                        label="Compare"
-                        to="/compare"
                         collapsed={collapsed}
                     />
                 </nav>

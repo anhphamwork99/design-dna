@@ -14,7 +14,21 @@ function formatDate(dateStr: string) {
     });
 }
 
-export default function MyAnalysesScreen() {
+// ── Module-level cache (persists across mounts, resets on page reload) ──
+const CACHE_TTL_MS = 30_000; // 30s
+let cachedAnalyses: any[] | null = null;
+let cacheTimestamp = 0;
+
+function isCacheValid() {
+    return cachedAnalyses !== null && Date.now() - cacheTimestamp < CACHE_TTL_MS;
+}
+
+export function invalidateAnalysesCache() {
+    cachedAnalyses = null;
+    cacheTimestamp = 0;
+}
+
+export default function MyAnalysesScreen({ hideTitle = false }: { hideTitle?: boolean }) {
     const { session } = useAuth();
     const navigate = useNavigate();
 
@@ -31,8 +45,18 @@ export default function MyAnalysesScreen() {
     useEffect(() => {
         async function fetchAnalyses() {
             if (!session) return;
+
+            // Serve from cache instantly, then revalidate in background
+            if (isCacheValid()) {
+                setAnalyses(cachedAnalyses!);
+                setLoading(false);
+                return; // still fresh — skip refetch
+            }
+
             try {
                 const data = await listAnalyses(session.access_token);
+                cachedAnalyses = data;
+                cacheTimestamp = Date.now();
                 setAnalyses(data);
             } catch (err) {
                 console.error('Failed to list analyses:', err);
@@ -54,7 +78,11 @@ export default function MyAnalysesScreen() {
         setDeletingId(id);
         try {
             await deleteAnalysis(session.access_token, id);
-            setAnalyses((prev) => prev.filter((a) => a.id !== id));
+            const updated = analyses.filter((a) => a.id !== id);
+            setAnalyses(updated);
+            // Sync cache so navigating away and back reflects deletion
+            cachedAnalyses = updated;
+            cacheTimestamp = Date.now();
         } catch (err) {
             console.error('Failed to delete analysis:', err);
             alert('Failed to delete analysis');
@@ -77,7 +105,7 @@ export default function MyAnalysesScreen() {
         {
             label: 'Compare',
             icon: Scale,
-            onClick: () => navigate('/compare'),
+            onClick: () => navigate('/pattern/compare'),
         },
         {
             label: 'Delete',
@@ -186,13 +214,15 @@ export default function MyAnalysesScreen() {
     );
 
     return (
-        <div className="pt-8 max-w-[960px] mx-auto">
-            <div className="mb-6">
-                <h1 className="text-[32px] font-bold tracking-tight mb-1">My Analyses</h1>
-                <p className="text-[14px] text-text-secondary">
-                    {analyses.length} {analyses.length === 1 ? 'analysis' : 'analyses'}
-                </p>
-            </div>
+        <div className="max-w-[960px] mx-auto">
+            {!hideTitle && (
+                <div className="pt-8 mb-6">
+                    <h1 className="text-[32px] font-bold tracking-tight mb-1">My Analyses</h1>
+                    <p className="text-[14px] text-text-secondary">
+                        {analyses.length} {analyses.length === 1 ? 'analysis' : 'analyses'}
+                    </p>
+                </div>
+            )}
 
             <DataGrid
                 items={filteredAnalyses}
@@ -205,9 +235,9 @@ export default function MyAnalysesScreen() {
                 renderListItem={renderListItem}
                 emptyIcon={BookOpen}
                 emptyTitle="No analyses yet"
-                emptyDescription="Analyze a design to decode its Visual DNA and Buyer DNA."
+                emptyDescription="Upload a design and get an instant breakdown of its style, colors, and target audience."
                 emptyActionLabel="Analyze a Design"
-                emptyOnAction={() => navigate('/analyze')}
+                emptyOnAction={() => navigate('/analyze/new')}
                 searchPlaceholder="Search analyses..."
             />
         </div>

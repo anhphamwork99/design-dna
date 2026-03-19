@@ -36,7 +36,7 @@ export default function PatternDetailScreen() {
         setIsDeleting(true);
         try {
             await deletePatternById(session.access_token, id);
-            navigate('/library');
+            navigate('/pattern');
         } catch (err) {
             console.error('Failed to delete pattern:', err);
             setIsDeleting(false);
@@ -70,7 +70,7 @@ export default function PatternDetailScreen() {
             <div className="pt-8 max-w-[960px] mx-auto flex flex-col items-center justify-center py-20 text-center">
                 <AlertTriangle className="w-10 h-10 text-warning mb-4" />
                 <p className="text-[16px] text-text-secondary mb-4">{error || 'Pattern not found.'}</p>
-                <Button variant="secondary" onClick={() => navigate('/library')}>
+                <Button variant="secondary" onClick={() => navigate('/pattern')}>
                     Go Back
                 </Button>
             </div>
@@ -82,7 +82,7 @@ export default function PatternDetailScreen() {
     return (
         <div className="pt-8 max-w-[960px] mx-auto pb-8">
             <button
-                onClick={() => navigate('/library')}
+                onClick={() => navigate('/pattern')}
                 className="flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-text-primary transition-colors mb-6"
             >
                 <ArrowLeft className="w-4 h-4" />
