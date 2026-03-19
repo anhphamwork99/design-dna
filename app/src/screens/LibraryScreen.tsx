@@ -219,7 +219,7 @@ export default function LibraryScreen({ hideTitle }: { hideTitle?: boolean } = {
                 emptyIcon={Layers}
                 emptyTitle="No patterns yet"
                 emptyDescription="Compare multiple designs to discover shared patterns you can reuse."
-                emptyActionLabel="Go to Compare"
+                emptyActionLabel="Find Pattern"
                 emptyOnAction={() => navigate('/pattern/compare')}
                 searchPlaceholder="Search patterns..."
             />

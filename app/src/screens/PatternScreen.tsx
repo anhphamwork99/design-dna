@@ -41,7 +41,7 @@ function PatternListView() {
                     className="flex items-center gap-2 flex-shrink-0"
                 >
                     <Plus className="w-4 h-4" />
-                    Compare Designs
+                    Find Pattern
                 </Button>
             </div>
             <LibraryScreen hideTitle />
