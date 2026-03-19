@@ -4,8 +4,8 @@
 
 - **Milestone:** v3.0 — UI Redesign
 - **Phase:** 19 — Analyze Screen Redesign
-- **Plan:** 01 ✅ + 02 ✅ — Plans 01 and 02 complete
-- **Status:** ✅ Plan 19-02 executed. Loading screen redesigned with MascotLoader + energy bar + error modal + cancel confirm.
+- **Plan:** 01 ✅ + 02 ✅ + 03 ✅ — All plans complete
+- **Status:** ✅ Plan 19-03 executed. ResultsStep polished (buttons, toast, mobile pin) + upload layout rebalanced.
 
 ## Phase 19 Results
 
@@ -18,6 +18,10 @@
 - Removed `uploadedImage` prop (no longer shown during loading)
 - Error as Modal overlay (not replacing loading screen)
 - Cancel requires confirm dialog: "Continue Analysis" vs "Yes, Cancel"
+
+### Plan 19-03: Results Polish + Upload Rebalance ✅
+- `AnalyzeScreen.tsx`: ResultsStep — "Analyze Another" ghost → /analyze, "Copy Analysis" (was "Copy DNA JSON"), auto-save toast (3s fixed bottom-right), mobile thumbnail pin (IntersectionObserver + fixed bar)
+- `AnalyzeUploadStep.tsx`: Vertically centered, max-w-[640px], 28px heading, spacious spacing, full-width Analyze button
 
 
 
