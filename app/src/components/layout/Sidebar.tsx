@@ -56,9 +56,9 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                         collapsed={collapsed}
                     />
                     <SidebarNavItem
-                        icon={<Layers className="w-5 h-5" />}
-                        label="Winning Patterns"
-                        to="/pattern"
+                        icon={<Palette className="w-5 h-5" />}
+                        label="Studio"
+                        to="/studio"
                         collapsed={collapsed}
                     />
                     <SidebarNavItem
@@ -68,9 +68,9 @@ export function Sidebar({ signOut, onSettingsClick }: SidebarProps) {
                         collapsed={collapsed}
                     />
                     <SidebarNavItem
-                        icon={<Palette className="w-5 h-5" />}
-                        label="Studio"
-                        to="/studio"
+                        icon={<Layers className="w-5 h-5" />}
+                        label="Winning Patterns"
+                        to="/pattern"
                         collapsed={collapsed}
                     />
                 </nav>
