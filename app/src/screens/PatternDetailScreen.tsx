@@ -5,8 +5,6 @@ import { getPatternById, deletePatternById, SavedPattern } from '../apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/shared';
 
-// ── PatternDetailScreen ────────────────────────────────────────────
-
 export default function PatternDetailScreen() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -45,7 +43,6 @@ export default function PatternDetailScreen() {
         }
     };
 
-    // ── Loading ────────────────────────────────────────────────────
     if (loading) {
         return (
             <div className="pt-8 max-w-[960px] mx-auto">
@@ -68,7 +65,6 @@ export default function PatternDetailScreen() {
         );
     }
 
-    // ── Error ──────────────────────────────────────────────────────
     if (error || !pattern) {
         return (
             <div className="pt-8 max-w-[960px] mx-auto flex flex-col items-center justify-center py-20 text-center">
@@ -81,13 +77,19 @@ export default function PatternDetailScreen() {
         );
     }
 
-    // ── Analysis rendering ─────────────────────────────────────────
     const analysis = pattern.batch_analysis;
 
     return (
         <div className="pt-8 max-w-[960px] mx-auto pb-8">
+            <button
+                onClick={() => navigate('/library')}
+                className="flex items-center gap-1.5 text-[13px] text-text-tertiary hover:text-text-primary transition-colors mb-6"
+            >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Library</span>
+            </button>
+
             <div className="flex flex-col md:flex-row gap-8">
-                {/* ── Left: Source thumbnails ── */}
                 <div className="w-full md:w-[40%] md:sticky md:top-[80px] self-start">
                     <div className="grid grid-cols-2 gap-3">
                         {pattern.thumbnails.map((thumb, i) => (
@@ -108,7 +110,6 @@ export default function PatternDetailScreen() {
                     </p>
                 </div>
 
-                {/* ── Right: Pattern data ── */}
                 <div className="w-full md:w-[60%] flex flex-col gap-6">
                     <div>
                         <h1 className="text-[32px] font-bold tracking-tight mb-1">{pattern.name}</h1>
@@ -117,14 +118,12 @@ export default function PatternDetailScreen() {
                         </p>
                     </div>
 
-                    {/* Summary */}
                     <div className="bg-bg-surface2 p-4 rounded-lg">
                         <p className="text-[14px] text-text-secondary italic">{pattern.summary}</p>
                     </div>
 
-                    {/* Batch analysis sections */}
                     {analysis && (
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-6">
                             {renderAnalysisSection('Winning Formula', analysis.winning_formula)}
                             {renderAnalysisSection('Visual Patterns', analysis.visual_patterns)}
                             {renderAnalysisSection('Buyer Overlap', analysis.buyer_overlap)}
@@ -135,7 +134,6 @@ export default function PatternDetailScreen() {
                 </div>
             </div>
 
-            {/* ── Action buttons ── */}
             <div className="mt-8 pt-6 border-t border-border-default flex items-center gap-3 flex-wrap">
                 <Button
                     variant="primary"
@@ -152,26 +150,20 @@ export default function PatternDetailScreen() {
                     <Trash2 className="w-4 h-4 mr-2" />
                     {isDeleting ? 'Deleting...' : 'Delete Pattern'}
                 </Button>
-                <Button variant="secondary" onClick={() => navigate('/library')}>
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Library
-                </Button>
             </div>
         </div>
     );
 }
 
-// ── Generic analysis section renderer ──────────────────────────────
-
 function renderAnalysisSection(title: string, data: unknown): React.ReactNode | null {
     if (!data) return null;
 
     return (
-        <div key={title} className="bg-bg-surface2 p-4 rounded-lg">
-            <h3 className="text-[14px] font-semibold text-text-primary uppercase tracking-wider mb-3">
+        <div key={title} className="flex flex-col gap-2">
+            <h3 className="text-[13px] font-semibold text-text-primary uppercase tracking-[0.06em]">
                 {title}
             </h3>
-            <div className="text-[14px] text-text-primary">
+            <div className="text-[14px] text-text-primary leading-relaxed">
                 {renderValue(data)}
             </div>
         </div>
