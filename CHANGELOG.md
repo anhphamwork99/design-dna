@@ -2,6 +2,32 @@
 
 All notable changes to DesignDNA are documented in this file.
 
+## [3.2.0] — 2026-03-20
+
+### 🏠 Home Screen Dashboard (Phase 18)
+- **Hero Banner** — full-width gradient overlay with welcome messaging and quick nav
+- **Bento Feature Grid** — compact 2-column card grid (1 large + 2 small) replacing lengthy hero blocks; dark overlay with hover scale animation
+- **Onboarding Checklist** — 3-step guided setup (API key, first analysis, patterns) with completion tracking and step-by-step card layout
+- **Recent Analyses Carousel** — horizontal scroll showing latest analyses with thumbnails
+- **Da Vinci Renaissance Graphics** — AI-generated feature illustrations blended seamlessly with solid `#F8FAFC` background
+- **Air Pattern Aesthetic** — images float without borders using blend modes and radial masks
+
+### 🔬 Analyze Screen Redesign (Phase 19)
+- **Nested Route Architecture** — `/analyze`, `/analyze/new`, `/analyze/:id` replacing single-page conditional rendering
+- **Energy Bar Loading** — MascotLoader GIF + animated energy bar with percentage, step-based status text, error modal overlay, and cancel confirmation dialog
+- **Upload UX** — centered layout with spacious heading, full-width CTA button, clipboard paste support in UploadZone
+- **Results Polish** — auto-save toast notification, mobile-friendly thumbnail pinning, renamed action buttons
+- **Sidebar Consolidation** — merged sidebar items, reordered nav (Home > Studio > Deep Analyze > Winning Patterns), removed WORKSPACE/TOOLS sections
+
+### 🎯 Pattern Library Flow Polish (Phase 25)
+- **Merged Routes** — Pattern Library + Compare unified into nested `/pattern/*` route with Layers icon and accent CTA
+- **PatternDetail Rewrite** — matches CompareResults visual style: gradient underline headings, icon cards, niche ladder
+- **Compare Screen** — new upload layout (inline add-image squares, flex-wrap thumbnails), loading state with energy bar, side-by-side results with DNA metrics
+- **Copy Updates** — renamed to "Deep Analyses" + "Winning Patterns" across headings, buttons, and empty states
+- **Visual Sync** — SVG wavy gradient underlines synced across CompareResults and PatternDetail
+
+---
+
 ## [3.1.0] — 2026-03-19
 
 ### ☁️ Cloudflare Workers Migration
