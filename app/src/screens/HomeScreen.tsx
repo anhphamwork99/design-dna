@@ -2,13 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useMigratePatterns } from '../hooks/useMigratePatterns';
 import { useAuth } from '../contexts/AuthContext';
 import { listPatterns, SavedPattern } from '../apiClient';
-import { FeatureHeroBlock } from '../components/home/FeatureHeroBlock';
 import { OnboardingChecklist } from '../components/home/OnboardingChecklist';
 import { RecentAnalysesCarousel } from '../components/home/RecentAnalysesCarousel';
+import { BentoFeatures } from '../components/home/BentoFeatures';
 import heroBanner from '../assets/hero-banner.png';
-import bgAnalyze from '../assets/bg-analyze.png';
-import bgStudio from '../assets/bg-studio.png';
-import bgCompare from '../assets/bg-compare.png';
 
 export default function HomeScreen() {
     const { session } = useAuth();
@@ -142,7 +139,7 @@ export default function HomeScreen() {
             </div>
 
             {/* Content Switcher: Onboarding or Recent Analyses */}
-            <div className="mb-20 lg:mb-24 min-h-[140px]">
+            <div className="mb-12 lg:mb-16 min-h-[140px]">
                 {loadingPatterns ? (
                     <div className="animate-pulse">
                         <div className="h-6 w-32 bg-bg-surface1 rounded-md mb-4" />
@@ -163,68 +160,16 @@ export default function HomeScreen() {
                 )}
             </div>
 
-            {/* Main Section: Feature Hero Blocks */}
-            <div className="flex flex-col gap-24 lg:gap-32 pb-20">
-                <FeatureHeroBlock
-                    title={<>Decode the DNA of any <em className="font-logo font-normal italic text-accent opacity-90 pr-1 px-1">graphic</em></>}
-                    description="Upload any print-on-demand artwork or illustration and let our AI analyze the core visual composition, typography, and color palettes that make it successful."
-                    ctaText="Analyze Design"
-                    ctaRoute="/analyze/new"
-                    ctaVariant="primary"
-                    illustration={
-                        <img
-                            src={bgAnalyze}
-                            alt="Analyze Graphic"
-                            className="w-full h-full object-contain scale-110 md:scale-125"
-                            draggable={false}
-                        />
-                    }
-                />
-
-                <FeatureHeroBlock
-                    reversed
-                    title={<>Generate variants from your <em className="font-logo font-normal italic text-accent opacity-90 pr-1 px-1">library</em></>}
-                    description="Enter the Studio to blend multiple successful patterns together. Give the AI an original graphic to get customized, print-ready variations maintaining the core visual DNA."
-                    ctaText="Open Studio"
-                    ctaRoute="/studio"
-                    ctaVariant="primary"
-                    illustration={
-                        <img
-                            src={bgStudio}
-                            alt="Studio Graphic"
-                            className="w-full h-full object-contain scale-110 md:scale-125"
-                            draggable={false}
-                        />
-                    }
-                />
-
-                <FeatureHeroBlock
-                    title={<>Find the common <em className="font-logo font-normal italic text-accent opacity-90 pr-1 px-1">patterns</em></>}
-                    description="Perform batch analysis on multiple winning designs to find their shared structural features. Extract and save these high-converting patterns to your personal library."
-                    ctaText="Compare Designs"
-                    ctaRoute="/compare"
-                    ctaVariant="primary"
-                    illustration={
-                        <img
-                            src={bgCompare}
-                            alt="Compare Graphic"
-                            className="w-full h-full object-contain scale-110 md:scale-125"
-                            draggable={false}
-                        />
-                    }
-                />
+            {/* Feature Bento Grid */}
+            <div className="pb-12">
+                <BentoFeatures />
             </div>
 
             {/* Simple Elegant Footer */}
-            <footer className="mt-8 pt-8 border-t border-border-default flex flex-col md:flex-row items-center justify-between gap-4">
-                <p className="text-[14px] text-text-tertiary">
+            <footer className="mt-8 pt-8 border-t border-border-default flex items-center justify-center">
+                <p className="text-[13px] text-text-tertiary">
                     &copy; 2026 DesignDNA. Empowered by AI.
                 </p>
-                <div className="flex items-center gap-6">
-                    <a href="#" className="text-[14px] font-medium text-text-tertiary hover:text-text-primary transition-colors">Documentation</a>
-                    <a href="#" className="text-[14px] font-medium text-text-tertiary hover:text-text-primary transition-colors">Support</a>
-                    <a href="#" className="text-[14px] font-medium text-text-tertiary hover:text-text-primary transition-colors">Terms</a>
-                </div>
             </footer>
         </div>
     );

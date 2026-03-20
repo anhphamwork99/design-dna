@@ -44,7 +44,7 @@ export function FeatureHeroBlock({
                 </div>
             </div>
 
-            <div className="flex-1 w-full flex items-center justify-center min-h-[360px] lg:min-h-[480px]">
+            <div className="flex-1 w-full flex items-center justify-center min-h-[280px] lg:min-h-[380px]">
                 <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
                     {illustration}
                 </div>
