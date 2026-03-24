@@ -2,142 +2,137 @@
 
 AI-powered design intelligence workspace for Print-on-Demand sellers and graphic designers.
 
-Upload a design image and DesignDNA breaks it into:
-
-- **Visual DNA**: composition, color, typography, graphics, POD production traits
-- **Buyer DNA**: persona, identity signals, emotional triggers, occasion timing, purchase psychology
-
-From there, users can compare designs, save reusable patterns, and generate new POD-ready artwork from grounded analysis.
+Upload any design image and DesignDNA extracts its **Visual DNA** and **Buyer DNA** — then lets you compare designs, save winning patterns, and generate new POD-ready artwork grounded in real analysis.
 
 ## Features
 
-### Analyze
+### 🔬 Deep Analyze
 
-- Upload a design image
-- Extract Visual DNA and Buyer DNA
-- Auto-save analysis history to Supabase
+Upload a design image and AI breaks it down into two layers:
 
-### Compare
+- **Visual DNA** — composition, color palette, typography, graphics style, POD production traits
+- **Buyer DNA** — target persona, identity signals, emotional triggers, occasion timing, purchase psychology
 
-- Analyze 2 to 5 designs together
-- Detect repeated visual and buyer patterns
-- Produce a winning formula
+Results are auto-saved to your cloud library for future reference.
 
-### Pattern Library
+### ⚡ Batch Compare
 
-- Save comparison insights as reusable patterns
-- Browse patterns in grid or list layouts
-- Send patterns into Studio
+Analyze 2–5 designs side by side:
 
-### Studio
+- Cross-design pattern detection across visual and buyer dimensions
+- **Winning Formula** extraction — what makes the best designs work
+- DNA metrics comparison with side-by-side results layout
 
-- Start from a real analyzed design
-- Clone, create variations, or explore new concepts
-- Synthesize concepts before generating artwork
-- Generate POD-ready outputs
+### 🎨 Creative Studio
 
-### My Analyses
+An immersive workspace to create new POD artwork grounded in real design analysis:
 
-- Persist analysis history in the cloud
-- Reopen, reuse, compare, or delete past analyses
+- **3 Creative Modes** — Make Variations, Explore New Directions, Clone Design
+- **Goal-driven workflow** — pick a goal → upload reference → AI analyzes → synthesize concepts → generate artwork
+- **AI Concept Synthesis** — mandatory synthesis step before generation ensures coherent results
+- **Two-pass artwork pipeline** — illustration generation → typography decoration
+- **Dimension Shifts** — fine-tune creativity, style, color, and composition per concept
+- **Floating Panel** — overlay configuration panel with collapsible accordion sections
+- **Per-card parallel generation** — generate artwork on individual concept cards simultaneously
 
-### Authentication And Security
+### 📚 Winning Patterns
 
-- Email/password and Google OAuth via Supabase Auth
-- Server-side API proxy for Gemini calls
-- Encrypted per-user API key storage
-- Row Level Security on persisted data
+Save and reuse insights from your best comparisons:
 
-## UI Status
+- Browse patterns in grid or list view with search
+- Full detail view with DNA breakdown
+- Send any pattern directly into Creative Studio as a creative foundation
 
-Current frontend direction:
+### 📂 My Analyses
 
-- light-first design system
-- achromatic surfaces with blue accent
-- left sidebar app shell for desktop
-- immersive Studio workspace
+Cloud-persisted analysis history:
 
-Current design baseline lives in [DESIGN.md](./DESIGN.md).
+- Search and filter past analyses
+- Reopen results, compare multiple analyses, or feed them into Studio
+- Context menu actions: View, Use in Studio, Compare, Delete
 
-Current style guide lives in [`.planning/deliverables/STYLE-GUIDE.md`](./.planning/deliverables/STYLE-GUIDE.md).
+### 🔐 Authentication & Security
+
+- **Supabase Auth** — email/password registration + Google OAuth
+- **Server-side API proxy** — all AI prompts run on the backend, never exposed to the client
+- **Encrypted API key storage** — AES-256-GCM encryption with per-key IV
+- **Row Level Security** — all database tables scoped to the authenticated user
+
+### 🏠 Home Dashboard
+
+- Hero banner with quick navigation
+- Bento feature grid with hover animations
+- Onboarding checklist (API key → first analysis → explore patterns)
+- Recent analyses carousel
 
 ## Architecture
 
-```text
-Frontend (React + Vite)
-  -> Hono API proxy
-    -> Gemini models
-    -> Supabase Auth + PostgreSQL
+```
+React SPA (Vite)  →  Hono API (Cloudflare Workers)  →  Gemini AI Models
+                                                    →  Supabase (Auth + PostgreSQL)
 ```
 
 | Layer | Technology |
 | --- | --- |
 | Frontend | React + Vite + TypeScript |
 | Routing | React Router v7 |
-| Backend API | Hono |
+| Backend API | Hono on Cloudflare Workers |
 | Database | Supabase PostgreSQL |
-| Auth | Supabase Auth |
-| AI | Gemini models |
-| Persistence | Per-user analyses and patterns with RLS |
+| Auth | Supabase Auth (email + Google OAuth) |
+| AI | Gemini models (analysis, synthesis, image generation) |
 | Encryption | AES-256-GCM |
+| Deployment | Cloudflare Workers (single-worker: API + SPA) |
 
-## Frontend Structure
+## Project Structure
 
-```text
-design-dna/
-├── app/
-│   ├── src/
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   ├── index.css
-│   │   ├── styles/
-│   │   ├── components/
-│   │   │   ├── layout/
-│   │   │   └── shared/
-│   │   ├── screens/
-│   │   ├── studio/
-│   │   ├── compare/
-│   │   ├── contexts/
-│   │   ├── hooks/
-│   │   ├── api.ts
-│   │   └── apiClient.ts
-├── api/
-│   ├── _src/
-│   │   ├── routes/
-│   │   ├── prompts/
-│   │   ├── middleware/
-│   │   └── lib/
-├── supabase/
-└── .planning/
 ```
-
-### Frontend Contracts
-
-- `components/layout/` owns app shell behavior
-- `components/shared/` owns reusable UI primitives
-- `screens/` owns route-level pages
-- `studio/` owns the immersive studio workflow and state machine
-- `compare/` owns comparison-specific UI
+design-dna/
+├── app/                        # Frontend (React + Vite)
+│   └── src/
+│       ├── screens/            # Route-level pages
+│       │   ├── HomeScreen
+│       │   ├── AnalyzeScreen
+│       │   ├── StudioScreen
+│       │   ├── CompareScreen
+│       │   ├── LibraryScreen
+│       │   ├── MyAnalysesScreen
+│       │   ├── PatternDetailScreen
+│       │   └── ViewAnalysisScreen
+│       ├── studio/             # Creative Studio components & state
+│       ├── compare/            # Comparison-specific UI
+│       ├── components/         # Shared UI (Button, Card, DataGrid...)
+│       ├── contexts/           # Auth & app state providers
+│       ├── hooks/              # Custom hooks
+│       ├── styles/             # CSS design tokens (80+ tokens)
+│       ├── api.ts              # Legacy API helpers
+│       └── apiClient.ts        # Authenticated API client
+├── api/                        # Backend (Hono + Cloudflare Workers)
+│   └── _src/
+│       ├── routes/             # API routes (ai, analyses, patterns, api-keys)
+│       ├── prompts/            # AI prompt modules (server-side only)
+│       ├── middleware/         # Auth middleware (JWT verification)
+│       └── lib/                # Shared utilities (encryption, Supabase client)
+└── supabase/
+    └── schema.sql              # Database schema (profiles, api_keys, analyses, patterns)
+```
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 20+
-- a Supabase project
-- a Gemini API key
+- A Supabase project
+- A Gemini API key
 
 ### Setup
 
-1. Clone the repository.
-2. Run `supabase/schema.sql` in Supabase SQL Editor.
-3. Configure frontend and backend environment variables.
-4. Install dependencies in `app/` and `api/`.
-5. Run the frontend and backend dev servers.
+1. Clone the repository
+2. Run `supabase/schema.sql` in your Supabase SQL Editor
+3. Configure environment variables (see below)
+4. Install dependencies in both `app/` and `api/`
+5. Start dev servers
 
-### Frontend env
-
-`app/.env.local`
+### Frontend env (`app/.env.local`)
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -145,9 +140,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_API_URL=http://localhost:4000
 ```
 
-### Backend env
-
-`api/.env`
+### Backend env (`api/.env`)
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
@@ -160,26 +153,15 @@ PORT=4000
 ### Run locally
 
 ```bash
-# frontend
-cd app
-npm install
-npm run dev
+# Frontend
+cd app && npm install && npm run dev
 
-# backend
-cd ../api
-npm install
-npm run dev
+# Backend (separate terminal)
+cd api && npm install && npm run dev
 ```
 
-Open `http://localhost:5173`, create an account, save your Gemini API key, then start analyzing designs.
-
-## Project Docs
-
-- [DESIGN.md](./DESIGN.md): current design baseline and guardrails
-- [CHANGELOG.md](./CHANGELOG.md): version history
-- [`.planning/REQUIREMENTS.md`](./.planning/REQUIREMENTS.md): active UI redesign requirements
+Open `http://localhost:5173`, create an account, save your Gemini API key in Settings, then start analyzing designs.
 
 ## License
 
 Private project. All rights reserved.
-
